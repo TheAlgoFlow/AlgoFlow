@@ -1,0 +1,294 @@
+{
+  "algorithms": {
+    "bubbleSort": {
+      "name": "Bubble Sort",
+      "description": "Repeatedly compares adjacent elements and swaps them if they are in the wrong order, causing larger elements to 'bubble up' to the end.",
+      "whenToUse": "Primarily educational. Acceptable for very small arrays or nearly-sorted data where simplicity matters more than performance.",
+      "steps": {
+        "comparing": "Comparing {{a}} and {{b}}",
+        "swap": "Swapping {{a}} and {{b}} — {{a}} > {{b}}",
+        "noSwap": "No swap needed — {{a}} ≤ {{b}}",
+        "sorted": "Element {{v}} is in its final position",
+        "done": "Array is sorted!"
+      }
+    },
+    "selectionSort": {
+      "name": "Selection Sort",
+      "description": "Divides the array into sorted and unsorted regions. Repeatedly finds the minimum element from the unsorted region and places it at the beginning.",
+      "whenToUse": "Simple to implement. Use for small arrays where write operations are costly (minimizes swaps). Not suitable for large datasets.",
+      "steps": {
+        "findMin": "Finding minimum in unsorted region starting at index {{i}}",
+        "newMin": "New minimum: {{v}} at index {{i}}",
+        "swap": "Placing minimum {{v}} at position {{i}}",
+        "sorted": "Position {{i}} is now sorted",
+        "done": "Array is sorted!"
+      }
+    },
+    "insertionSort": {
+      "name": "Insertion Sort",
+      "description": "Builds the sorted array one element at a time by inserting each new element into its correct position within the already-sorted portion.",
+      "whenToUse": "Excellent for small arrays or nearly-sorted data. Used as a subroutine in more complex algorithms like Timsort.",
+      "steps": {
+        "pick": "Picking element {{v}} to insert",
+        "compare": "Comparing {{v}} with {{w}} — shifting {{w}} right",
+        "insert": "Inserting {{v}} at position {{i}}",
+        "done": "Array is sorted!"
+      }
+    },
+    "mergeSort": {
+      "name": "Merge Sort",
+      "description": "A divide-and-conquer algorithm that recursively splits the array in half, sorts each half, then merges them back together in sorted order.",
+      "whenToUse": "Reliable O(n log n) for any input. Preferred for linked lists, stable sorting, and external sorting of large datasets.",
+      "steps": {
+        "split": "Splitting array into two halves",
+        "merge": "Merging subarrays [{{left}}] and [{{right}}]",
+        "pick": "Picking {{v}} from the {{side}} array",
+        "done": "Array is sorted!"
+      }
+    },
+    "quickSort": {
+      "name": "Quick Sort",
+      "description": "Selects a pivot element, partitions the array into elements less than and greater than the pivot, then recursively sorts each partition.",
+      "whenToUse": "Average O(n log n) with small constant factor. Typically fastest in practice for in-memory sorting. Widely used in system libraries.",
+      "steps": {
+        "pivot": "Choosing pivot: {{v}}",
+        "compare": "Comparing {{v}} with pivot {{p}}",
+        "swap": "Swapping {{a}} and {{b}}",
+        "place": "Placing pivot {{v}} in final position",
+        "done": "Array is sorted!"
+      }
+    },
+    "heapSort": {
+      "name": "Heap Sort",
+      "description": "Builds a max-heap from the array, then repeatedly extracts the maximum element and places it at the end, rebuilding the heap each time.",
+      "whenToUse": "Guaranteed O(n log n) worst case with O(1) space. Use when worst-case performance is critical and space is constrained.",
+      "steps": {
+        "buildHeap": "Building max-heap",
+        "heapify": "Heapifying at index {{i}}",
+        "extract": "Extracting max {{v}}, placing at position {{i}}",
+        "done": "Array is sorted!"
+      }
+    },
+    "countingSort": {
+      "name": "Counting Sort",
+      "description": "Counts the occurrences of each value, then reconstructs the sorted array by iterating over the count array.",
+      "whenToUse": "O(n+k) time for non-negative integers with small range k. Ideal for sorting integers, characters, or categorical data.",
+      "steps": {
+        "count": "Counting occurrence of {{v}}",
+        "accumulate": "Accumulating counts for position calculation",
+        "place": "Placing {{v}} at its correct position",
+        "done": "Array is sorted!"
+      }
+    },
+    "radixSort": {
+      "name": "Radix Sort",
+      "description": "Sorts numbers digit by digit from least significant to most significant, using a stable sort (like counting sort) for each digit pass.",
+      "whenToUse": "O(d·n) where d is number of digits. Efficient for integers and strings with bounded length. Used in suffix array construction.",
+      "steps": {
+        "pass": "Processing digit place: {{place}}",
+        "bucket": "Placing {{v}} in bucket {{b}}",
+        "collect": "Collecting buckets back to array",
+        "done": "Array is sorted!"
+      }
+    },
+    "linearSearch": {
+      "name": "Linear Search",
+      "description": "Sequentially checks each element until the target is found or the array ends. Works on both sorted and unsorted arrays.",
+      "whenToUse": "Simple O(n) search for small or unsorted arrays. Best when you only search occasionally and the list is short.",
+      "steps": {
+        "check": "Checking index {{i}}: {{v}}",
+        "found": "Found {{target}} at index {{i}}!",
+        "notFound": "{{target}} not found in the array",
+        "move": "{{v}} ≠ {{target}}, moving to next"
+      }
+    },
+    "binarySearch": {
+      "name": "Binary Search",
+      "description": "On a sorted array, repeatedly halves the search space by comparing the target with the middle element.",
+      "whenToUse": "O(log n) search for sorted arrays. Use when the data is sorted and searches are frequent (libraries, databases, competitive programming).",
+      "steps": {
+        "init": "Searching for {{target}} in sorted array",
+        "mid": "Mid index is {{i}}, value is {{v}}",
+        "found": "Found {{target}} at index {{i}}!",
+        "goLeft": "{{target}} < {{v}}, searching left half",
+        "goRight": "{{target}} > {{v}}, searching right half",
+        "notFound": "{{target}} not found"
+      }
+    },
+    "bfs": {
+      "name": "Breadth-First Search",
+      "description": "Explores a graph level by level, visiting all neighbors before moving deeper. Uses a queue to track the next node to visit.",
+      "whenToUse": "Finding shortest paths in unweighted graphs. Level-order traversal. Useful in social networks, GPS navigation, web crawlers.",
+      "steps": {
+        "start": "Starting BFS from node {{node}}",
+        "visit": "Visiting node {{node}}",
+        "enqueue": "Enqueueing neighbors of {{node}}",
+        "dequeue": "Dequeuing node {{node}}",
+        "done": "BFS complete! Visited: {{visited}}"
+      }
+    },
+    "dfs": {
+      "name": "Depth-First Search",
+      "description": "Explores as far as possible along each branch before backtracking. Uses a stack (or recursion) to track nodes to visit.",
+      "whenToUse": "Cycle detection, topological sort, path finding, maze solving. Memory-efficient for deep graphs compared to BFS.",
+      "steps": {
+        "start": "Starting DFS from node {{node}}",
+        "visit": "Visiting node {{node}}",
+        "backtrack": "Backtracking from node {{node}}",
+        "done": "DFS complete! Visited: {{visited}}"
+      }
+    },
+    "arrayOps": {
+      "name": "Array Operations",
+      "description": "Fundamental operations on arrays: access, insertion, deletion, and search. The foundation of most data structure implementations.",
+      "whenToUse": "Arrays provide O(1) random access and are cache-friendly. Use when index-based access is frequent and size is known.",
+      "steps": {
+        "access": "Accessing index {{i}}: value is {{v}}",
+        "insert": "Inserting {{v}} at index {{i}}",
+        "shift": "Shifting elements to make room",
+        "delete": "Deleting element at index {{i}}",
+        "search": "Searching for {{v}}"
+      }
+    },
+    "linkedList": {
+      "name": "Singly Linked List",
+      "description": "A sequence of nodes where each node stores a value and a pointer to the next node. Allows efficient insertion and deletion at any point.",
+      "whenToUse": "When frequent insertions/deletions are needed and random access is not required. Foundation for stacks, queues, and hash table chaining.",
+      "steps": {
+        "insert": "Inserting {{v}} at head",
+        "append": "Appending {{v}} at tail",
+        "delete": "Deleting node with value {{v}}",
+        "traverse": "Traversing: current node is {{v}}",
+        "done": "Operation complete"
+      }
+    },
+    "stack": {
+      "name": "Stack",
+      "description": "A Last-In-First-Out (LIFO) data structure. Elements are added and removed from the same end (top).",
+      "whenToUse": "Function call management, undo operations, expression evaluation, backtracking algorithms (DFS), and browser history.",
+      "steps": {
+        "push": "Pushing {{v}} onto the stack",
+        "pop": "Popping {{v}} from the stack",
+        "peek": "Peeking at top: {{v}}",
+        "empty": "Stack is empty",
+        "done": "Operation complete"
+      }
+    },
+    "queue": {
+      "name": "Queue",
+      "description": "A First-In-First-Out (FIFO) data structure. Elements are added at the rear and removed from the front.",
+      "whenToUse": "Task scheduling, BFS, print spoolers, messaging systems, and any scenario requiring ordered processing.",
+      "steps": {
+        "enqueue": "Enqueueing {{v}} at rear",
+        "dequeue": "Dequeueing {{v}} from front",
+        "peek": "Front element is {{v}}",
+        "empty": "Queue is empty",
+        "done": "Operation complete"
+      }
+    },
+    "binaryTree": {
+      "name": "Binary Tree Traversals",
+      "description": "Three ways to visit all nodes: in-order (left-root-right), pre-order (root-left-right), and post-order (left-right-root).",
+      "whenToUse": "In-order gives sorted output for BST. Pre-order for copying/serializing trees. Post-order for deletion and evaluation.",
+      "steps": {
+        "visit": "Visiting node {{v}}",
+        "goLeft": "Going left from {{v}}",
+        "goRight": "Going right from {{v}}",
+        "backtrack": "Backtracking from {{v}}",
+        "done": "Traversal complete: [{{order}}]"
+      }
+    },
+    "bst": {
+      "name": "Binary Search Tree",
+      "description": "A binary tree where the left subtree contains only nodes with values less than the root, and the right subtree only nodes greater.",
+      "whenToUse": "Efficient O(log n) search, insert, delete when balanced. Foundation for sets, maps, and ordered data structures.",
+      "steps": {
+        "search": "Searching for {{v}}",
+        "insert": "Inserting {{v}}",
+        "compare": "{{v}} vs {{node}}: going {{dir}}",
+        "found": "Found {{v}}!",
+        "placed": "Placing {{v}} here",
+        "done": "Operation complete"
+      }
+    },
+    "hashTable": {
+      "name": "Hash Table",
+      "description": "Maps keys to values using a hash function. Provides average O(1) insert, delete, and lookup with chaining for collision handling.",
+      "whenToUse": "When you need fast key-value lookups. Used in caches, databases, compilers, and most modern language runtimes.",
+      "steps": {
+        "hash": "hash({{key}}) = {{h}} → bucket {{b}}",
+        "insert": "Inserting key={{key}}, value={{val}} at bucket {{b}}",
+        "collision": "Collision at bucket {{b}}, chaining",
+        "lookup": "Looking up key={{key}}",
+        "found": "Found key={{key}}: value={{val}}",
+        "done": "Operation complete"
+      }
+    },
+    "minHeap": {
+      "name": "Min-Heap",
+      "description": "A complete binary tree where every parent node is smaller than its children. The root is always the minimum element.",
+      "whenToUse": "Priority queues, Dijkstra's algorithm, heap sort, scheduling systems. O(log n) insert and O(1) min access.",
+      "steps": {
+        "insert": "Inserting {{v}} at end",
+        "bubbleUp": "Bubbling up {{v}}: swapping with parent {{p}}",
+        "extractMin": "Extracting minimum: {{v}}",
+        "heapify": "Heapifying down from root",
+        "swap": "Swapping {{a}} with smaller child {{b}}",
+        "done": "Heap property maintained"
+      }
+    },
+    "fibonacci": {
+      "name": "Fibonacci",
+      "description": "Computes Fibonacci numbers using memoization (top-down) or tabulation (bottom-up), showing how DP eliminates redundant computation.",
+      "whenToUse": "Demonstrates the core DP concept. Memoization vs tabulation trade-offs apply to many optimization problems.",
+      "steps": {
+        "compute": "Computing F({{n}})",
+        "memo": "F({{n}}) already computed: {{v}}",
+        "fill": "F({{n}}) = F({{a}}) + F({{b}}) = {{v}}",
+        "done": "F({{n}}) = {{v}}"
+      }
+    },
+    "knapsack": {
+      "name": "0/1 Knapsack",
+      "description": "Finds the maximum value subset of items that fits in a weight-capacity knapsack, where each item can be taken or left.",
+      "whenToUse": "Resource allocation, budget optimization, cargo loading. Classic DP problem with many real-world variants.",
+      "steps": {
+        "fill": "dp[{{i}}][{{w}}]: item {{name}} (wt={{wt}}, val={{val}}), capacity {{w}}",
+        "include": "Including item {{name}}: dp[{{i}}][{{w}}] = {{v}}",
+        "exclude": "Excluding item {{name}}: dp[{{i}}][{{w}}] = {{v}}",
+        "done": "Maximum value: {{v}}"
+      }
+    },
+    "lcs": {
+      "name": "Longest Common Subsequence",
+      "description": "Finds the longest subsequence present in both strings in the same relative order (not necessarily contiguous).",
+      "whenToUse": "Diff tools (git), spell checkers, bioinformatics (DNA comparison), version control systems.",
+      "steps": {
+        "match": "Characters match: '{{c}}', dp[{{i}}][{{j}}] = {{v}}",
+        "noMatch": "No match: dp[{{i}}][{{j}}] = max({{a}}, {{b}}) = {{v}}",
+        "done": "LCS length: {{v}}"
+      }
+    },
+    "lis": {
+      "name": "Longest Increasing Subsequence",
+      "description": "Finds the longest subsequence of a sequence in which the elements are in strictly increasing order.",
+      "whenToUse": "Patience sorting, stock trading problems, chain problems, patience game analysis.",
+      "steps": {
+        "check": "Checking dp[{{i}}] using dp[{{j}}]",
+        "update": "dp[{{i}}] updated to {{v}} (ending with {{x}})",
+        "done": "LIS length: {{v}}"
+      }
+    },
+    "coinChange": {
+      "name": "Coin Change",
+      "description": "Finds the minimum number of coins needed to make a given amount, given an array of coin denominations.",
+      "whenToUse": "Currency systems, vending machines, any problem requiring minimum resources to reach a target.",
+      "steps": {
+        "coin": "Trying coin {{c}} for amount {{a}}",
+        "update": "dp[{{a}}] = min({{prev}}, dp[{{rem}}]+1) = {{v}}",
+        "skip": "Coin {{c}} > amount {{a}}, skipping",
+        "done": "Minimum coins for {{amount}}: {{v}}"
+      }
+    }
+  }
+}

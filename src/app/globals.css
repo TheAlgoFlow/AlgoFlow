@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-purple: #7c3aed;
+  --color-brand-blue: #2563eb;
+  --color-brand-green: #16a34a;
+  --color-brand-orange: #ea580c;
+  --color-brand-pink: #db2777;
+  --color-brand-teal: #0d9488;
+
+  --color-bar-default: #6366f1;
+  --color-bar-compare: #f59e0b;
+  --color-bar-swap: #ef4444;
+  --color-bar-pivot: #8b5cf6;
+  --color-bar-found: #10b981;
+  --color-bar-visited: #6366f1;
+  --color-bar-current: #f59e0b;
+  --color-bar-sorted: #10b981;
+
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
+  background-color: #0f172a;
+  color: #f1f5f9;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* Code panel */
+.code-panel {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.code-line {
+  display: block;
+  padding: 1px 12px;
+  transition: background-color 0.15s ease;
+}
+
+.code-line.active {
+  background-color: rgba(99, 102, 241, 0.25);
+  border-left: 3px solid #6366f1;
+  padding-left: 9px;
+}
+
+/* Animation classes */
+.bar-transition {
+  transition: height 0.3s ease, background-color 0.2s ease;
+}
+
+.element-transition {
+  transition: background-color 0.2s ease, transform 0.3s ease, border-color 0.2s ease;
+}

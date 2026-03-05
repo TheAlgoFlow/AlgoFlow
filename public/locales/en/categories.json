@@ -1,0 +1,28 @@
+{
+  "categories": {
+    "sorting": {
+      "name": "Sorting",
+      "description": "Algorithms that arrange elements in a specific order",
+      "whenToUse": "Use when you need to order data for efficient searching, display, or further processing.",
+      "count": "8 algorithms"
+    },
+    "searching": {
+      "name": "Searching",
+      "description": "Algorithms for finding elements in data structures",
+      "whenToUse": "Use when you need to locate specific elements in arrays, trees, or graphs.",
+      "count": "4 algorithms"
+    },
+    "data-structures": {
+      "name": "Data Structures",
+      "description": "Fundamental structures for organizing and storing data",
+      "whenToUse": "Use to understand the building blocks of efficient programs.",
+      "count": "8 structures"
+    },
+    "dp": {
+      "name": "Dynamic Programming",
+      "description": "Optimization technique for solving complex problems",
+      "whenToUse": "Use when a problem has overlapping subproblems and optimal substructure.",
+      "count": "5 algorithms"
+    }
+  }
+}

@@ -1,0 +1,294 @@
+{
+  "algorithms": {
+    "bubbleSort": {
+      "name": "Bubble Sort",
+      "description": "Compara repetidamente elementos adjacentes e os troca se estiverem na ordem errada, fazendo elementos maiores 'borbulharem' para o fim.",
+      "whenToUse": "Principalmente educacional. Aceitável para arrays muito pequenos ou quase ordenados onde a simplicidade importa mais que o desempenho.",
+      "steps": {
+        "comparing": "Comparando {{a}} e {{b}}",
+        "swap": "Trocando {{a}} e {{b}} — {{a}} > {{b}}",
+        "noSwap": "Sem troca necessária — {{a}} ≤ {{b}}",
+        "sorted": "Elemento {{v}} está na posição final",
+        "done": "Array ordenado!"
+      }
+    },
+    "selectionSort": {
+      "name": "Selection Sort",
+      "description": "Divide o array em regiões ordenada e não-ordenada. Encontra repetidamente o mínimo da região não-ordenada e o coloca no início.",
+      "whenToUse": "Simples de implementar. Use para arrays pequenos onde operações de escrita são custosas (minimiza trocas). Não adequado para grandes conjuntos.",
+      "steps": {
+        "findMin": "Encontrando mínimo na região não-ordenada começando no índice {{i}}",
+        "newMin": "Novo mínimo: {{v}} no índice {{i}}",
+        "swap": "Colocando mínimo {{v}} na posição {{i}}",
+        "sorted": "Posição {{i}} está ordenada",
+        "done": "Array ordenado!"
+      }
+    },
+    "insertionSort": {
+      "name": "Insertion Sort",
+      "description": "Constrói o array ordenado elemento por elemento, inserindo cada novo elemento na posição correta dentro da parte já ordenada.",
+      "whenToUse": "Excelente para arrays pequenos ou quase ordenados. Usado como sub-rotina em algoritmos mais complexos como Timsort.",
+      "steps": {
+        "pick": "Selecionando elemento {{v}} para inserir",
+        "compare": "Comparando {{v}} com {{w}} — deslocando {{w}} para direita",
+        "insert": "Inserindo {{v}} na posição {{i}}",
+        "done": "Array ordenado!"
+      }
+    },
+    "mergeSort": {
+      "name": "Merge Sort",
+      "description": "Algoritmo de divisão e conquista que recursivamente divide o array ao meio, ordena cada metade e mescla de volta em ordem.",
+      "whenToUse": "O(n log n) confiável para qualquer entrada. Preferível para listas encadeadas, ordenação estável e ordenação externa de grandes conjuntos.",
+      "steps": {
+        "split": "Dividindo array em duas metades",
+        "merge": "Mesclando subarrays [{{left}}] e [{{right}}]",
+        "pick": "Selecionando {{v}} do array {{side}}",
+        "done": "Array ordenado!"
+      }
+    },
+    "quickSort": {
+      "name": "Quick Sort",
+      "description": "Seleciona um elemento pivô, particiona o array em elementos menores e maiores que o pivô, e recursivamente ordena cada partição.",
+      "whenToUse": "O(n log n) médio com pequena constante. Tipicamente o mais rápido na prática para ordenação em memória. Amplamente usado em bibliotecas de sistema.",
+      "steps": {
+        "pivot": "Escolhendo pivô: {{v}}",
+        "compare": "Comparando {{v}} com pivô {{p}}",
+        "swap": "Trocando {{a}} e {{b}}",
+        "place": "Colocando pivô {{v}} na posição final",
+        "done": "Array ordenado!"
+      }
+    },
+    "heapSort": {
+      "name": "Heap Sort",
+      "description": "Constrói um max-heap do array, então extrai repetidamente o elemento máximo e o coloca no final, reconstruindo o heap a cada vez.",
+      "whenToUse": "O(n log n) garantido no pior caso com O(1) de espaço. Use quando o desempenho no pior caso é crítico e o espaço é limitado.",
+      "steps": {
+        "buildHeap": "Construindo max-heap",
+        "heapify": "Heapificando no índice {{i}}",
+        "extract": "Extraindo máximo {{v}}, colocando na posição {{i}}",
+        "done": "Array ordenado!"
+      }
+    },
+    "countingSort": {
+      "name": "Counting Sort",
+      "description": "Conta as ocorrências de cada valor, então reconstrói o array ordenado iterando sobre o array de contagem.",
+      "whenToUse": "O(n+k) para inteiros não-negativos com pequeno intervalo k. Ideal para ordenar inteiros, caracteres ou dados categóricos.",
+      "steps": {
+        "count": "Contando ocorrência de {{v}}",
+        "accumulate": "Acumulando contagens para calcular posições",
+        "place": "Colocando {{v}} na posição correta",
+        "done": "Array ordenado!"
+      }
+    },
+    "radixSort": {
+      "name": "Radix Sort",
+      "description": "Ordena números dígito por dígito do menos significativo ao mais significativo, usando uma ordenação estável para cada passagem.",
+      "whenToUse": "O(d·n) onde d é o número de dígitos. Eficiente para inteiros e strings de comprimento limitado.",
+      "steps": {
+        "pass": "Processando posição de dígito: {{place}}",
+        "bucket": "Colocando {{v}} no bucket {{b}}",
+        "collect": "Coletando buckets de volta ao array",
+        "done": "Array ordenado!"
+      }
+    },
+    "linearSearch": {
+      "name": "Busca Linear",
+      "description": "Verifica cada elemento sequencialmente até encontrar o alvo ou atingir o fim. Funciona em arrays ordenados e não-ordenados.",
+      "whenToUse": "Busca O(n) simples para arrays pequenos ou não-ordenados. Melhor quando buscas são raras e a lista é curta.",
+      "steps": {
+        "check": "Verificando índice {{i}}: {{v}}",
+        "found": "Encontrado {{target}} no índice {{i}}!",
+        "notFound": "{{target}} não encontrado no array",
+        "move": "{{v}} ≠ {{target}}, movendo para o próximo"
+      }
+    },
+    "binarySearch": {
+      "name": "Busca Binária",
+      "description": "Em um array ordenado, divide repetidamente o espaço de busca ao meio comparando o alvo com o elemento do meio.",
+      "whenToUse": "Busca O(log n) para arrays ordenados. Use quando os dados estão ordenados e buscas são frequentes.",
+      "steps": {
+        "init": "Buscando {{target}} no array ordenado",
+        "mid": "Índice do meio é {{i}}, valor é {{v}}",
+        "found": "Encontrado {{target}} no índice {{i}}!",
+        "goLeft": "{{target}} < {{v}}, buscando na metade esquerda",
+        "goRight": "{{target}} > {{v}}, buscando na metade direita",
+        "notFound": "{{target}} não encontrado"
+      }
+    },
+    "bfs": {
+      "name": "Busca em Largura (BFS)",
+      "description": "Explora um grafo nível por nível, visitando todos os vizinhos antes de ir mais fundo. Usa uma fila para rastrear o próximo nó a visitar.",
+      "whenToUse": "Encontrar caminhos mais curtos em grafos não-ponderados. Travessia por nível. Útil em redes sociais, GPS, rastreadores web.",
+      "steps": {
+        "start": "Iniciando BFS pelo nó {{node}}",
+        "visit": "Visitando nó {{node}}",
+        "enqueue": "Enfileirando vizinhos de {{node}}",
+        "dequeue": "Desenfileirando nó {{node}}",
+        "done": "BFS completo! Visitados: {{visited}}"
+      }
+    },
+    "dfs": {
+      "name": "Busca em Profundidade (DFS)",
+      "description": "Explora o máximo possível em cada ramificação antes de retroceder. Usa uma pilha (ou recursão) para rastrear nós a visitar.",
+      "whenToUse": "Detecção de ciclos, ordenação topológica, encontrar caminhos, resolver labirintos. Eficiente em memória para grafos profundos.",
+      "steps": {
+        "start": "Iniciando DFS pelo nó {{node}}",
+        "visit": "Visitando nó {{node}}",
+        "backtrack": "Retrocedendo do nó {{node}}",
+        "done": "DFS completo! Visitados: {{visited}}"
+      }
+    },
+    "arrayOps": {
+      "name": "Operações em Array",
+      "description": "Operações fundamentais em arrays: acesso, inserção, deleção e busca. A base da maioria das implementações de estruturas de dados.",
+      "whenToUse": "Arrays oferecem acesso aleatório O(1) e são cache-friendly. Use quando o acesso por índice é frequente e o tamanho é conhecido.",
+      "steps": {
+        "access": "Acessando índice {{i}}: valor é {{v}}",
+        "insert": "Inserindo {{v}} no índice {{i}}",
+        "shift": "Deslocando elementos para abrir espaço",
+        "delete": "Deletando elemento no índice {{i}}",
+        "search": "Buscando {{v}}"
+      }
+    },
+    "linkedList": {
+      "name": "Lista Encadeada Simples",
+      "description": "Uma sequência de nós onde cada nó armazena um valor e um ponteiro para o próximo nó. Permite inserção e deleção eficientes em qualquer ponto.",
+      "whenToUse": "Quando inserções/deleções frequentes são necessárias e acesso aleatório não é exigido. Base para pilhas, filas e tabelas hash.",
+      "steps": {
+        "insert": "Inserindo {{v}} na cabeça",
+        "append": "Adicionando {{v}} na cauda",
+        "delete": "Deletando nó com valor {{v}}",
+        "traverse": "Percorrendo: nó atual é {{v}}",
+        "done": "Operação concluída"
+      }
+    },
+    "stack": {
+      "name": "Pilha",
+      "description": "Uma estrutura de dados LIFO (Último a Entrar, Primeiro a Sair). Elementos são adicionados e removidos pelo mesmo lado (topo).",
+      "whenToUse": "Gerenciamento de chamadas de função, operações de desfazer, avaliação de expressões, algoritmos de retrocesso (DFS), histórico do navegador.",
+      "steps": {
+        "push": "Empilhando {{v}}",
+        "pop": "Desempilhando {{v}}",
+        "peek": "Espiando o topo: {{v}}",
+        "empty": "Pilha vazia",
+        "done": "Operação concluída"
+      }
+    },
+    "queue": {
+      "name": "Fila",
+      "description": "Uma estrutura de dados FIFO (Primeiro a Entrar, Primeiro a Sair). Elementos são adicionados no final e removidos do início.",
+      "whenToUse": "Escalonamento de tarefas, BFS, spoolers de impressão, sistemas de mensagens e qualquer cenário que requer processamento ordenado.",
+      "steps": {
+        "enqueue": "Enfileirando {{v}} no final",
+        "dequeue": "Desenfileirando {{v}} do início",
+        "peek": "Elemento da frente é {{v}}",
+        "empty": "Fila vazia",
+        "done": "Operação concluída"
+      }
+    },
+    "binaryTree": {
+      "name": "Travessias em Árvore Binária",
+      "description": "Três formas de visitar todos os nós: em ordem (esq-raiz-dir), pré-ordem (raiz-esq-dir) e pós-ordem (esq-dir-raiz).",
+      "whenToUse": "Em ordem dá saída ordenada para BST. Pré-ordem para copiar/serializar árvores. Pós-ordem para deleção e avaliação.",
+      "steps": {
+        "visit": "Visitando nó {{v}}",
+        "goLeft": "Indo à esquerda de {{v}}",
+        "goRight": "Indo à direita de {{v}}",
+        "backtrack": "Retrocedendo de {{v}}",
+        "done": "Travessia completa: [{{order}}]"
+      }
+    },
+    "bst": {
+      "name": "Árvore Binária de Busca",
+      "description": "Uma árvore binária onde a subárvore esquerda contém apenas nós com valores menores que a raiz, e a direita apenas maiores.",
+      "whenToUse": "Busca, inserção e deleção eficientes em O(log n) quando balanceada. Base para conjuntos, mapas e estruturas de dados ordenadas.",
+      "steps": {
+        "search": "Buscando {{v}}",
+        "insert": "Inserindo {{v}}",
+        "compare": "{{v}} vs {{node}}: indo para {{dir}}",
+        "found": "Encontrado {{v}}!",
+        "placed": "Colocando {{v}} aqui",
+        "done": "Operação concluída"
+      }
+    },
+    "hashTable": {
+      "name": "Tabela Hash",
+      "description": "Mapeia chaves para valores usando uma função hash. Fornece inserção, deleção e busca em O(1) médio com encadeamento para colisões.",
+      "whenToUse": "Quando você precisa de buscas rápidas por chave-valor. Usado em caches, bancos de dados, compiladores e a maioria dos runtimes modernos.",
+      "steps": {
+        "hash": "hash({{key}}) = {{h}} → bucket {{b}}",
+        "insert": "Inserindo chave={{key}}, valor={{val}} no bucket {{b}}",
+        "collision": "Colisão no bucket {{b}}, encadeando",
+        "lookup": "Buscando chave={{key}}",
+        "found": "Encontrado chave={{key}}: valor={{val}}",
+        "done": "Operação concluída"
+      }
+    },
+    "minHeap": {
+      "name": "Min-Heap",
+      "description": "Uma árvore binária completa onde todo nó pai é menor que seus filhos. A raiz é sempre o elemento mínimo.",
+      "whenToUse": "Filas de prioridade, algoritmo de Dijkstra, heap sort, sistemas de escalonamento. Inserção O(log n) e acesso ao mínimo O(1).",
+      "steps": {
+        "insert": "Inserindo {{v}} no final",
+        "bubbleUp": "Subindo {{v}}: trocando com pai {{p}}",
+        "extractMin": "Extraindo mínimo: {{v}}",
+        "heapify": "Heapificando para baixo a partir da raiz",
+        "swap": "Trocando {{a}} com filho menor {{b}}",
+        "done": "Propriedade de heap mantida"
+      }
+    },
+    "fibonacci": {
+      "name": "Fibonacci",
+      "description": "Computa números de Fibonacci usando memoização (top-down) ou tabulação (bottom-up), mostrando como PD elimina computação redundante.",
+      "whenToUse": "Demonstra o conceito central de PD. As trocas entre memoização e tabulação se aplicam a muitos problemas de otimização.",
+      "steps": {
+        "compute": "Computando F({{n}})",
+        "memo": "F({{n}}) já computado: {{v}}",
+        "fill": "F({{n}}) = F({{a}}) + F({{b}}) = {{v}}",
+        "done": "F({{n}}) = {{v}}"
+      }
+    },
+    "knapsack": {
+      "name": "Mochila 0/1",
+      "description": "Encontra o subconjunto de itens de valor máximo que cabe em uma mochila com capacidade de peso, onde cada item pode ser levado ou não.",
+      "whenToUse": "Alocação de recursos, otimização de orçamento, carregamento de carga. Problema clássico de PD com muitas variantes reais.",
+      "steps": {
+        "fill": "dp[{{i}}][{{w}}]: item {{name}} (peso={{wt}}, val={{val}}), capacidade {{w}}",
+        "include": "Incluindo item {{name}}: dp[{{i}}][{{w}}] = {{v}}",
+        "exclude": "Excluindo item {{name}}: dp[{{i}}][{{w}}] = {{v}}",
+        "done": "Valor máximo: {{v}}"
+      }
+    },
+    "lcs": {
+      "name": "Maior Subsequência Comum",
+      "description": "Encontra a maior subsequência presente em ambas as strings na mesma ordem relativa (não necessariamente contígua).",
+      "whenToUse": "Ferramentas de diff (git), corretores ortográficos, bioinformática (comparação de DNA), sistemas de controle de versão.",
+      "steps": {
+        "match": "Caracteres iguais: '{{c}}', dp[{{i}}][{{j}}] = {{v}}",
+        "noMatch": "Sem correspondência: dp[{{i}}][{{j}}] = max({{a}}, {{b}}) = {{v}}",
+        "done": "Tamanho da MSC: {{v}}"
+      }
+    },
+    "lis": {
+      "name": "Maior Subsequência Crescente",
+      "description": "Encontra a maior subsequência de uma sequência na qual os elementos estão em ordem estritamente crescente.",
+      "whenToUse": "Ordenação por paciência, problemas de trading de ações, problemas de correntes, análise do jogo de paciência.",
+      "steps": {
+        "check": "Verificando dp[{{i}}] usando dp[{{j}}]",
+        "update": "dp[{{i}}] atualizado para {{v}} (terminando com {{x}})",
+        "done": "Tamanho da MSC: {{v}}"
+      }
+    },
+    "coinChange": {
+      "name": "Troco de Moedas",
+      "description": "Encontra o número mínimo de moedas necessárias para fazer um determinado valor, dado um array de denominações.",
+      "whenToUse": "Sistemas monetários, máquinas de venda automática, qualquer problema que requer recursos mínimos para atingir um alvo.",
+      "steps": {
+        "coin": "Tentando moeda {{c}} para o valor {{a}}",
+        "update": "dp[{{a}}] = min({{prev}}, dp[{{rem}}]+1) = {{v}}",
+        "skip": "Moeda {{c}} > valor {{a}}, pulando",
+        "done": "Mínimo de moedas para {{amount}}: {{v}}"
+      }
+    }
+  }
+}

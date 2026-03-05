@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Home",
+    "visualizer": "Visualizer",
+    "sorting": "Sorting",
+    "searching": "Searching",
+    "dataStructures": "Data Structures",
+    "dp": "Dynamic Programming"
+  },
+  "controls": {
+    "play": "Play",
+    "pause": "Pause",
+    "stepBack": "Step Back",
+    "stepForward": "Step Forward",
+    "reset": "Reset",
+    "speed": "Speed",
+    "step": "Step",
+    "of": "of"
+  },
+  "input": {
+    "preset": "Preset",
+    "custom": "Custom array",
+    "customPlaceholder": "e.g. 5,3,8,1,9,2",
+    "target": "Target",
+    "targetPlaceholder": "Search target",
+    "run": "Run",
+    "apply": "Apply"
+  },
+  "complexity": {
+    "time": "Time",
+    "space": "Space",
+    "best": "Best",
+    "average": "Average",
+    "worst": "Worst"
+  },
+  "tabs": {
+    "typescript": "TypeScript",
+    "python": "Python",
+    "c": "C",
+    "java": "Java",
+    "go": "Go"
+  },
+  "hero": {
+    "title": "DSA Visualizer",
+    "tagline": "Learn algorithms through interactive animations",
+    "subtitle": "Step-by-step visualizations for 25 algorithms across 4 categories. Free, open-source, and designed for students.",
+    "explore": "Explore Algorithms",
+    "viewSource": "View Source"
+  },
+  "back": "← Back",
+  "algorithms": "Algorithms",
+  "tags": "Tags",
+  "description": "Description",
+  "whenToUse": "When to use",
+  "codeline": "Line"
+}

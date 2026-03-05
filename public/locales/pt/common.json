@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Início",
+    "visualizer": "Visualizador",
+    "sorting": "Ordenação",
+    "searching": "Busca",
+    "dataStructures": "Estruturas de Dados",
+    "dp": "Programação Dinâmica"
+  },
+  "controls": {
+    "play": "Reproduzir",
+    "pause": "Pausar",
+    "stepBack": "Passo Anterior",
+    "stepForward": "Próximo Passo",
+    "reset": "Reiniciar",
+    "speed": "Velocidade",
+    "step": "Passo",
+    "of": "de"
+  },
+  "input": {
+    "preset": "Predefinição",
+    "custom": "Array personalizado",
+    "customPlaceholder": "ex: 5,3,8,1,9,2",
+    "target": "Alvo",
+    "targetPlaceholder": "Valor a buscar",
+    "run": "Executar",
+    "apply": "Aplicar"
+  },
+  "complexity": {
+    "time": "Tempo",
+    "space": "Espaço",
+    "best": "Melhor",
+    "average": "Médio",
+    "worst": "Pior"
+  },
+  "tabs": {
+    "typescript": "TypeScript",
+    "python": "Python",
+    "c": "C",
+    "java": "Java",
+    "go": "Go"
+  },
+  "hero": {
+    "title": "DSA Visualizador",
+    "tagline": "Aprenda algoritmos com animações interativas",
+    "subtitle": "Visualizações passo a passo de 25 algoritmos em 4 categorias. Gratuito, open-source e feito para estudantes.",
+    "explore": "Explorar Algoritmos",
+    "viewSource": "Ver Código"
+  },
+  "back": "← Voltar",
+  "algorithms": "Algoritmos",
+  "tags": "Tags",
+  "description": "Descrição",
+  "whenToUse": "Quando usar",
+  "codeline": "Linha"
+}

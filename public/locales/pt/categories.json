@@ -1,0 +1,28 @@
+{
+  "categories": {
+    "sorting": {
+      "name": "Ordenação",
+      "description": "Algoritmos que organizam elementos em uma ordem específica",
+      "whenToUse": "Use quando precisar ordenar dados para busca eficiente, exibição ou processamento posterior.",
+      "count": "8 algoritmos"
+    },
+    "searching": {
+      "name": "Busca",
+      "description": "Algoritmos para encontrar elementos em estruturas de dados",
+      "whenToUse": "Use quando precisar localizar elementos específicos em arrays, árvores ou grafos.",
+      "count": "4 algoritmos"
+    },
+    "data-structures": {
+      "name": "Estruturas de Dados",
+      "description": "Estruturas fundamentais para organizar e armazenar dados",
+      "whenToUse": "Use para entender os blocos de construção de programas eficientes.",
+      "count": "8 estruturas"
+    },
+    "dp": {
+      "name": "Programação Dinâmica",
+      "description": "Técnica de otimização para resolver problemas complexos",
+      "whenToUse": "Use quando um problema tem subproblemas sobrepostos e subestrutura ótima.",
+      "count": "5 algoritmos"
+    }
+  }
+}
