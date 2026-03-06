@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import {
   LineChart,
   Line,
@@ -98,15 +99,6 @@ function cap(v: number, max = 30) {
 
 const N = Array.from({ length: 20 }, (_, i) => i + 1)
 
-const chartData = N.map(n => ({
-  n,
-  'O(1)': cap(1),
-  'O(log n)': parseFloat(cap(Math.log2(n)).toFixed(2)),
-  'O(n)': cap(n),
-  'O(n log n)': parseFloat(cap(n * Math.log2(n)).toFixed(2)),
-  'O(n²)': cap(n * n),
-  'O(2ⁿ)': cap(Math.pow(2, n)),
-}))
 
 function buildSparkData(notation: string) {
   return N.map(n => {
@@ -127,10 +119,12 @@ function CustomTooltip({
   active,
   payload,
   label,
+  yMax = 30,
 }: {
   active?: boolean
   payload?: Array<{ dataKey: string; value: number; color: string }>
   label?: number
+  yMax?: number
 }) {
   if (!active || !payload?.length) return null
   return (
@@ -175,11 +169,11 @@ function CustomTooltip({
             style={{
               fontSize: '12px',
               fontWeight: 600,
-              color: entry.value >= 30 ? '#C8BDB0' : entry.color,
-              fontStyle: entry.value >= 30 ? 'italic' : 'normal',
+              color: entry.value >= yMax ? '#C8BDB0' : entry.color,
+              fontStyle: entry.value >= yMax ? 'italic' : 'normal',
             }}
           >
-            {entry.value >= 30 ? '≥ 30' : entry.value}
+            {entry.value >= yMax ? '≥ ' + yMax : entry.value}
           </span>
         </div>
       ))}
@@ -190,6 +184,27 @@ function CustomTooltip({
 /* ─── Page ───────────────────────────────────────────────────────────── */
 
 export default function BigOPage() {
+  const [yMax, setYMax] = useState(30)
+  const [inputVal, setInputVal] = useState('30')
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const parsed = Math.max(1, Number(inputVal))
+      if (!isNaN(parsed)) setYMax(parsed)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [inputVal])
+
+  const chartData = N.map(n => ({
+    n,
+    'O(1)': cap(1, yMax),
+    'O(log n)': parseFloat(cap(Math.log2(n), yMax).toFixed(2)),
+    'O(n)': cap(n, yMax),
+    'O(n log n)': parseFloat(cap(n * Math.log2(n), yMax).toFixed(2)),
+    'O(n²)': cap(n * n, yMax),
+    'O(2ⁿ)': cap(Math.pow(2, n), yMax),
+  }))
+
   return (
     <div style={{ background: '#F5F1EB', minHeight: 'calc(100vh - 64px)' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'clamp(40px,6vw,80px) 24px' }}>
@@ -249,29 +264,67 @@ export default function BigOPage() {
             boxShadow: '0 2px 20px rgba(28,25,23,0.06)',
           }}
         >
-          <div style={{ marginBottom: '24px' }}>
-            <h2
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '22px',
-                fontWeight: 800,
-                color: '#1C1917',
-                letterSpacing: '-0.02em',
-                marginBottom: '6px',
-              }}
-            >
-              Growth Curves
-            </h2>
-            <p
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '11px',
-                color: '#C8BDB0',
-                letterSpacing: '0.04em',
-              }}
-            >
-              Operations vs. input size n = 1..20 — y-axis capped at 30 for readability
-            </p>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '24px', gap: '16px', flexWrap: 'wrap' }}>
+            <div>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '22px',
+                  fontWeight: 800,
+                  color: '#1C1917',
+                  letterSpacing: '-0.02em',
+                  marginBottom: '6px',
+                }}
+              >
+                Growth Curves
+              </h2>
+              <p
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '11px',
+                  color: '#C8BDB0',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                Operations vs. input size n = 1..20 — y-axis capped at {yMax} for readability
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
+              <label
+                htmlFor="ymax-input"
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '9px',
+                  fontWeight: 700,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: '#C8BDB0',
+                }}
+              >
+                y max
+              </label>
+              <input
+                id="ymax-input"
+                type="number"
+                min="1"
+                value={inputVal}
+                onChange={e => setInputVal(e.target.value)}
+                style={{
+                  width: '80px',
+                  height: '32px',
+                  padding: '0 8px',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: '#1C1917',
+                  background: '#FDFCFA',
+                  border: '1.5px solid #E5DDD0',
+                  borderRadius: '6px',
+                  outline: 'none',
+                  textAlign: 'right',
+                }}
+              />
+            </div>
           </div>
 
           <ResponsiveContainer width="100%" height={360}>
@@ -293,10 +346,10 @@ export default function BigOPage() {
                 tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: '#78716C' }}
                 axisLine={{ stroke: '#E5DDD0' }}
                 tickLine={false}
-                domain={[0, 30]}
+                domain={[0, yMax]}
                 width={34}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip yMax={yMax} />} />
               {CURVE_KEYS.map(key => (
                 <Line
                   key={key}
