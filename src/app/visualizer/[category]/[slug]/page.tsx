@@ -119,7 +119,7 @@ export default function VisualizerPage({
 
   if (!algo) {
     return (
-      <div style={{ padding: '80px', textAlign: 'center', color: '#94a3b8', fontWeight: 500 }}>
+      <div style={{ padding: '80px', textAlign: 'center', color: '#78716C', fontWeight: 500 }}>
         Algorithm not found.{' '}
         <Link href="/" style={{ color: '#5200FF', fontWeight: 700 }}>Go home</Link>
       </div>
@@ -146,14 +146,14 @@ export default function VisualizerPage({
   const isArrayAlgo = sortingSlugs.includes(slug) || isSearchAlgo || slug === 'array-ops'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', background: '#f8f9fb' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', background: '#F5F1EB' }}>
 
       {/* ── Top bar ──────────────────────────────────────── */}
       <div
         style={{
-          background: '#ffffff',
-          borderBottom: '1px solid rgba(0,0,0,0.07)',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          background: '#FDFCFA',
+          borderBottom: '1px solid #E5DDD0',
+          boxShadow: '0 1px 4px rgba(28,25,23,0.04)',
           padding: '0 24px',
           height: '52px',
           display: 'flex',
@@ -169,29 +169,32 @@ export default function VisualizerPage({
             display: 'inline-flex',
             alignItems: 'center',
             gap: '5px',
-            color: '#94a3b8',
+            color: '#78716C',
             textDecoration: 'none',
-            fontSize: '13px',
+            fontSize: '12px',
             fontWeight: 600,
             flexShrink: 0,
             transition: 'color 0.15s',
+            fontFamily: 'var(--font-mono)',
+            letterSpacing: '0.04em',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#475569' }}
-          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#94a3b8' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#1C1917' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#78716C' }}
         >
           <ArrowLeft size={13} strokeWidth={2.5} />
           {t(`categories.${category}.name`)}
         </Link>
 
-        <span style={{ color: '#e2e8f0', fontSize: '16px', fontWeight: 300 }}>/</span>
+        <span style={{ color: '#E5DDD0', fontSize: '16px', fontWeight: 300 }}>/</span>
 
         {/* Algorithm name */}
         <span
           style={{
-            color: '#0f172a',
+            color: '#1C1917',
             fontWeight: 700,
             fontSize: '14px',
             letterSpacing: '-0.01em',
+            fontFamily: 'var(--font-display)',
           }}
         >
           {t(meta.nameKey)}
@@ -205,12 +208,13 @@ export default function VisualizerPage({
               style={{
                 padding: '2px 8px',
                 borderRadius: '5px',
-                background: `${color}14`,
-                border: `1.5px solid ${color}28`,
+                background: `${color}18`,
+                border: `1.5px solid ${color}35`,
                 color: textColor,
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.03em',
+                fontFamily: 'var(--font-mono)',
               }}
             >
               {tag}
@@ -231,7 +235,7 @@ export default function VisualizerPage({
             borderRadius: '8px',
             border: `1.5px solid ${showCode ? '#5200FF' : 'rgba(0,0,0,0.1)'}`,
             background: showCode ? '#5200FF' : 'transparent',
-            color: showCode ? '#ffffff' : '#94a3b8',
+            color: showCode ? '#ffffff' : '#78716C',
             fontSize: '12px',
             fontWeight: 700,
             cursor: 'pointer',
@@ -264,7 +268,7 @@ export default function VisualizerPage({
           style={{
             position: 'relative',
             minHeight: '52vh',
-            background: '#e0f2fe',
+            background: '#F0EDE8',
             flex: showCode ? `0 0 ${100 - codeWidthPct}%` : '1 1 100%',
             minWidth: 0,
             overflow: 'hidden',
@@ -284,9 +288,9 @@ export default function VisualizerPage({
                 right: '12px',
                 display: 'flex',
                 gap: '2px',
-                background: 'rgba(255,255,255,0.9)',
+                background: 'rgba(253,252,250,0.92)',
                 borderRadius: '8px',
-                border: '1px solid rgba(0,0,0,0.08)',
+                border: '1px solid #E5DDD0',
                 padding: '3px',
                 backdropFilter: 'blur(8px)',
               }}
@@ -346,15 +350,15 @@ export default function VisualizerPage({
             style={{
               width: '5px',
               flexShrink: 0,
-              background: isDragging ? '#7dd3fc' : '#bae6fd',
+              background: isDragging ? '#C8BDB0' : '#E5DDD0',
               cursor: 'col-resize',
               zIndex: 10,
               transition: 'background 0.15s',
               borderLeft: '1px solid rgba(0,0,0,0.08)',
               borderRight: '1px solid rgba(0,0,0,0.08)',
             }}
-            onMouseEnter={e => { if (!isDragging) (e.currentTarget as HTMLDivElement).style.background = '#7dd3fc' }}
-            onMouseLeave={e => { if (!isDragging) (e.currentTarget as HTMLDivElement).style.background = '#bae6fd' }}
+            onMouseEnter={e => { if (!isDragging) (e.currentTarget as HTMLDivElement).style.background = '#C8BDB0' }}
+            onMouseLeave={e => { if (!isDragging) (e.currentTarget as HTMLDivElement).style.background = '#E5DDD0' }}
           />
         )}
 
@@ -365,7 +369,7 @@ export default function VisualizerPage({
               flex: `0 0 ${codeWidthPct}%`,
               minWidth: 0,
               overflow: 'auto',
-              background: '#e0f2fe',
+              background: '#F0EDE8',
             }}
           >
             <CodePanel snippets={codeSnippets} activeLine={frame?.codeLine ?? 0} />
@@ -376,11 +380,11 @@ export default function VisualizerPage({
       {/* ── Controls dock ────────────────────────────────── */}
       <div
         style={{
-          borderTop: '1px solid rgba(0,0,0,0.07)',
-          background: '#ffffff',
+          borderTop: '1px solid #E5DDD0',
+          background: '#FDFCFA',
           padding: '16px 24px',
           flexShrink: 0,
-          boxShadow: '0 -1px 8px rgba(0,0,0,0.04)',
+          boxShadow: '0 -1px 8px rgba(28,25,23,0.04)',
         }}
       >
         <PlaybackControls player={player} message={stepMessage} />
@@ -391,7 +395,7 @@ export default function VisualizerPage({
         <div
           style={{
             borderTop: '1px solid rgba(0,0,0,0.05)',
-            background: '#f8f9fb',
+            background: '#F5F1EB',
             padding: '12px 24px',
             display: 'flex',
             alignItems: 'center',
@@ -412,9 +416,9 @@ export default function VisualizerPage({
                     gap: '5px',
                     padding: '6px 12px',
                     borderRadius: '8px',
-                    border: '1.5px solid rgba(0,0,0,0.09)',
-                    background: '#ffffff',
-                    color: '#475569',
+                    border: '1.5px solid #E5DDD0',
+                    background: '#FDFCFA',
+                    color: '#78716C',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -429,7 +433,7 @@ export default function VisualizerPage({
                   onMouseLeave={e => {
                     const el = e.currentTarget as HTMLButtonElement
                     el.style.borderColor = 'rgba(0,0,0,0.09)'
-                    el.style.color = '#475569'
+                    el.style.color = '#78716C'
                   }}
                 >
                   {p.icon}{p.label}
@@ -447,9 +451,9 @@ export default function VisualizerPage({
                   style={{
                     padding: '6px 12px',
                     borderRadius: '8px',
-                    border: '1.5px solid rgba(0,0,0,0.09)',
-                    background: '#ffffff',
-                    color: '#475569',
+                    border: '1.5px solid #E5DDD0',
+                    background: '#FDFCFA',
+                    color: '#78716C',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -473,11 +477,11 @@ export default function VisualizerPage({
             style={{
               flex: 1,
               minWidth: '160px',
-              background: '#ffffff',
-              border: '1.5px solid rgba(0,0,0,0.09)',
+              background: '#FDFCFA',
+              border: '1.5px solid #E5DDD0',
               borderRadius: '8px',
               padding: '6px 12px',
-              color: '#0f172a',
+              color: '#1C1917',
               fontSize: '13px',
               fontWeight: 500,
               outline: 'none',
@@ -510,8 +514,8 @@ export default function VisualizerPage({
       {/* ── Info panel ───────────────────────────────────── */}
       <div
         style={{
-          borderTop: '1px solid rgba(0,0,0,0.07)',
-          background: '#ffffff',
+          borderTop: '1px solid #E5DDD0',
+          background: '#FDFCFA',
           flexShrink: 0,
         }}
       >
@@ -519,7 +523,7 @@ export default function VisualizerPage({
         <div
           style={{
             display: 'flex',
-            borderBottom: '1px solid rgba(0,0,0,0.06)',
+            borderBottom: '1px solid #E5DDD0',
             padding: '0 24px',
           }}
         >
@@ -533,7 +537,7 @@ export default function VisualizerPage({
                 border: 'none',
                 borderBottom: `2px solid ${infoTab === tab ? textColor : 'transparent'}`,
                 background: 'transparent',
-                color: infoTab === tab ? '#0f172a' : '#94a3b8',
+                color: infoTab === tab ? '#1C1917' : '#78716C',
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
@@ -555,12 +559,12 @@ export default function VisualizerPage({
                 { label: t('complexity.best'),    value: meta.complexity.time.best,  col: '#10b981' },
                 { label: t('complexity.average'), value: meta.complexity.time.avg,   col: textColor },
                 { label: t('complexity.worst'),   value: meta.complexity.time.worst, col: '#ef4444' },
-                { label: t('complexity.space'),   value: meta.complexity.space,      col: '#94a3b8' },
+                { label: t('complexity.space'),   value: meta.complexity.space,      col: '#78716C' },
               ].map(row => (
                 <div key={row.label} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <span
                     style={{
-                      color: '#c1c9d2',
+                      color: '#C8BDB0',
                       fontSize: '10px',
                       fontWeight: 700,
                       textTransform: 'uppercase',
@@ -585,7 +589,7 @@ export default function VisualizerPage({
           ) : (
             <p
               style={{
-                color: '#64748b',
+                color: '#78716C',
                 fontSize: '14px',
                 lineHeight: 1.7,
                 margin: 0,

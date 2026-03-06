@@ -23,7 +23,7 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
       <div
         style={{
           fontSize: '0.8rem',
-          color: '#94a3b8',
+          color: '#78716C',
           minHeight: '1.2rem',
           textAlign: 'center',
           letterSpacing: '0.01em',
@@ -41,7 +41,7 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
         }}
         style={{
           height: '3px',
-          background: 'rgba(0,0,0,0.08)',
+          background: '#E5DDD0',
           borderRadius: '2px',
           cursor: 'pointer',
           position: 'relative',
@@ -70,7 +70,7 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
         {/* Step counter */}
         <span
           style={{
-            color: '#c1c9d2',
+            color: '#C8BDB0',
             fontSize: '0.7rem',
             fontFamily: 'ui-monospace, monospace',
             minWidth: '72px',
@@ -133,9 +133,9 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
                 padding: '2px 5px',
                 borderRadius: '4px',
                 border: '1px solid',
-                borderColor: speed === s ? '#5200FF' : 'rgba(0,0,0,0.1)',
-                background: speed === s ? '#5200FF' : '#ffffff',
-                color: speed === s ? '#ffffff' : '#94a3b8',
+                borderColor: speed === s ? '#5200FF' : '#E5DDD0',
+                background: speed === s ? '#5200FF' : '#FDFCFA',
+                color: speed === s ? '#ffffff' : '#78716C',
                 fontSize: '0.63rem',
                 cursor: 'pointer',
                 fontWeight: speed === s ? 700 : 500,
@@ -171,9 +171,9 @@ function CtrlBtn({
         width: '30px',
         height: '30px',
         borderRadius: '6px',
-        border: '1px solid rgba(0,0,0,0.1)',
-        background: '#ffffff',
-        color: disabled ? '#d1d9e0' : '#475569',
+        border: '1px solid #E5DDD0',
+        background: '#FDFCFA',
+        color: disabled ? '#C8BDB0' : '#78716C',
         cursor: disabled ? 'not-allowed' : 'pointer',
         display: 'flex',
         alignItems: 'center',

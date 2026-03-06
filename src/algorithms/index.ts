@@ -33,7 +33,7 @@ import * as lcs from './dp/lcs'
 import * as lis from './dp/lis'
 import * as coinChange from './dp/coin-change'
 
-const allModules: AlgorithmModule[] = [
+export const allModules: AlgorithmModule[] = [
   bubbleSort,
   selectionSort,
   insertionSort,

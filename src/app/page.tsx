@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowUpDown, Search, Database, BrainCircuit, ArrowRight } from 'lucide-react'
+import { ArrowUpDown, Search, Database, BrainCircuit } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { categories, getCategory } from '@/algorithms/index'
 
@@ -9,191 +9,211 @@ const CATEGORY_META: Record<string, {
   icon: React.ReactNode
   color: string
   num: string
-  textColor: string
-  mutedColor: string
+  tags: string[]
 }> = {
   sorting: {
-    icon: <ArrowUpDown size={22} strokeWidth={2} />,
+    icon: <ArrowUpDown size={20} strokeWidth={2} />,
     color: '#CCFF00',
     num: '01',
-    textColor: '#0a0f1a',
-    mutedColor: 'rgba(0,0,0,0.4)',
+    tags: ['comparison', 'in-place'],
   },
   searching: {
-    icon: <Search size={22} strokeWidth={2} />,
+    icon: <Search size={20} strokeWidth={2} />,
     color: '#FF6B00',
     num: '02',
-    textColor: '#ffffff',
-    mutedColor: 'rgba(255,255,255,0.55)',
+    tags: ['graph', 'binary'],
   },
   'data-structures': {
-    icon: <Database size={22} strokeWidth={2} />,
+    icon: <Database size={20} strokeWidth={2} />,
     color: '#F900FF',
     num: '03',
-    textColor: '#ffffff',
-    mutedColor: 'rgba(255,255,255,0.55)',
+    tags: ['tree', 'linked-list'],
   },
   dp: {
-    icon: <BrainCircuit size={22} strokeWidth={2} />,
+    icon: <BrainCircuit size={20} strokeWidth={2} />,
     color: '#5200FF',
     num: '04',
-    textColor: '#ffffff',
-    mutedColor: 'rgba(255,255,255,0.55)',
+    tags: ['memoization', 'tabulation'],
   },
 }
 
 export default function HomePage() {
   const { t } = useI18n()
+  const totalAlgos = categories.reduce((n, c) => n + getCategory(c.id).length, 0)
 
   return (
-    <div>
-      {/* ── Topics ────────────────────────────────────────── */}
-      <section
-        style={{
-          background: '#f8f9fb',
-          padding: 'clamp(48px, 7vw, 96px) 24px',
-          minHeight: 'calc(100vh - 64px)',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        <div style={{ maxWidth: '760px', margin: '0 auto', width: '100%' }}>
-          {/* 2 × 2 card grid */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '16px',
-            }}
-          >
-            {categories.map(cat => {
-              const algos = getCategory(cat.id)
-              const meta = CATEGORY_META[cat.id]
+    <div style={{ background: '#F5F1EB', minHeight: 'calc(100vh - 64px)' }}>
 
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/visualizer/${cat.id}`}
-                  style={{ textDecoration: 'none', display: 'flex' }}
+      {/* ── Page header ── */}
+      <section style={{
+        maxWidth: '1100px',
+        margin: '0 auto',
+        padding: 'clamp(32px, 4vw, 48px) 24px 24px',
+      }}>
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(28px, 4vw, 36px)',
+          fontWeight: 900,
+          color: '#1C1917',
+          letterSpacing: '-0.025em',
+          marginBottom: '6px',
+        }}>
+          Algorithms
+        </h1>
+        <p style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '12px',
+          fontWeight: 600,
+          color: '#78716C',
+          letterSpacing: '0.04em',
+        }}>
+          {categories.length} categories · {totalAlgos} algorithms
+        </p>
+      </section>
+
+      {/* ── Category cards ── */}
+      <section style={{
+        maxWidth: '1100px',
+        margin: '0 auto',
+        padding: '0 24px clamp(48px, 7vw, 96px)',
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: '16px',
+        }}>
+          {categories.map(cat => {
+            const algos = getCategory(cat.id)
+            const meta = CATEGORY_META[cat.id]
+
+            return (
+              <Link
+                key={cat.id}
+                href={`/visualizer/${cat.id}`}
+                style={{ textDecoration: 'none', display: 'flex' }}
+              >
+                <div
+                  style={{
+                    flex: 1,
+                    background: '#FDFCFA',
+                    borderRadius: '16px',
+                    border: '1.5px solid #E5DDD0',
+                    borderTop: `4px solid ${meta.color}`,
+                    padding: '24px 24px 20px',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                    boxShadow: '0 2px 8px rgba(28,25,23,0.05)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0',
+                    minHeight: '200px',
+                  }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLDivElement
+                    el.style.transform = 'translateY(-4px)'
+                    el.style.boxShadow = '0 12px 32px rgba(28,25,23,0.10)'
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLDivElement
+                    el.style.transform = 'translateY(0)'
+                    el.style.boxShadow = '0 2px 8px rgba(28,25,23,0.05)'
+                  }}
                 >
-                  <div
+                  {/* Ghost number */}
+                  <span
                     style={{
-                      flex: 1,
-                      background: meta.color,
-                      borderRadius: '20px',
-                      padding: '28px 28px 24px',
-                      cursor: 'pointer',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-                      boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0',
-                      minHeight: '220px',
-                    }}
-                    onMouseEnter={e => {
-                      const el = e.currentTarget as HTMLDivElement
-                      el.style.transform = 'translateY(-5px)'
-                      el.style.boxShadow = '0 16px 40px rgba(0,0,0,0.16)'
-                    }}
-                    onMouseLeave={e => {
-                      const el = e.currentTarget as HTMLDivElement
-                      el.style.transform = 'translateY(0)'
-                      el.style.boxShadow = '0 2px 12px rgba(0,0,0,0.08)'
+                      position: 'absolute',
+                      bottom: '-16px',
+                      right: '-6px',
+                      fontSize: '120px',
+                      fontWeight: 900,
+                      lineHeight: 1,
+                      color: 'rgba(28,25,23,0.04)',
+                      letterSpacing: '-0.05em',
+                      userSelect: 'none',
+                      pointerEvents: 'none',
+                      fontFamily: 'var(--font-display)',
                     }}
                   >
-                    {/* Decorative number — bleeds off the bottom-right edge */}
-                    <span
-                      style={{
-                        position: 'absolute',
-                        bottom: '-18px',
-                        right: '-8px',
-                        fontSize: '130px',
-                        fontWeight: 900,
-                        lineHeight: 1,
-                        color: 'rgba(0,0,0,0.13)',
-                        letterSpacing: '-0.05em',
-                        userSelect: 'none',
-                        pointerEvents: 'none',
-                      }}
-                    >
-                      {meta.num}
-                    </span>
+                    {meta.num}
+                  </span>
 
-                    {/* Icon */}
-                    <div style={{ color: meta.textColor, marginBottom: '22px', opacity: 0.9 }}>
-                      {meta.icon}
-                    </div>
-
-                    {/* Name */}
-                    <h2
-                      style={{
-                        color: meta.textColor,
-                        fontWeight: 800,
-                        fontSize: '22px',
-                        letterSpacing: '-0.025em',
-                        marginBottom: '8px',
-                        lineHeight: 1.15,
-                      }}
-                    >
-                      {t(`categories.${cat.id}.name`)}
-                    </h2>
-
-                    {/* Count */}
-                    <p
-                      style={{
-                        color: meta.mutedColor,
-                        fontSize: '15px',
-                        fontWeight: 500,
-                        margin: 0,
-                        marginBottom: 'auto',
-                      }}
-                    >
-                      {algos.length} algorithms
-                    </p>
-
-                    {/* Footer row */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                        marginTop: '24px',
-                        color: meta.textColor,
-                        fontSize: '13px',
-                        fontWeight: 700,
-                        letterSpacing: '0.05em',
-                        opacity: 0.8,
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Explore
-                      <ArrowRight size={13} strokeWidth={2.5} />
-                    </div>
+                  {/* Icon chip */}
+                  <div
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '9px',
+                      background: `${meta.color}18`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#1C1917',
+                      marginBottom: '18px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    {meta.icon}
                   </div>
-                </Link>
-              )
-            })}
-          </div>
+
+                  {/* Name */}
+                  <h2
+                    style={{
+                      color: '#1C1917',
+                      fontWeight: 800,
+                      fontSize: '20px',
+                      letterSpacing: '-0.025em',
+                      marginBottom: '6px',
+                      lineHeight: 1.15,
+                      fontFamily: 'var(--font-display)',
+                    }}
+                  >
+                    {t(`categories.${cat.id}.name`)}
+                  </h2>
+
+                  {/* Count */}
+                  <p
+                    style={{
+                      color: '#78716C',
+                      fontSize: '13px',
+                      fontWeight: 500,
+                      margin: 0,
+                      marginBottom: 'auto',
+                    }}
+                  >
+                    {algos.length} algorithms
+                  </p>
+
+                  {/* Tags */}
+                  <div style={{ display: 'flex', gap: '5px', marginTop: '12px', flexWrap: 'wrap' }}>
+                    {meta.tags.map(tag => (
+                      <span
+                        key={tag}
+                        style={{
+                          fontSize: '10px',
+                          color: '#78716C',
+                          background: '#F0EDE8',
+                          border: '1px solid #E5DDD0',
+                          padding: '2px 7px',
+                          borderRadius: '4px',
+                          fontWeight: 600,
+                          letterSpacing: '0.04em',
+                          fontFamily: 'var(--font-mono)',
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            )
+          })}
         </div>
       </section>
 
-      {/* ── Footer ────────────────────────────────────────── */}
-      <footer
-        style={{
-          background: '#ffffff',
-          borderTop: '1px solid rgba(0,0,0,0.06)',
-          padding: '24px',
-          textAlign: 'center',
-          color: '#cbd5e1',
-          fontSize: '12px',
-          fontWeight: 500,
-          letterSpacing: '0.02em',
-        }}
-      >
-        Free &amp; Open Source · Built for CS students
-      </footer>
     </div>
   )
 }

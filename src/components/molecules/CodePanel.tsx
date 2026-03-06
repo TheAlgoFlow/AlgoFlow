@@ -79,10 +79,10 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        background: '#ffffff',
+        background: '#FDFCFA',
         borderRadius: '8px',
         overflow: 'hidden',
-        border: '1px solid rgba(0,0,0,0.08)',
+        border: '1px solid #E5DDD0',
       }}
     >
       {/* Language tabs */}
@@ -90,9 +90,9 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
         style={{
           display: 'flex',
           gap: '1px',
-          background: '#f0f9ff',
+          background: '#F0EDE8',
           padding: '4px 4px 0',
-          borderBottom: '1px solid rgba(0,0,0,0.08)',
+          borderBottom: '1px solid #E5DDD0',
           overflowX: 'auto',
           scrollbarWidth: 'none',
           flexShrink: 0,
@@ -106,12 +106,12 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
               padding: '6px 12px',
               borderRadius: '6px 6px 0 0',
               border: 'none',
-              background: lang === key ? '#ffffff' : 'transparent',
-              color: lang === key ? '#0f172a' : '#64748b',
+              background: lang === key ? '#FDFCFA' : 'transparent',
+              color: lang === key ? '#1C1917' : '#78716C',
               fontSize: '0.72rem',
               fontWeight: 600,
               cursor: 'pointer',
-              borderBottom: lang === key ? '2px solid #0ea5e9' : '2px solid transparent',
+              borderBottom: lang === key ? '2px solid #5200FF' : '2px solid transparent',
               transition: 'all 0.15s ease',
               fontFamily: 'inherit',
               whiteSpace: 'nowrap',
@@ -144,8 +144,8 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                background: isActive ? 'rgba(14,165,233,0.12)' : 'transparent',
-                borderLeft: isActive ? '3px solid #0ea5e9' : '3px solid transparent',
+                background: isActive ? 'rgba(82,0,255,0.08)' : 'transparent',
+                borderLeft: isActive ? '3px solid #5200FF' : '3px solid transparent',
                   paddingLeft: isActive ? '9px' : '12px',
                   paddingRight: '12px',
                   transition: 'all 0.15s ease',
@@ -153,7 +153,7 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
               >
                 <span
                   style={{
-                    color: isActive ? '#0369a1' : '#64748b',
+                    color: isActive ? '#5200FF' : '#C8BDB0',
                     fontSize: '0.7rem',
                     width: '28px',
                     flexShrink: 0,
@@ -164,7 +164,7 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
                 >
                   {line}
                 </span>
-                <code style={{ color: '#1e293b', whiteSpace: 'pre' }}>
+                <code style={{ color: '#1C1917', whiteSpace: 'pre' }}>
                   {colorize(code, lang)}
                 </code>
               </div>

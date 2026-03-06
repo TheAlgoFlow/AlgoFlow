@@ -1,11 +1,20 @@
 @import "tailwindcss";
 
 @theme {
+  /* Brand accent colors */
   --color-brand-lime:   #CCFF00;
   --color-brand-orange: #FF6B00;
   --color-brand-pink:   #F900FF;
   --color-brand-violet: #5200FF;
 
+  /* Semantic palette */
+  --color-bg:           #F5F1EB;
+  --color-surface:      #FDFCFA;
+  --color-text:         #1C1917;
+  --color-text-muted:   #78716C;
+  --color-border:       #E5DDD0;
+
+  /* Visualizer bar colors — DO NOT CHANGE */
   --color-bar-default: #6366f1;
   --color-bar-compare: #f59e0b;
   --color-bar-swap:    #ef4444;
@@ -15,7 +24,10 @@
   --color-bar-current: #f59e0b;
   --color-bar-sorted:  #10b981;
 
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+  /* Font stacks */
+  --font-display: var(--font-fraunces), 'Georgia', serif;
+  --font-body:    var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    var(--font-jetbrains), 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
 * {
@@ -27,7 +39,7 @@
 
 input, textarea {
   cursor: text;
-  caret-color: transparent;
+  caret-color: auto;
 }
 
 a, button, [role="button"] {
@@ -39,19 +51,22 @@ html {
 }
 
 body {
-  font-family: var(--font-poppins, ui-sans-serif, system-ui, sans-serif);
-  background-color: #ffffff;
-  color: #0f172a;
+  font-family: var(--font-body);
+  background-color: #F5F1EB;
+  color: #1C1917;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* SVG noise grain overlay */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: #f1f5f9; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-track { background: #E5DDD0; }
+::-webkit-scrollbar-thumb { background: #C8BDB0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #A89E94; }
 
 /* Code panel */
 .code-panel {
