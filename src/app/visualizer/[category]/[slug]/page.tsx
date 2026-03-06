@@ -1,7 +1,8 @@
 'use client'
 
-import { use, useState, useCallback, useMemo } from 'react'
+import { use, useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { ArrowLeft, Code2, X, Shuffle, TrendingDown, TrendingUp, Equal, LayoutGrid, BarChart2 } from 'lucide-react'
 import { getAlgorithm } from '@/algorithms/index'
 import { useAlgorithmPlayer } from '@/hooks/useAlgorithmPlayer'
 import { useI18n } from '@/i18n/context'
@@ -9,6 +10,7 @@ import { CodePanel } from '@/components/molecules/CodePanel'
 import { PlaybackControls } from '@/components/molecules/PlaybackControls'
 import { ArrayBarsVisualizer } from '@/components/visualizers/ArrayBarsVisualizer'
 import { ArraySearchVisualizer } from '@/components/visualizers/ArraySearchVisualizer'
+import { ArrayBoxesVisualizer } from '@/components/visualizers/ArrayBoxesVisualizer'
 import { GraphVisualizer } from '@/components/visualizers/GraphVisualizer'
 import { TreeVisualizer } from '@/components/visualizers/TreeVisualizer'
 import { GridVisualizer } from '@/components/visualizers/GridVisualizer'
@@ -17,12 +19,26 @@ import { StackQueueVisualizer } from '@/components/visualizers/StackQueueVisuali
 import { HashTableVisualizer } from '@/components/visualizers/HashTableVisualizer'
 import type { AlgorithmFrame } from '@/engine/types'
 
-const SORTING_PRESETS: Record<string, number[]> = {
-  random: [64, 34, 25, 12, 22, 11, 90],
-  'nearly-sorted': [1, 2, 4, 3, 5, 7, 6],
-  reversed: [90, 75, 50, 35, 20, 10, 5],
-  equal: [42, 42, 42, 42, 42],
+const CATEGORY_COLORS: Record<string, string> = {
+  sorting:          '#CCFF00',
+  searching:        '#FF6B00',
+  'data-structures':'#F900FF',
+  dp:               '#5200FF',
 }
+
+const CATEGORY_TEXT_COLORS: Record<string, string> = {
+  sorting:          '#4a6600',
+  searching:        '#FF6B00',
+  'data-structures':'#c000cc',
+  dp:               '#5200FF',
+}
+
+const SORTING_PRESETS: { label: string; icon: React.ReactNode; arr: number[] }[] = [
+  { label: 'Random',   icon: <Shuffle size={12} strokeWidth={2.5} />,      arr: [64, 34, 25, 12, 22, 11, 90] },
+  { label: 'Nearly ↑', icon: <TrendingUp size={12} strokeWidth={2.5} />,   arr: [1, 2, 4, 3, 5, 7, 6] },
+  { label: 'Reversed', icon: <TrendingDown size={12} strokeWidth={2.5} />, arr: [90, 75, 50, 35, 20, 10, 5] },
+  { label: 'Equal',    icon: <Equal size={12} strokeWidth={2.5} />,        arr: [42, 42, 42, 42, 42] },
+]
 
 const SEARCH_PRESETS = {
   linear: { array: [4, 2, 7, 1, 9, 3, 8, 5, 6], target: 9 },
@@ -35,34 +51,16 @@ function interpolateMessage(template: string, vars?: Record<string, unknown>): s
 }
 
 function getVisualizerForSlug(slug: string, frame: AlgorithmFrame | null) {
-  // Sorting algorithms → ArrayBarsVisualizer
   const sortingSlugs = ['bubble-sort', 'selection-sort', 'insertion-sort', 'merge-sort', 'quick-sort', 'heap-sort', 'counting-sort', 'radix-sort']
   if (sortingSlugs.includes(slug)) return <ArrayBarsVisualizer frame={frame} />
-
-  // Linear/Binary search → ArraySearchVisualizer
   if (slug === 'linear-search' || slug === 'binary-search') return <ArraySearchVisualizer frame={frame} />
-
-  // Graph-based → GraphVisualizer
   if (slug === 'bfs' || slug === 'dfs') return <GraphVisualizer frame={frame} />
-
-  // Tree-based
   if (slug === 'binary-tree' || slug === 'bst') return <TreeVisualizer frame={frame} />
-
-  // Stack/Queue
   if (slug === 'stack') return <StackQueueVisualizer frame={frame} mode="stack" />
   if (slug === 'queue') return <StackQueueVisualizer frame={frame} mode="queue" />
-
-  // Linked list
   if (slug === 'linked-list') return <LinkedListVisualizer frame={frame} />
-
-  // Hash table
   if (slug === 'hash-table') return <HashTableVisualizer frame={frame} />
-
-  // Array ops, min-heap → bars
-  if (slug === 'array-ops') return <ArrayBarsVisualizer frame={frame} />
-  if (slug === 'min-heap') return <ArrayBarsVisualizer frame={frame} />
-
-  // DP → GridVisualizer
+  if (slug === 'array-ops' || slug === 'min-heap') return <ArrayBarsVisualizer frame={frame} />
   return <GridVisualizer frame={frame} />
 }
 
@@ -75,8 +73,31 @@ export default function VisualizerPage({
   const { t } = useI18n()
   const algo = getAlgorithm(slug)
 
+  const [showCode, setShowCode] = useState(false)
   const [customInput, setCustomInput] = useState('')
   const [currentInput, setCurrentInput] = useState<unknown>(algo?.meta.defaultInput ?? null)
+  const [infoTab, setInfoTab] = useState<'complexity' | 'about'>('complexity')
+  const [vizMode, setVizMode] = useState<'array' | 'classic'>('array')
+  const [codeWidthPct, setCodeWidthPct] = useState(50)
+  const [isDragging, setIsDragging] = useState(false)
+  const canvasRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !canvasRef.current) return
+      const rect = canvasRef.current.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const pct = (mouseX / rect.width) * 100
+      setCodeWidthPct(100 - Math.max(25, Math.min(72, pct)))
+    }
+    const onMouseUp = () => setIsDragging(false)
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [isDragging])
 
   const generator = useMemo(() => {
     if (!algo) return null
@@ -98,18 +119,17 @@ export default function VisualizerPage({
 
   if (!algo) {
     return (
-      <div style={{ padding: '4rem', textAlign: 'center', color: '#64748b' }}>
-        Algorithm &quot;{slug}&quot; not found.{' '}
-        <Link href="/" style={{ color: '#6366f1' }}>
-          Go home
-        </Link>
+      <div style={{ padding: '80px', textAlign: 'center', color: '#94a3b8', fontWeight: 500 }}>
+        Algorithm not found.{' '}
+        <Link href="/" style={{ color: '#5200FF', fontWeight: 700 }}>Go home</Link>
       </div>
     )
   }
 
   const { meta, codeSnippets } = algo
+  const color = CATEGORY_COLORS[category] ?? '#5200FF'
+  const textColor = CATEGORY_TEXT_COLORS[category] ?? '#5200FF'
 
-  // Build step message
   let stepMessage = ''
   if (frame) {
     const rawMsg = t(frame.message)
@@ -122,153 +142,318 @@ export default function VisualizerPage({
   const isGraphAlgo = ['bfs', 'dfs'].includes(slug)
   const isTreeOrDS = ['binary-tree', 'bst', 'linked-list', 'stack', 'queue', 'hash-table', 'min-heap', 'array-ops'].includes(slug)
   const showArrayInput = !isGraphAlgo && !isTreeOrDS
-
-  const CATEGORY_COLORS: Record<string, string> = {
-    sorting: '#7c3aed',
-    searching: '#2563eb',
-    'data-structures': '#16a34a',
-    dp: '#ea580c',
-  }
-  const color = CATEGORY_COLORS[category] ?? '#6366f1'
+  const sortingSlugs = ['bubble-sort', 'selection-sort', 'insertion-sort', 'merge-sort', 'quick-sort', 'heap-sort', 'counting-sort', 'radix-sort']
+  const isArrayAlgo = sortingSlugs.includes(slug) || isSearchAlgo || slug === 'array-ops'
 
   return (
-    <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', background: '#f8f9fb' }}>
+
+      {/* ── Top bar ──────────────────────────────────────── */}
+      <div
+        style={{
+          background: '#ffffff',
+          borderBottom: '1px solid rgba(0,0,0,0.07)',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+          padding: '0 24px',
+          height: '52px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          flexShrink: 0,
+        }}
+      >
+        {/* Back */}
         <Link
           href={`/visualizer/${category}`}
-          style={{ color: '#64748b', textDecoration: 'none', fontSize: '0.875rem' }}
-        >
-          {t('back')}
-        </Link>
-        <h1
           style={{
-            flex: 1,
-            fontSize: '1.5rem',
-            fontWeight: 800,
-            color: '#f1f5f9',
-            margin: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            color: '#94a3b8',
+            textDecoration: 'none',
+            fontSize: '13px',
+            fontWeight: 600,
+            flexShrink: 0,
+            transition: 'color 0.15s',
+          }}
+          onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#475569' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#94a3b8' }}
+        >
+          <ArrowLeft size={13} strokeWidth={2.5} />
+          {t(`categories.${category}.name`)}
+        </Link>
+
+        <span style={{ color: '#e2e8f0', fontSize: '16px', fontWeight: 300 }}>/</span>
+
+        {/* Algorithm name */}
+        <span
+          style={{
+            color: '#0f172a',
+            fontWeight: 700,
+            fontSize: '14px',
+            letterSpacing: '-0.01em',
           }}
         >
           {t(meta.nameKey)}
-        </h1>
-        <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
-          {meta.tags.map(tag => (
+        </span>
+
+        {/* Tags */}
+        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+          {meta.tags.slice(0, 3).map(tag => (
             <span
               key={tag}
               style={{
                 padding: '2px 8px',
-                borderRadius: '20px',
-                background: `${color}20`,
-                color,
-                fontSize: '0.7rem',
-                fontWeight: 600,
+                borderRadius: '5px',
+                background: `${color}14`,
+                border: `1.5px solid ${color}28`,
+                color: textColor,
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.03em',
               }}
             >
               {tag}
             </span>
           ))}
         </div>
-      </div>
 
-      {/* Main two-column layout */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 3fr) minmax(0, 2fr)',
-          gap: '1rem',
-          minHeight: '380px',
-        }}
-      >
-        {/* Visualization Canvas */}
-        <div
+        <div style={{ flex: 1 }} />
+
+        {/* Code toggle */}
+        <button
+          onClick={() => setShowCode(v => !v)}
           style={{
-            background: '#1e293b',
-            borderRadius: '12px',
-            border: '1px solid rgba(99,102,241,0.2)',
-            overflow: 'hidden',
-            minHeight: '320px',
-            position: 'relative',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '6px 14px',
+            borderRadius: '8px',
+            border: `1.5px solid ${showCode ? '#5200FF' : 'rgba(0,0,0,0.1)'}`,
+            background: showCode ? '#5200FF' : 'transparent',
+            color: showCode ? '#ffffff' : '#94a3b8',
+            fontSize: '12px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+            flexShrink: 0,
           }}
         >
-          {getVisualizerForSlug(slug, frame)}
-        </div>
-
-        {/* Code Panel */}
-        <div style={{ minHeight: '320px' }}>
-          <CodePanel snippets={codeSnippets} activeLine={frame?.codeLine ?? 0} />
-        </div>
+          {showCode ? <X size={13} strokeWidth={2.5} /> : <Code2 size={13} strokeWidth={2.5} />}
+          {showCode ? 'Hide code' : 'Code'}
+        </button>
       </div>
 
-      {/* Playback Controls */}
-      <PlaybackControls player={player} message={stepMessage} />
+      {/* ── Canvas + optional code panel ─────────────────── */}
+      <div
+        ref={canvasRef}
+        style={{
+          flex: 1,
+          display: 'flex',
+          minHeight: '52vh',
+          position: 'relative',
+        }}
+      >
+        {/* Drag-in-progress overlay — keeps cursor consistent while moving */}
+        {isDragging && (
+          <div style={{ position: 'fixed', inset: 0, zIndex: 9999, cursor: 'col-resize' }} />
+        )}
 
-      {/* Input Section */}
+        {/* Visualizer canvas */}
+        <div
+          style={{
+            position: 'relative',
+            minHeight: '52vh',
+            background: '#e0f2fe',
+            flex: showCode ? `0 0 ${100 - codeWidthPct}%` : '1 1 100%',
+            minWidth: 0,
+            overflow: 'hidden',
+          }}
+        >
+          {isArrayAlgo && vizMode === 'array'
+            ? <ArrayBoxesVisualizer frame={frame} />
+            : getVisualizerForSlug(slug, frame)
+          }
+
+          {/* Viz mode toggle — only for array algorithms */}
+          {isArrayAlgo && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                display: 'flex',
+                gap: '2px',
+                background: 'rgba(255,255,255,0.9)',
+                borderRadius: '8px',
+                border: '1px solid rgba(0,0,0,0.08)',
+                padding: '3px',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
+              <button
+                onClick={() => setVizMode('array')}
+                title="Array view"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 10px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: vizMode === 'array' ? '#5200FF' : 'transparent',
+                  color: vizMode === 'array' ? '#ffffff' : '#64748b',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  letterSpacing: '0.03em',
+                }}
+              >
+                <LayoutGrid size={12} strokeWidth={2.5} />
+                Array
+              </button>
+              <button
+                onClick={() => setVizMode('classic')}
+                title="Classic view"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 10px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  background: vizMode === 'classic' ? '#5200FF' : 'transparent',
+                  color: vizMode === 'classic' ? '#ffffff' : '#64748b',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  letterSpacing: '0.03em',
+                }}
+              >
+                <BarChart2 size={12} strokeWidth={2.5} />
+                Classic
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Drag handle */}
+        {showCode && (
+          <div
+            onMouseDown={() => setIsDragging(true)}
+            style={{
+              width: '5px',
+              flexShrink: 0,
+              background: isDragging ? '#7dd3fc' : '#bae6fd',
+              cursor: 'col-resize',
+              zIndex: 10,
+              transition: 'background 0.15s',
+              borderLeft: '1px solid rgba(0,0,0,0.08)',
+              borderRight: '1px solid rgba(0,0,0,0.08)',
+            }}
+            onMouseEnter={e => { if (!isDragging) (e.currentTarget as HTMLDivElement).style.background = '#7dd3fc' }}
+            onMouseLeave={e => { if (!isDragging) (e.currentTarget as HTMLDivElement).style.background = '#bae6fd' }}
+          />
+        )}
+
+        {/* Code panel */}
+        {showCode && (
+          <div
+            style={{
+              flex: `0 0 ${codeWidthPct}%`,
+              minWidth: 0,
+              overflow: 'auto',
+              background: '#e0f2fe',
+            }}
+          >
+            <CodePanel snippets={codeSnippets} activeLine={frame?.codeLine ?? 0} />
+          </div>
+        )}
+      </div>
+
+      {/* ── Controls dock ────────────────────────────────── */}
+      <div
+        style={{
+          borderTop: '1px solid rgba(0,0,0,0.07)',
+          background: '#ffffff',
+          padding: '16px 24px',
+          flexShrink: 0,
+          boxShadow: '0 -1px 8px rgba(0,0,0,0.04)',
+        }}
+      >
+        <PlaybackControls player={player} message={stepMessage} />
+      </div>
+
+      {/* ── Input row ────────────────────────────────────── */}
       {showArrayInput && (
         <div
           style={{
-            background: '#1e293b',
-            borderRadius: '8px',
-            border: '1px solid rgba(99,102,241,0.2)',
-            padding: '0.75rem 1rem',
+            borderTop: '1px solid rgba(0,0,0,0.05)',
+            background: '#f8f9fb',
+            padding: '12px 24px',
             display: 'flex',
-            gap: '0.75rem',
             alignItems: 'center',
+            gap: '10px',
             flexWrap: 'wrap',
+            flexShrink: 0,
           }}
         >
-          <span style={{ color: '#64748b', fontSize: '0.875rem', flexShrink: 0 }}>
-            {t('input.custom')}:
-          </span>
-          <input
-            type="text"
-            value={customInput}
-            onChange={e => setCustomInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && applyCustom()}
-            placeholder={isSearchAlgo ? 'sorted: 1,3,5,7,9 target:7' : t('input.customPlaceholder')}
-            style={{
-              flex: 1,
-              background: '#0f172a',
-              border: '1px solid rgba(99,102,241,0.3)',
-              borderRadius: '6px',
-              padding: '6px 10px',
-              color: '#f1f5f9',
-              fontSize: '0.875rem',
-              outline: 'none',
-              minWidth: '200px',
-            }}
-          />
-          <button
-            onClick={applyCustom}
-            style={{
-              padding: '6px 16px',
-              borderRadius: '6px',
-              border: 'none',
-              background: '#6366f1',
-              color: '#fff',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            {t('input.run')}
-          </button>
-
-          {/* Presets for sorting */}
           {meta.category === 'sorting' && (
-            <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
-              {Object.entries(SORTING_PRESETS).map(([name, arr]) => (
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {SORTING_PRESETS.map(p => (
+                <button
+                  key={p.label}
+                  onClick={() => { setCurrentInput(p.arr); setCustomInput('') }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: '1.5px solid rgba(0,0,0,0.09)',
+                    background: '#ffffff',
+                    color: '#475569',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+                    transition: 'all 0.12s',
+                  }}
+                  onMouseEnter={e => {
+                    const el = e.currentTarget as HTMLButtonElement
+                    el.style.borderColor = `${color}50`
+                    el.style.color = textColor
+                  }}
+                  onMouseLeave={e => {
+                    const el = e.currentTarget as HTMLButtonElement
+                    el.style.borderColor = 'rgba(0,0,0,0.09)'
+                    el.style.color = '#475569'
+                  }}
+                >
+                  {p.icon}{p.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {isSearchAlgo && (
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {Object.entries(SEARCH_PRESETS).map(([name, preset]) => (
                 <button
                   key={name}
-                  onClick={() => { setCurrentInput(arr); setCustomInput('') }}
+                  onClick={() => setCurrentInput(preset)}
                   style={{
-                    padding: '4px 10px',
-                    borderRadius: '4px',
-                    border: '1px solid rgba(99,102,241,0.3)',
-                    background: 'transparent',
-                    color: '#94a3b8',
-                    fontSize: '0.75rem',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: '1.5px solid rgba(0,0,0,0.09)',
+                    background: '#ffffff',
+                    color: '#475569',
+                    fontSize: '12px',
+                    fontWeight: 600,
                     cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
                   }}
                 >
                   {name}
@@ -276,81 +461,143 @@ export default function VisualizerPage({
               ))}
             </div>
           )}
+
+          <div style={{ width: '1px', height: '22px', background: 'rgba(0,0,0,0.08)' }} />
+
+          <input
+            type="text"
+            value={customInput}
+            onChange={e => setCustomInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && applyCustom()}
+            placeholder={isSearchAlgo ? 'sorted: 1,3,5  target:5' : t('input.customPlaceholder')}
+            style={{
+              flex: 1,
+              minWidth: '160px',
+              background: '#ffffff',
+              border: '1.5px solid rgba(0,0,0,0.09)',
+              borderRadius: '8px',
+              padding: '6px 12px',
+              color: '#0f172a',
+              fontSize: '13px',
+              fontWeight: 500,
+              outline: 'none',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            }}
+          />
+          <button
+            onClick={applyCustom}
+            style={{
+              padding: '7px 20px',
+              borderRadius: '8px',
+              border: 'none',
+              background: '#5200FF',
+              color: '#ffffff',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              flexShrink: 0,
+              boxShadow: '0 2px 10px rgba(82,0,255,0.28)',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 18px rgba(82,0,255,0.4)' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 10px rgba(82,0,255,0.28)' }}
+          >
+            Run
+          </button>
         </div>
       )}
 
-      {/* Complexity + Description */}
+      {/* ── Info panel ───────────────────────────────────── */}
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'auto 1fr 1fr',
-          gap: '1rem',
-          flexWrap: 'wrap',
+          borderTop: '1px solid rgba(0,0,0,0.07)',
+          background: '#ffffff',
+          flexShrink: 0,
         }}
       >
-        {/* Complexity */}
+        {/* Tabs */}
         <div
           style={{
-            background: '#1e293b',
-            borderRadius: '8px',
-            border: '1px solid rgba(99,102,241,0.2)',
-            padding: '0.875rem 1rem',
+            display: 'flex',
+            borderBottom: '1px solid rgba(0,0,0,0.06)',
+            padding: '0 24px',
           }}
         >
-          <h4 style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
-            Complexity
-          </h4>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', fontFamily: 'ui-monospace, monospace', fontSize: '0.8rem' }}>
-            <Row label={t('complexity.best')} value={meta.complexity.time.best} color="#10b981" />
-            <Row label={t('complexity.average')} value={meta.complexity.time.avg} color={color} />
-            <Row label={t('complexity.worst')} value={meta.complexity.time.worst} color="#ef4444" />
-            <Row label={t('complexity.space')} value={meta.complexity.space} color="#64748b" />
-          </div>
+          {(['complexity', 'about'] as const).map(tab => (
+            <button
+              key={tab}
+              onClick={() => setInfoTab(tab)}
+              style={{
+                padding: '10px 0',
+                marginRight: '24px',
+                border: 'none',
+                borderBottom: `2px solid ${infoTab === tab ? textColor : 'transparent'}`,
+                background: 'transparent',
+                color: infoTab === tab ? '#0f172a' : '#94a3b8',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                cursor: 'pointer',
+                transition: 'color 0.15s',
+              }}
+            >
+              {tab === 'complexity' ? 'Complexity' : 'About'}
+            </button>
+          ))}
         </div>
 
-        {/* Description */}
-        <div
-          style={{
-            background: '#1e293b',
-            borderRadius: '8px',
-            border: '1px solid rgba(99,102,241,0.2)',
-            padding: '0.875rem 1rem',
-          }}
-        >
-          <h4 style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
-            {t('description')}
-          </h4>
-          <p style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>
-            {t(meta.descriptionKey)}
-          </p>
-        </div>
-
-        {/* When to use */}
-        <div
-          style={{
-            background: '#1e293b',
-            borderRadius: '8px',
-            border: '1px solid rgba(99,102,241,0.2)',
-            padding: '0.875rem 1rem',
-          }}
-        >
-          <h4 style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
-            {t('whenToUse')}
-          </h4>
-          <p style={{ color: '#94a3b8', fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>
-            {t(meta.descriptionKey.replace('.description', '.whenToUse'))}
-          </p>
+        {/* Content */}
+        <div style={{ padding: '16px 24px' }}>
+          {infoTab === 'complexity' ? (
+            <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
+              {[
+                { label: t('complexity.best'),    value: meta.complexity.time.best,  col: '#10b981' },
+                { label: t('complexity.average'), value: meta.complexity.time.avg,   col: textColor },
+                { label: t('complexity.worst'),   value: meta.complexity.time.worst, col: '#ef4444' },
+                { label: t('complexity.space'),   value: meta.complexity.space,      col: '#94a3b8' },
+              ].map(row => (
+                <div key={row.label} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span
+                    style={{
+                      color: '#c1c9d2',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                    }}
+                  >
+                    {row.label}
+                  </span>
+                  <span
+                    style={{
+                      color: row.col,
+                      fontFamily: 'ui-monospace, monospace',
+                      fontSize: '15px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    {row.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p
+              style={{
+                color: '#64748b',
+                fontSize: '14px',
+                lineHeight: 1.7,
+                margin: 0,
+                maxWidth: '640px',
+                fontWeight: 400,
+              }}
+            >
+              {t(meta.descriptionKey)}
+            </p>
+          )}
         </div>
       </div>
-    </div>
-  )
-}
-
-function Row({ label, value, color }: { label: string; value: string; color: string }) {
-  return (
-    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-      <span style={{ color: '#475569', fontSize: '0.7rem', minWidth: '48px' }}>{label}:</span>
-      <span style={{ color }}>{value}</span>
     </div>
   )
 }

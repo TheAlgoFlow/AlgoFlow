@@ -1,5 +1,6 @@
 'use client'
 
+import { SkipBack, ChevronLeft, Play, Pause, ChevronRight, SkipForward } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import type { PlayerState } from '@/hooks/useAlgorithmPlayer'
 
@@ -17,24 +18,15 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
   const progress = totalFrames > 1 ? (frameIndex / (totalFrames - 1)) * 100 : 0
 
   return (
-    <div
-      style={{
-        background: '#0f172a',
-        border: '1px solid rgba(99,102,241,0.2)',
-        borderRadius: '8px',
-        padding: '0.75rem 1rem',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '0.5rem',
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
       {/* Message */}
       <div
         style={{
-          fontSize: '0.875rem',
+          fontSize: '0.8rem',
           color: '#94a3b8',
-          minHeight: '1.25rem',
+          minHeight: '1.2rem',
           textAlign: 'center',
+          letterSpacing: '0.01em',
         }}
       >
         {message}
@@ -42,14 +34,14 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
 
       {/* Progress bar */}
       <div
-        onClick={(e) => {
+        onClick={e => {
           const rect = e.currentTarget.getBoundingClientRect()
           const pct = (e.clientX - rect.left) / rect.width
           seekTo(Math.round(pct * (totalFrames - 1)))
         }}
         style={{
-          height: '4px',
-          background: 'rgba(99,102,241,0.2)',
+          height: '3px',
+          background: 'rgba(0,0,0,0.08)',
           borderRadius: '2px',
           cursor: 'pointer',
           position: 'relative',
@@ -59,7 +51,7 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
           style={{
             height: '100%',
             width: `${progress}%`,
-            background: '#6366f1',
+            background: '#5200FF',
             borderRadius: '2px',
             transition: 'width 0.1s linear',
           }}
@@ -75,67 +67,82 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
           gap: '0.5rem',
         }}
       >
-        {/* Left: step counter */}
-        <span style={{ color: '#64748b', fontSize: '0.75rem', minWidth: '80px' }}>
+        {/* Step counter */}
+        <span
+          style={{
+            color: '#c1c9d2',
+            fontSize: '0.7rem',
+            fontFamily: 'ui-monospace, monospace',
+            minWidth: '72px',
+            fontWeight: 600,
+          }}
+        >
           {t('controls.step')} {frameIndex + 1}/{totalFrames}
         </span>
 
-        {/* Center: playback buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <ControlBtn onClick={reset} title="Reset" disabled={frameIndex === 0 && !isPlaying}>
-            ⏮
-          </ControlBtn>
-          <ControlBtn onClick={stepBack} title={t('controls.stepBack')} disabled={frameIndex === 0}>
-            ◀
-          </ControlBtn>
+        {/* Playback buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <CtrlBtn onClick={reset} title="Reset" disabled={frameIndex === 0 && !isPlaying}>
+            <SkipBack size={14} strokeWidth={2} />
+          </CtrlBtn>
+          <CtrlBtn onClick={stepBack} title={t('controls.stepBack')} disabled={frameIndex === 0}>
+            <ChevronLeft size={16} strokeWidth={2.5} />
+          </CtrlBtn>
+
+          {/* Play / Pause */}
           <button
             onClick={isPlaying ? pause : play}
             disabled={totalFrames === 0}
             style={{
-              width: '40px',
-              height: '40px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
               border: 'none',
-              background: totalFrames === 0 ? '#1e293b' : '#6366f1',
-              color: '#fff',
-              fontSize: '1rem',
+              background: totalFrames === 0 ? '#f1f5f9' : '#5200FF',
+              color: totalFrames === 0 ? '#c1c9d2' : '#ffffff',
               cursor: totalFrames === 0 ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'all 0.15s ease',
-              boxShadow: totalFrames > 0 ? '0 0 12px rgba(99,102,241,0.4)' : 'none',
+              boxShadow: totalFrames > 0 ? '0 2px 12px rgba(82,0,255,0.35)' : 'none',
+              flexShrink: 0,
             }}
           >
-            {isPlaying ? '⏸' : '▶'}
+            {isPlaying
+              ? <Pause size={15} strokeWidth={2.5} />
+              : <Play size={15} strokeWidth={2.5} style={{ marginLeft: '2px' }} />
+            }
           </button>
-          <ControlBtn onClick={stepForward} title={t('controls.stepForward')} disabled={frameIndex >= totalFrames - 1}>
-            ▶
-          </ControlBtn>
-          <ControlBtn onClick={() => seekTo(totalFrames - 1)} title="Skip to end" disabled={frameIndex >= totalFrames - 1}>
-            ⏭
-          </ControlBtn>
+
+          <CtrlBtn onClick={stepForward} title={t('controls.stepForward')} disabled={frameIndex >= totalFrames - 1}>
+            <ChevronRight size={16} strokeWidth={2.5} />
+          </CtrlBtn>
+          <CtrlBtn onClick={() => seekTo(totalFrames - 1)} title="Skip to end" disabled={frameIndex >= totalFrames - 1}>
+            <SkipForward size={14} strokeWidth={2} />
+          </CtrlBtn>
         </div>
 
-        {/* Right: speed selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: '80px', justifyContent: 'flex-end' }}>
+        {/* Speed selector */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '3px', minWidth: '72px', justifyContent: 'flex-end' }}>
           {SPEEDS.map(s => (
             <button
               key={s}
               onClick={() => setSpeed(s)}
               style={{
-                padding: '2px 6px',
-                borderRadius: '3px',
+                padding: '2px 5px',
+                borderRadius: '4px',
                 border: '1px solid',
-                borderColor: speed === s ? '#6366f1' : 'rgba(99,102,241,0.2)',
-                background: speed === s ? 'rgba(99,102,241,0.2)' : 'transparent',
-                color: speed === s ? '#a5b4fc' : '#64748b',
-                fontSize: '0.65rem',
+                borderColor: speed === s ? '#5200FF' : 'rgba(0,0,0,0.1)',
+                background: speed === s ? '#5200FF' : '#ffffff',
+                color: speed === s ? '#ffffff' : '#94a3b8',
+                fontSize: '0.63rem',
                 cursor: 'pointer',
-                fontWeight: speed === s ? 700 : 400,
+                fontWeight: speed === s ? 700 : 500,
+                transition: 'all 0.12s',
               }}
             >
-              {s}x
+              {s}×
             </button>
           ))}
         </div>
@@ -144,7 +151,7 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
   )
 }
 
-function ControlBtn({
+function CtrlBtn({
   onClick,
   children,
   title,
@@ -161,18 +168,18 @@ function ControlBtn({
       title={title}
       disabled={disabled}
       style={{
-        width: '32px',
-        height: '32px',
+        width: '30px',
+        height: '30px',
         borderRadius: '6px',
-        border: '1px solid rgba(99,102,241,0.3)',
-        background: 'transparent',
-        color: disabled ? '#334155' : '#94a3b8',
-        fontSize: '0.875rem',
+        border: '1px solid rgba(0,0,0,0.1)',
+        background: '#ffffff',
+        color: disabled ? '#d1d9e0' : '#475569',
         cursor: disabled ? 'not-allowed' : 'pointer',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        transition: 'all 0.15s ease',
+        transition: 'all 0.12s ease',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
       }}
     >
       {children}

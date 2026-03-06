@@ -6,24 +6,24 @@ import { useI18n } from '@/i18n/context'
 
 type Language = keyof CodeSnippets
 
-const LANGUAGES: { key: Language; label: string }[] = [
-  { key: 'ts', label: 'TS' },
-  { key: 'python', label: 'PY' },
-  { key: 'c', label: 'C' },
-  { key: 'java', label: 'Java' },
-  { key: 'go', label: 'Go' },
+const LANGUAGES: { key: Language; label: string; logo: string; logoW: number; logoH: number; right: number }[] = [
+  { key: 'ts',     label: 'TypeScript', logo: '/logos/typescript.svg',    logoW: 48,  logoH: 48, right: 14 },
+  { key: 'python', label: 'Python',     logo: '/logos/python.svg',        logoW: 48,  logoH: 48, right: 14 },
+  { key: 'c',      label: 'C',          logo: '/logos/c-program-icon.svg',logoW: 48,  logoH: 48, right: 14 },
+  { key: 'java',   label: 'Java',       logo: '/logos/java.svg',          logoW: 48,  logoH: 48, right: 14 },
+  { key: 'go',     label: 'Go',         logo: '/logos/golang-ar21.svg',   logoW: 128, logoH: 48, right: 0  },
 ]
 
-// Syntax token colors (simplified)
+// Syntax token colors (light theme)
 const TOKEN_COLORS = {
-  keyword: '#c792ea',
-  string: '#c3e88d',
-  number: '#f78c6c',
-  comment: '#546e7a',
-  function: '#82aaff',
-  type: '#ffcb6b',
-  operator: '#89ddff',
-  default: '#eeffff',
+  keyword: '#7c3aed',
+  string: '#059669',
+  number: '#dc2626',
+  comment: '#64748b',
+  function: '#2563eb',
+  type: '#b45309',
+  operator: '#0d9488',
+  default: '#1e293b',
 }
 
 function colorize(code: string, lang: Language): React.ReactNode[] {
@@ -79,10 +79,10 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        background: '#0d1117',
+        background: '#ffffff',
         borderRadius: '8px',
         overflow: 'hidden',
-        border: '1px solid rgba(99,102,241,0.2)',
+        border: '1px solid rgba(0,0,0,0.08)',
       }}
     >
       {/* Language tabs */}
@@ -90,9 +90,12 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
         style={{
           display: 'flex',
           gap: '1px',
-          background: '#161b22',
+          background: '#f0f9ff',
           padding: '4px 4px 0',
-          borderBottom: '1px solid rgba(99,102,241,0.2)',
+          borderBottom: '1px solid rgba(0,0,0,0.08)',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          flexShrink: 0,
         }}
       >
         {LANGUAGES.map(({ key, label }) => (
@@ -101,16 +104,17 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
             onClick={() => setLang(key)}
             style={{
               padding: '6px 12px',
-              borderRadius: '4px 4px 0 0',
+              borderRadius: '6px 6px 0 0',
               border: 'none',
-              background: lang === key ? '#0d1117' : 'transparent',
-              color: lang === key ? '#a5b4fc' : '#64748b',
-              fontSize: '0.75rem',
+              background: lang === key ? '#ffffff' : 'transparent',
+              color: lang === key ? '#0f172a' : '#64748b',
+              fontSize: '0.72rem',
               fontWeight: 600,
               cursor: 'pointer',
-              borderBottom: lang === key ? '2px solid #6366f1' : '2px solid transparent',
+              borderBottom: lang === key ? '2px solid #0ea5e9' : '2px solid transparent',
               transition: 'all 0.15s ease',
               fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
             }}
           >
             {label}
@@ -118,51 +122,77 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
         ))}
       </div>
 
-      {/* Code lines */}
-      <div
-        style={{
-          flex: 1,
-          overflow: 'auto',
-          padding: '8px 0',
-          fontFamily: "'JetBrains Mono', 'Fira Code', ui-monospace, monospace",
-          fontSize: '0.8125rem',
-          lineHeight: '1.7',
-        }}
-      >
-        {lines.map(({ line, code }) => {
-          const isActive = line === activeLine
-          return (
-            <div
-              key={line}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: isActive ? 'rgba(99,102,241,0.15)' : 'transparent',
-                borderLeft: isActive ? '3px solid #6366f1' : '3px solid transparent',
-                paddingLeft: isActive ? '9px' : '12px',
-                paddingRight: '12px',
-                transition: 'all 0.15s ease',
-              }}
-            >
-              <span
+      {/* Code lines + watermark wrapper */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+
+        {/* Scrollable code lines */}
+        <div
+          style={{
+            height: '100%',
+            overflow: 'auto',
+            padding: '8px 0',
+            fontFamily: "'JetBrains Mono', 'Fira Code', ui-monospace, monospace",
+            fontSize: '0.8125rem',
+            lineHeight: '1.7',
+          }}
+        >
+          {lines.map(({ line, code }) => {
+            const isActive = line === activeLine
+            return (
+              <div
+                key={line}
                 style={{
-                  color: isActive ? '#4f46e5' : '#3d4f69',
-                  fontSize: '0.7rem',
-                  width: '28px',
-                  flexShrink: 0,
-                  userSelect: 'none',
-                  textAlign: 'right',
-                  marginRight: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                background: isActive ? 'rgba(14,165,233,0.12)' : 'transparent',
+                borderLeft: isActive ? '3px solid #0ea5e9' : '3px solid transparent',
+                  paddingLeft: isActive ? '9px' : '12px',
+                  paddingRight: '12px',
+                  transition: 'all 0.15s ease',
                 }}
               >
-                {line}
-              </span>
-              <code style={{ color: '#eeffff', whiteSpace: 'pre' }}>
-                {colorize(code, lang)}
-              </code>
-            </div>
+                <span
+                  style={{
+                    color: isActive ? '#0369a1' : '#64748b',
+                    fontSize: '0.7rem',
+                    width: '28px',
+                    flexShrink: 0,
+                    userSelect: 'none',
+                    textAlign: 'right',
+                    marginRight: '12px',
+                  }}
+                >
+                  {line}
+                </span>
+                <code style={{ color: '#1e293b', whiteSpace: 'pre' }}>
+                  {colorize(code, lang)}
+                </code>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Language watermark — always at bottom-right of visible area */}
+        {(() => {
+          const activeLang = LANGUAGES.find(l => l.key === lang)!
+          return (
+            <img
+              src={activeLang.logo}
+              alt=""
+              width={activeLang.logoW}
+              height={activeLang.logoH}
+              style={{
+                position: 'absolute',
+                bottom: '14px',
+                right: `${activeLang.right}px`,
+                objectFit: 'contain',
+                opacity: 0.07,
+                pointerEvents: 'none',
+                filter: 'grayscale(1)',
+              }}
+            />
           )
-        })}
+        })()}
       </div>
     </div>
   )

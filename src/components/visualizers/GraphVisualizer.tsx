@@ -51,7 +51,7 @@ export function GraphVisualizer({ frame }: GraphVisualizerProps) {
     if (current === nodeId) return '#f59e0b'
     if (visited?.includes(nodeId)) return '#10b981'
     if ((queue ?? stack ?? []).includes(nodeId)) return '#6366f1'
-    return '#1e293b'
+    return '#e2e8f0'
   }
 
   const getNodeBorder = (nodeId: string) => {

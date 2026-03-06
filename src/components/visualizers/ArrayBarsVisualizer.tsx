@@ -128,7 +128,7 @@ export function ArrayBarsVisualizer({ frame }: ArrayBarsVisualizerProps) {
 
       {/* Count array (for counting sort) */}
       {state.countArray && state.countArray.length > 0 && (
-        <div style={{ borderTop: '1px solid #1e293b', paddingTop: '0.5rem' }}>
+        <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: '0.5rem' }}>
           <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '0.25rem' }}>
             Count array
           </div>
@@ -142,11 +142,11 @@ export function ArrayBarsVisualizer({ frame }: ArrayBarsVisualizerProps) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  background: count > 0 ? 'rgba(99,102,241,0.3)' : '#1e293b',
-                  border: '1px solid rgba(99,102,241,0.2)',
+                  background: count > 0 ? 'rgba(99,102,241,0.2)' : '#f1f5f9',
+                  border: '1px solid rgba(0,0,0,0.08)',
                   borderRadius: '3px',
                   fontSize: '0.7rem',
-                  color: count > 0 ? '#a5b4fc' : '#475569',
+                  color: count > 0 ? '#4f46e5' : '#64748b',
                 }}
               >
                 {count}

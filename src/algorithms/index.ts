@@ -73,11 +73,11 @@ for (const mod of allModules) {
   categorizedAlgorithms.get(cat)!.push(mod)
 }
 
-export const categories: { id: AlgorithmCategory; color: string; icon: string }[] = [
-  { id: 'sorting', color: '#7c3aed', icon: '↕' },
-  { id: 'searching', color: '#2563eb', icon: '🔍' },
-  { id: 'data-structures', color: '#16a34a', icon: '🗂' },
-  { id: 'dp', color: '#ea580c', icon: '🧩' },
+export const categories: { id: AlgorithmCategory; color: string }[] = [
+  { id: 'sorting',          color: '#CCFF00' },
+  { id: 'searching',        color: '#FF6B00' },
+  { id: 'data-structures',  color: '#F900FF' },
+  { id: 'dp',               color: '#5200FF' },
 ]
 
 export function getAlgorithm(slug: string): AlgorithmModule | undefined {

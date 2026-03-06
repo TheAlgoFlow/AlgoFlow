@@ -1,21 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-purple: #7c3aed;
-  --color-brand-blue: #2563eb;
-  --color-brand-green: #16a34a;
-  --color-brand-orange: #ea580c;
-  --color-brand-pink: #db2777;
-  --color-brand-teal: #0d9488;
+  --color-brand-lime:   #CCFF00;
+  --color-brand-orange: #FF6B00;
+  --color-brand-pink:   #F900FF;
+  --color-brand-violet: #5200FF;
 
   --color-bar-default: #6366f1;
   --color-bar-compare: #f59e0b;
-  --color-bar-swap: #ef4444;
-  --color-bar-pivot: #8b5cf6;
-  --color-bar-found: #10b981;
+  --color-bar-swap:    #ef4444;
+  --color-bar-pivot:   #8b5cf6;
+  --color-bar-found:   #10b981;
   --color-bar-visited: #6366f1;
   --color-bar-current: #f59e0b;
-  --color-bar-sorted: #10b981;
+  --color-bar-sorted:  #10b981;
 
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
 }
@@ -24,6 +22,16 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  cursor: default;
+}
+
+input, textarea {
+  cursor: text;
+  caret-color: transparent;
+}
+
+a, button, [role="button"] {
+  cursor: pointer;
 }
 
 html {
@@ -31,30 +39,19 @@ html {
 }
 
 body {
-  font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
-  background-color: #0f172a;
-  color: #f1f5f9;
+  font-family: var(--font-poppins, ui-sans-serif, system-ui, sans-serif);
+  background-color: #ffffff;
+  color: #0f172a;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1e293b;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* Code panel */
 .code-panel {
@@ -70,12 +67,11 @@ body {
 }
 
 .code-line.active {
-  background-color: rgba(99, 102, 241, 0.25);
-  border-left: 3px solid #6366f1;
+  background-color: rgba(82, 0, 255, 0.1);
+  border-left: 3px solid #5200FF;
   padding-left: 9px;
 }
 
-/* Animation classes */
 .bar-transition {
   transition: height 0.3s ease, background-color 0.2s ease;
 }

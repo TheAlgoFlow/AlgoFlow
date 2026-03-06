@@ -110,9 +110,9 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
                   fontSize: '1rem',
                   fontWeight: color ? 700 : 400,
                   border: '2px solid',
-                  borderColor: color ?? 'rgba(99,102,241,0.2)',
-                  background: color ? `${color}20` : 'rgba(30,41,59,0.8)',
-                  color: color ?? '#94a3b8',
+                  borderColor: color ?? 'rgba(0,0,0,0.12)',
+                  background: color ? `${color}18` : '#ffffff',
+                  color: color ?? '#334155',
                   boxShadow: isFound || isCurrent ? `0 0 12px ${color}60` : 'none',
                   transform: isCurrent ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all 0.2s ease',
@@ -147,9 +147,9 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
             gap: '1.5rem',
             fontSize: '0.875rem',
             padding: '0.5rem 1rem',
-            background: '#1e293b',
+            background: '#f1f5f9',
             borderRadius: '8px',
-            border: '1px solid rgba(99,102,241,0.2)',
+            border: '1px solid rgba(0,0,0,0.08)',
           }}
         >
           <span style={{ color: '#3b82f6' }}>Low: {state.low}</span>
