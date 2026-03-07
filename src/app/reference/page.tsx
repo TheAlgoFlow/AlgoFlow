@@ -4,20 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { allModules, categories } from '@/algorithms/index'
 import { useI18n } from '@/i18n/context'
-
-const CATEGORY_COLORS: Record<string, string> = {
-  sorting:           '#CCFF00',
-  searching:         '#FF6B00',
-  'data-structures': '#F900FF',
-  dp:                '#5200FF',
-}
-
-const CATEGORY_TEXT_COLORS: Record<string, string> = {
-  sorting:           '#4a6600',
-  searching:         '#FF6B00',
-  'data-structures': '#c000cc',
-  dp:                '#5200FF',
-}
+import { getCategoryTheme, CATEGORY_COLORS } from '@/components/constants/categoryTheme'
+import { Tag } from '@/components/atoms/Tag'
 
 function getComplexityColor(notation: string): string {
   if (notation === 'O(1)') return '#0f7142'
@@ -81,8 +69,7 @@ export default function ReferencePage() {
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '28px' }}>
           {['all', ...categories.map(c => c.id)].map(cat => {
             const active = activeCategory === cat
-            const color = cat !== 'all' ? CATEGORY_COLORS[cat] : undefined
-            const textColor = cat !== 'all' ? CATEGORY_TEXT_COLORS[cat] : undefined
+            const { color, textColor } = cat !== 'all' ? getCategoryTheme(cat) : { color: '#5200FF', textColor: '#5200FF' }
             return (
               <button
                 key={cat}
@@ -91,9 +78,9 @@ export default function ReferencePage() {
                   padding: '6px 16px',
                   borderRadius: '999px',
                   border: '1.5px solid',
-                  borderColor: active ? (color ?? '#5200FF') : '#E5DDD0',
-                  background: active ? (color ? `${color}18` : 'rgba(82,0,255,0.06)') : '#FDFCFA',
-                  color: active ? (textColor ?? '#5200FF') : '#78716C',
+                  borderColor: active ? color : '#E5DDD0',
+                  background: active ? `${color}18` : '#FDFCFA',
+                  color: active ? textColor : '#78716C',
                   fontSize: '12px',
                   fontWeight: 700,
                   letterSpacing: '0.04em',
@@ -147,8 +134,7 @@ export default function ReferencePage() {
               </thead>
               <tbody>
                 {filtered.map((mod, i) => {
-                  const catColor = CATEGORY_COLORS[mod.meta.category] ?? '#5200FF'
-                  const catTextColor = CATEGORY_TEXT_COLORS[mod.meta.category] ?? '#5200FF'
+                  const { color: catColor, textColor: catTextColor } = getCategoryTheme(mod.meta.category)
                   const isEven = i % 2 === 0
                   return (
                     <tr
@@ -220,22 +206,7 @@ export default function ReferencePage() {
                       <td style={{ padding: '11px 16px', borderBottom: '1px solid #F0EDE8' }}>
                         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                           {mod.meta.tags.slice(0, 3).map(tag => (
-                            <span
-                              key={tag}
-                              style={{
-                                fontSize: '10px',
-                                color: '#78716C',
-                                background: '#F0EDE8',
-                                border: '1px solid #E5DDD0',
-                                padding: '1px 6px',
-                                borderRadius: '4px',
-                                fontWeight: 600,
-                                letterSpacing: '0.03em',
-                                whiteSpace: 'nowrap',
-                              }}
-                            >
-                              {tag}
-                            </span>
+                            <Tag key={tag}>{tag}</Tag>
                           ))}
                         </div>
                       </td>

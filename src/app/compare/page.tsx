@@ -18,19 +18,7 @@ import { StackQueueVisualizer } from '@/components/visualizers/StackQueueVisuali
 import { HashTableVisualizer } from '@/components/visualizers/HashTableVisualizer'
 import type { AlgorithmFrame } from '@/engine/types'
 
-const CATEGORY_COLORS: Record<string, string> = {
-  sorting:           '#CCFF00',
-  searching:         '#FF6B00',
-  'data-structures': '#F900FF',
-  dp:                '#5200FF',
-}
-
-const CATEGORY_TEXT_COLORS: Record<string, string> = {
-  sorting:           '#4a6600',
-  searching:         '#FF6B00',
-  'data-structures': '#c000cc',
-  dp:                '#5200FF',
-}
+import { getCategoryTheme, CATEGORY_COLORS } from '@/components/constants/categoryTheme'
 
 function getComplexityRank(notation: string): number {
   if (notation === 'O(1)') return 1
@@ -316,10 +304,10 @@ function ComparePageInner() {
                 <thead>
                   <tr>
                     <th style={thStyle}>Metric</th>
-                    <th style={{ ...thStyle, color: CATEGORY_TEXT_COLORS[algoA.meta.category] ?? '#5200FF' }}>
+                    <th style={{ ...thStyle, color: getCategoryTheme(algoA.meta.category).textColor }}>
                       {t(algoA.meta.nameKey)}
                     </th>
-                    <th style={{ ...thStyle, color: CATEGORY_TEXT_COLORS[algoB.meta.category] ?? '#FF6B00' }}>
+                    <th style={{ ...thStyle, color: getCategoryTheme(algoB.meta.category).textColor }}>
                       {t(algoB.meta.nameKey)}
                     </th>
                     <th style={thStyle}>Winner</th>
