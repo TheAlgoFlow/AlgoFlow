@@ -90,7 +90,7 @@ export default function ReferencePage() {
                   textTransform: 'capitalize',
                 }}
               >
-                {cat === 'all' ? t('reference.all') : cat === 'data-structures' ? 'Data Structures' : cat === 'dp' ? 'DP' : t(`nav.${cat}`)}
+                {cat === 'all' ? t('reference.all') : t(`categories.${cat}.name`)}
               </button>
             )
           })}
@@ -99,8 +99,8 @@ export default function ReferencePage() {
         {/* ── Table ── */}
         <div
           style={{
-            background: '#FDFCFA',
-            border: '1.5px solid #E5DDD0',
+            background: 'var(--bg-card)',
+            border: '1.5px solid var(--border)',
             borderRadius: '16px',
             overflow: 'hidden',
             marginBottom: '48px',

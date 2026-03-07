@@ -30,8 +30,8 @@ export default function VisualizerPage({
   if (!algo) {
     return (
       <div style={{ padding: '80px', textAlign: 'center', color: '#78716C', fontWeight: 500 }}>
-        Algorithm not found.{' '}
-        <Link href="/" style={{ color: '#5200FF', fontWeight: 700 }}>Go home</Link>
+        {t('viz.notFound')}{' '}
+        <Link href="/" style={{ color: '#5200FF', fontWeight: 700 }}>{t('viz.goHome')}</Link>
       </div>
     )
   }

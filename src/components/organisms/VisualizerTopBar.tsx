@@ -122,7 +122,7 @@ export function VisualizerTopBar({
         }}
       >
         {showCode ? <X size={13} strokeWidth={2.5} /> : <Code2 size={13} strokeWidth={2.5} />}
-        {showCode ? 'Hide code' : 'Code'}
+        {showCode ? t('viz.hideCode') : t('viz.showCode')}
       </button>
     </div>
   )

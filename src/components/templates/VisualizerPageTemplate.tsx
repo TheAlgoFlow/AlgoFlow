@@ -148,6 +148,7 @@ export function VisualizerPageTemplate({
             minHeight: '52vh',
             background: 'var(--bg-muted)',
             flex: showCode ? `0 0 ${100 - codeWidthPct}%` : '1 1 100%',
+            transition: 'flex-basis 0.3s ease',
             minWidth: 0,
             overflow: 'hidden',
           }}
@@ -174,8 +175,8 @@ export function VisualizerPageTemplate({
               }}
             >
               {([
-                { mode: 'array',   icon: <LayoutGrid size={12} strokeWidth={2.5} />, label: 'Array' },
-                { mode: 'classic', icon: <BarChart2  size={12} strokeWidth={2.5} />, label: 'Classic' },
+                { mode: 'array',   icon: <LayoutGrid size={12} strokeWidth={2.5} />, label: t('viz.modeArray') },
+                { mode: 'classic', icon: <BarChart2  size={12} strokeWidth={2.5} />, label: t('viz.modeClassic') },
               ] as const).map(btn => (
                 <button
                   key={btn.mode}
@@ -205,37 +206,35 @@ export function VisualizerPageTemplate({
         </div>
 
         {/* Drag handle */}
-        {showCode && (
-          <div
-            onMouseDown={() => setIsDragging(true)}
-            style={{
-              width: '5px',
-              flexShrink: 0,
-              background: isDragging ? 'var(--border-hover)' : 'var(--border)',
-              cursor: 'col-resize',
-              zIndex: 10,
-              transition: 'background 0.15s',
-              borderLeft:  '1px solid rgba(0,0,0,0.08)',
-              borderRight: '1px solid rgba(0,0,0,0.08)',
-            }}
-            onMouseEnter={e => { if (!isDragging) e.currentTarget.style.background = 'var(--border-hover)' }}
-            onMouseLeave={e => { if (!isDragging) e.currentTarget.style.background = 'var(--border)' }}
-          />
-        )}
+        <div
+          onMouseDown={() => setIsDragging(true)}
+          style={{
+            width: showCode ? '5px' : '0px',
+            flexShrink: 0,
+            background: isDragging ? 'var(--border-hover)' : 'var(--border)',
+            cursor: 'col-resize',
+            zIndex: 10,
+            overflow: 'hidden',
+            transition: 'width 0.3s ease, background 0.15s',
+            borderLeft:  showCode ? '1px solid rgba(0,0,0,0.08)' : 'none',
+            borderRight: showCode ? '1px solid rgba(0,0,0,0.08)' : 'none',
+          }}
+          onMouseEnter={e => { if (!isDragging) e.currentTarget.style.background = 'var(--border-hover)' }}
+          onMouseLeave={e => { if (!isDragging) e.currentTarget.style.background = 'var(--border)' }}
+        />
 
         {/* Code panel */}
-        {showCode && (
-          <div
-            style={{
-              flex: `0 0 ${codeWidthPct}%`,
-              minWidth: 0,
-              overflow: 'auto',
-              background: 'var(--bg-muted)',
-            }}
-          >
-            <CodePanel snippets={algo.codeSnippets} activeLine={frame?.codeLine ?? 0} />
-          </div>
-        )}
+        <div
+          style={{
+            flex: `0 0 ${showCode ? codeWidthPct : 0}%`,
+            minWidth: 0,
+            overflow: 'hidden',
+            background: 'var(--bg-muted)',
+            transition: 'flex-basis 0.3s ease',
+          }}
+        >
+          <CodePanel snippets={algo.codeSnippets} activeLine={frame?.codeLine ?? 0} />
+        </div>
       </div>
 
       {/* ── Controls dock + input row ── */}

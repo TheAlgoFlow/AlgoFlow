@@ -56,6 +56,28 @@ function ComparePageInner() {
 
   const [slotASlug, setSlotASlug] = useState<string>(searchParams.get('a') ?? '')
   const [slotBSlug, setSlotBSlug] = useState<string>(searchParams.get('b') ?? '')
+
+  const handleSlotAChange = useCallback((slug: string) => {
+    setSlotASlug(slug)
+    if (slug) {
+      const newAlgo = allModules.find(m => m.meta.slug === slug)
+      const algoB = allModules.find(m => m.meta.slug === slotBSlug)
+      if (newAlgo && algoB && newAlgo.meta.category !== algoB.meta.category) {
+        setSlotBSlug('')
+      }
+    }
+  }, [slotBSlug])
+
+  const handleSlotBChange = useCallback((slug: string) => {
+    setSlotBSlug(slug)
+    if (slug) {
+      const newAlgo = allModules.find(m => m.meta.slug === slug)
+      const algoA = allModules.find(m => m.meta.slug === slotASlug)
+      if (newAlgo && algoA && newAlgo.meta.category !== algoA.meta.category) {
+        setSlotASlug('')
+      }
+    }
+  }, [slotASlug])
   const [linked, setLinked] = useState(false)
   const [linkedFrame, setLinkedFrame] = useState(0)
   const [isLinkedPlaying, setIsLinkedPlaying] = useState(false)
@@ -179,7 +201,7 @@ function ComparePageInner() {
             marginBottom: '20px',
           }}
         >
-          <AlgorithmPicker value={slotASlug} onChange={setSlotASlug} label={t('compare.algoA')} accent="#5200FF" />
+          <AlgorithmPicker value={slotASlug} onChange={handleSlotAChange} label={t('compare.algoA')} accent="#5200FF" filterCategory={algoB?.meta.category} />
           <div
             style={{
               display: 'flex',
@@ -194,7 +216,7 @@ function ComparePageInner() {
           >
             {t('compare.vs')}
           </div>
-          <AlgorithmPicker value={slotBSlug} onChange={setSlotBSlug} label={t('compare.algoB')} accent="#FF6B00" />
+          <AlgorithmPicker value={slotBSlug} onChange={handleSlotBChange} label={t('compare.algoB')} accent="#FF6B00" filterCategory={algoA?.meta.category} />
         </div>
 
         {/* ── Link toggle ── */}
@@ -379,14 +401,25 @@ const tdStyle: React.CSSProperties = {
 }
 
 function AlgorithmPicker({
-  value, onChange, label, accent,
+  value, onChange, label, accent, filterCategory,
 }: {
   value: string
   onChange: (v: string) => void
   label: string
   accent: string
+  filterCategory?: string
 }) {
   const { t } = useI18n()
+  const options = filterCategory
+    ? allModules.filter(m => m.meta.category === filterCategory)
+    : allModules
+
+  const categoryLabel = (cat: string) => {
+    if (cat === 'data-structures') return 'DS'
+    if (cat === 'dp') return 'DP'
+    return t(`nav.${cat}`)
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <label
@@ -400,6 +433,11 @@ function AlgorithmPicker({
         }}
       >
         {label}
+        {filterCategory && (
+          <span style={{ marginLeft: '6px', color: accent, opacity: 0.8 }}>
+            · {categoryLabel(filterCategory)} {t('compare.onlyCategory')}
+          </span>
+        )}
       </label>
       <select
         value={value}
@@ -420,9 +458,9 @@ function AlgorithmPicker({
         }}
       >
         <option value="">{t('compare.selectAlgorithm')}</option>
-        {allModules.map(mod => (
+        {options.map(mod => (
           <option key={mod.meta.slug} value={mod.meta.slug}>
-            {t(mod.meta.nameKey)} ({mod.meta.category === 'data-structures' ? 'DS' : mod.meta.category === 'dp' ? 'DP' : t(`nav.${mod.meta.category}`)})
+            {t(mod.meta.nameKey)} ({categoryLabel(mod.meta.category)})
           </option>
         ))}
       </select>

@@ -8,11 +8,11 @@ import { useI18n } from '@/i18n/context'
 import { PlaybackControls } from '@/components/molecules/PlaybackControls'
 import type { PlayerState } from '@/hooks/useAlgorithmPlayer'
 
-const SORTING_PRESETS: { label: string; icon: React.ReactNode; arr: number[] }[] = [
-  { label: 'Random',   icon: <Shuffle size={12} strokeWidth={2.5} />,      arr: [64, 34, 25, 12, 22, 11, 90] },
-  { label: 'Nearly ↑', icon: <TrendingUp size={12} strokeWidth={2.5} />,   arr: [1, 2, 4, 3, 5, 7, 6] },
-  { label: 'Reversed', icon: <TrendingDown size={12} strokeWidth={2.5} />, arr: [90, 75, 50, 35, 20, 10, 5] },
-  { label: 'Equal',    icon: <Equal size={12} strokeWidth={2.5} />,        arr: [42, 42, 42, 42, 42] },
+const SORTING_PRESETS: { labelKey: string; icon: React.ReactNode; arr: number[] }[] = [
+  { labelKey: 'input.presetRandom',   icon: <Shuffle size={12} strokeWidth={2.5} />,      arr: [64, 34, 25, 12, 22, 11, 90] },
+  { labelKey: 'input.presetNearly',   icon: <TrendingUp size={12} strokeWidth={2.5} />,   arr: [1, 2, 4, 3, 5, 7, 6] },
+  { labelKey: 'input.presetReversed', icon: <TrendingDown size={12} strokeWidth={2.5} />, arr: [90, 75, 50, 35, 20, 10, 5] },
+  { labelKey: 'input.presetEqual',    icon: <Equal size={12} strokeWidth={2.5} />,        arr: [42, 42, 42, 42, 42] },
 ]
 
 const SEARCH_PRESETS = {
@@ -86,7 +86,7 @@ export function VisualizerControlsDock({
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
               {SORTING_PRESETS.map(p => (
                 <button
-                  key={p.label}
+                  key={p.labelKey}
                   onClick={() => { onInputChange(p.arr); setCustomInput('') }}
                   style={{
                     display: 'inline-flex',
@@ -112,7 +112,7 @@ export function VisualizerControlsDock({
                     e.currentTarget.style.color = 'var(--text-muted)'
                   }}
                 >
-                  {p.icon}{p.label}
+                  {p.icon}{t(p.labelKey)}
                 </button>
               ))}
             </div>
@@ -182,7 +182,7 @@ export function VisualizerControlsDock({
             onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 18px rgba(82,0,255,0.4)' }}
             onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 10px rgba(82,0,255,0.28)' }}
           >
-            Run
+            {t('input.run')}
           </button>
         </div>
       )}

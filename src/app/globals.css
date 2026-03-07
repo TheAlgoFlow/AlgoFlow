@@ -33,6 +33,7 @@
 /* ── Light mode (default) ── */
 :root {
   --bg:           #F5F1EB;
+  --bg-card:      #FDFCFA;
   --bg-surface:   #F9F6F0;
   --bg-muted:     #F0EDE8;
   --text:         #1C1917;
@@ -50,6 +51,7 @@
 /* ── Dark mode ── */
 [data-theme="dark"] {
   --bg:           #0F0E0D;
+  --bg-card:      #1A1917;
   --bg-surface:   #1A1917;
   --bg-muted:     #242220;
   --text:         #EDE8E3;

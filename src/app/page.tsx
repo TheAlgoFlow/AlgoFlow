@@ -56,7 +56,7 @@ export default function HomePage() {
           letterSpacing: '-0.025em',
           marginBottom: '6px',
         }}>
-          Algorithms
+          {t('algorithms')}
         </h1>
         <p style={{
           fontFamily: 'var(--font-mono)',
@@ -65,7 +65,7 @@ export default function HomePage() {
           color: 'var(--text-muted)',
           letterSpacing: '0.04em',
         }}>
-          {categories.length} categories · {totalAlgos} algorithms
+          {t('home.stats', { categories: categories.length, total: totalAlgos })}
         </p>
       </section>
 
@@ -129,7 +129,8 @@ export default function HomePage() {
                       fontSize: '120px',
                       fontWeight: 900,
                       lineHeight: 1,
-                      color: 'rgba(28,25,23,0.04)',
+                      color: 'var(--text)',
+                      opacity: 0.06,
                       letterSpacing: '-0.05em',
                       userSelect: 'none',
                       pointerEvents: 'none',
@@ -169,7 +170,7 @@ export default function HomePage() {
                       marginBottom: 'auto',
                     }}
                   >
-                    {algos.length} algorithms
+                    {t('home.algorithmCount', { count: algos.length })}
                   </p>
 
                   {/* Tags — using atom */}

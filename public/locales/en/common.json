@@ -5,7 +5,11 @@
     "sorting": "Sorting",
     "searching": "Searching",
     "dataStructures": "Data Structures",
-    "dp": "Dynamic Programming"
+    "dp": "Dynamic Programming",
+    "reference": "Reference",
+    "bigO": "Big-O",
+    "compare": "Compare",
+    "searchPlaceholder": "Search algorithms…"
   },
   "controls": {
     "play": "Play",
@@ -24,7 +28,11 @@
     "target": "Target",
     "targetPlaceholder": "Search target",
     "run": "Run",
-    "apply": "Apply"
+    "apply": "Apply",
+    "presetRandom": "Random",
+    "presetNearly": "Nearly ↑",
+    "presetReversed": "Reversed",
+    "presetEqual": "Equal"
   },
   "complexity": {
     "time": "Time",
@@ -49,6 +57,30 @@
   },
   "back": "← Back",
   "algorithms": "Algorithms",
+  "home": {
+    "stats": "{{categories}} categories · {{total}} algorithms",
+    "algorithmCount": "{{count}} algorithms"
+  },
+  "viz": {
+    "notFound": "Algorithm not found.",
+    "goHome": "Go home",
+    "hideCode": "Hide code",
+    "showCode": "Code",
+    "modeArray": "Array",
+    "modeClassic": "Classic"
+  },
+  "infopanel": {
+    "complexity": "Complexity",
+    "about": "About"
+  },
+  "search": {
+    "quickAccess": "Quick Access",
+    "noResults": "No algorithms found for \"{{query}}\"",
+    "recent": "Recent",
+    "navigate": "Navigate",
+    "jump": "Jump",
+    "close": "Close"
+  },
   "tags": "Tags",
   "description": "Description",
   "whenToUse": "When to use",
@@ -69,7 +101,8 @@
     "tie": "Tie",
     "selectAlgorithm": "Select algorithm…",
     "noAlgorithm": "No algorithm selected",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "onlyCategory": "only"
   },
   "reference": {
     "subtitle": "Big-O Reference",
@@ -101,6 +134,7 @@
     "classesTitle": "The Six Classes",
     "examples": "Examples in AlgoFlow",
     "fullCheatSheet": "→ Full Cheat Sheet",
+    "footerLink": "Click any algorithm name to open its interactive visualizer.",
     "classes": {
       "constant": { "label": "Constant", "desc": "Fixed time regardless of input size. The gold standard — as close to instant as algorithms get." },
       "logarithmic": { "label": "Logarithmic", "desc": "Halves the search space each step. Blazingly fast even on inputs with millions of elements." },

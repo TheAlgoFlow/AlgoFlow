@@ -174,7 +174,7 @@ export function SearchOverlay({ open, onClose }: Props) {
             ref={inputRef}
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search algorithms…"
+            placeholder={t('nav.searchPlaceholder')}
             style={{
               flex: 1,
               border: 'none',
@@ -261,7 +261,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                   transition: 'all 0.12s',
                 }}
               >
-                {cat === 'all' ? 'All' : cat === 'data-structures' ? 'Data Structures' : cat === 'dp' ? 'DP' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {cat === 'all' ? t('reference.all') : t(`categories.${cat}.name`)}
               </button>
             )
           })}
@@ -283,7 +283,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                   marginBottom: '10px',
                 }}
               >
-                Quick Access
+                {t('search.quickAccess')}
               </p>
               {categories.map(cat => {
                 const { color, textColor } = getCategoryTheme(cat.id)
@@ -315,7 +315,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                       }}
                     />
                     <span style={{ color: 'var(--text)', fontSize: '14px', fontWeight: 600, flex: 1 }}>
-                      {cat.id === 'data-structures' ? 'Data Structures' : cat.id === 'dp' ? 'Dynamic Programming' : cat.id.charAt(0).toUpperCase() + cat.id.slice(1)}
+                      {t(`categories.${cat.id}.name`)}
                     </span>
                     <ChevronRight size={13} style={{ color: 'var(--text-faint)' }} />
                   </a>
@@ -332,7 +332,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                 fontWeight: 500,
               }}
             >
-              No algorithms found for &ldquo;{query}&rdquo;
+              {t('search.noResults', { query })}
             </div>
           ) : (
             <div style={{ padding: '8px' }}>
@@ -352,7 +352,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                   }}
                 >
                   <Clock size={10} strokeWidth={2} />
-                  Recent
+                  {t('search.recent')}
                 </p>
               )}
               {displayResults.map((result, i) => {
@@ -412,9 +412,9 @@ export function SearchOverlay({ open, onClose }: Props) {
           }}
         >
           {[
-            { key: '↑↓', label: 'Navigate' },
-            { key: '↵',  label: 'Jump' },
-            { key: 'Esc', label: 'Close' },
+            { key: '↑↓', label: t('search.navigate') },
+            { key: '↵',  label: t('search.jump') },
+            { key: 'Esc', label: t('search.close') },
           ].map(item => (
             <span
               key={item.key}

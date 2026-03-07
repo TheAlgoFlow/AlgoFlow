@@ -11,7 +11,7 @@ import { Kbd } from '@/components/atoms/Kbd'
 import { SearchOverlay } from '@/components/organisms/SearchOverlay'
 
 export function Nav() {
-  const { locale, setLocale } = useI18n()
+  const { locale, setLocale, t } = useI18n()
   const { theme, toggleTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -38,7 +38,7 @@ export function Nav() {
     <>
       <nav
         style={{
-          background: 'var(--bg)',
+          background: 'var(--bg-card)',
           borderBottom: `1px solid var(--border)`,
           position: 'sticky',
           top: 0,
@@ -81,9 +81,9 @@ export function Nav() {
 
           {/* Nav links */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <NavLink href="/reference">Reference</NavLink>
-            <NavLink href="/big-o">Big-O</NavLink>
-            <NavLink href="/compare">Compare</NavLink>
+            <NavLink href="/reference">{t('nav.reference')}</NavLink>
+            <NavLink href="/big-o">{t('nav.bigO')}</NavLink>
+            <NavLink href="/compare">{t('nav.compare')}</NavLink>
           </div>
 
           {/* Spacer */}
@@ -118,7 +118,7 @@ export function Nav() {
           >
             <Search size={13} strokeWidth={2} />
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              Search algorithms…
+              {t('nav.searchPlaceholder')}
               <Kbd>⌘K</Kbd>
             </span>
           </button>

@@ -578,7 +578,7 @@ export default function BigOPage() {
             textAlign: 'center',
           }}
         >
-          Click any algorithm name to open its interactive visualizer.{' '}
+          {t('bigo.footerLink')}{' '}
           <Link
             href="/reference"
             style={{ color: '#5200FF', textDecoration: 'none', fontWeight: 700 }}

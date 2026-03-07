@@ -49,7 +49,7 @@ export function InfoPanel({ complexity, descriptionKey, textColor }: Props) {
               transition: 'color 0.15s',
             }}
           >
-            {tab === 'complexity' ? 'Complexity' : 'About'}
+            {tab === 'complexity' ? t('infopanel.complexity') : t('infopanel.about')}
           </button>
         ))}
       </div>

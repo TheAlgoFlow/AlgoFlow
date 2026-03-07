@@ -60,7 +60,7 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
             onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)' }}
           >
             <ArrowLeft size={13} strokeWidth={2.5} />
-            Home
+            {t('nav.home')}
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: '12px', flexWrap: 'wrap' }}>
@@ -100,7 +100,7 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
                 fontFamily: 'var(--font-mono)',
               }}
             >
-              {algorithms.length} algorithms
+              {t('home.algorithmCount', { count: algorithms.length })}
             </span>
           </div>
         </div>

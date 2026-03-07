@@ -5,7 +5,11 @@
     "sorting": "Ordenação",
     "searching": "Busca",
     "dataStructures": "Estruturas de Dados",
-    "dp": "Programação Dinâmica"
+    "dp": "Programação Dinâmica",
+    "reference": "Referência",
+    "bigO": "Big-O",
+    "compare": "Comparar",
+    "searchPlaceholder": "Buscar algoritmos…"
   },
   "controls": {
     "play": "Reproduzir",
@@ -24,7 +28,11 @@
     "target": "Alvo",
     "targetPlaceholder": "Valor a buscar",
     "run": "Executar",
-    "apply": "Aplicar"
+    "apply": "Aplicar",
+    "presetRandom": "Aleatório",
+    "presetNearly": "Quase ↑",
+    "presetReversed": "Invertido",
+    "presetEqual": "Igual"
   },
   "complexity": {
     "time": "Tempo",
@@ -49,6 +57,30 @@
   },
   "back": "← Voltar",
   "algorithms": "Algoritmos",
+  "home": {
+    "stats": "{{categories}} categorias · {{total}} algoritmos",
+    "algorithmCount": "{{count}} algoritmos"
+  },
+  "viz": {
+    "notFound": "Algoritmo não encontrado.",
+    "goHome": "Ir para o início",
+    "hideCode": "Ocultar código",
+    "showCode": "Código",
+    "modeArray": "Array",
+    "modeClassic": "Clássico"
+  },
+  "infopanel": {
+    "complexity": "Complexidade",
+    "about": "Sobre"
+  },
+  "search": {
+    "quickAccess": "Acesso Rápido",
+    "noResults": "Nenhum algoritmo encontrado para \"{{query}}\"",
+    "recent": "Recentes",
+    "navigate": "Navegar",
+    "jump": "Abrir",
+    "close": "Fechar"
+  },
   "tags": "Tags",
   "description": "Descrição",
   "whenToUse": "Quando usar",
@@ -69,7 +101,8 @@
     "tie": "Empate",
     "selectAlgorithm": "Selecione o algoritmo…",
     "noAlgorithm": "Nenhum algoritmo selecionado",
-    "loading": "Carregando…"
+    "loading": "Carregando…",
+    "onlyCategory": "apenas"
   },
   "reference": {
     "subtitle": "Referência Big-O",
@@ -101,6 +134,7 @@
     "classesTitle": "As Seis Classes",
     "examples": "Exemplos no AlgoFlow",
     "fullCheatSheet": "→ Guia de Bolso Completo",
+    "footerLink": "Clique no nome de qualquer algoritmo para abrir seu visualizador interativo.",
     "classes": {
       "constant": { "label": "Constante", "desc": "Tempo fixo independentemente do tamanho da entrada. O padrão ouro — tão imediato quanto possível." },
       "logarithmic": { "label": "Logarítmica", "desc": "Divide o espaço de busca pela metade a cada passo. Extremamente rápido mesmo com milhões de elementos." },
