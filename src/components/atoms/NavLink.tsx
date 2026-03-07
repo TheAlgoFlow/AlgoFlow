@@ -16,7 +16,7 @@ export function NavLink({ href, children }: Props) {
     <Link
       href={href}
       style={{
-        color: '#78716C',
+        color: 'var(--text-muted)',
         textDecoration: 'none',
         fontSize: '11px',
         fontWeight: 600,
@@ -26,10 +26,10 @@ export function NavLink({ href, children }: Props) {
         transition: 'color 0.15s',
       }}
       onMouseEnter={(e: MouseEvent<HTMLAnchorElement>) => {
-        e.currentTarget.style.color = '#1C1917'
+        e.currentTarget.style.color = 'var(--text)'
       }}
       onMouseLeave={(e: MouseEvent<HTMLAnchorElement>) => {
-        e.currentTarget.style.color = '#78716C'
+        e.currentTarget.style.color = 'var(--text-muted)'
       }}
     >
       {children}

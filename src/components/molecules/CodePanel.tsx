@@ -23,7 +23,7 @@ const TOKEN_COLORS = {
   function: '#2563eb',
   type: '#b45309',
   operator: '#0d9488',
-  default: '#1e293b',
+  default: 'var(--text)',
 }
 
 function colorize(code: string, lang: Language): React.ReactNode[] {
@@ -79,10 +79,10 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        background: '#FDFCFA',
+        background: 'var(--bg-surface)',
         borderRadius: '8px',
         overflow: 'hidden',
-        border: '1px solid #E5DDD0',
+        border: `1px solid var(--border)`,
       }}
     >
       {/* Language tabs */}
@@ -90,9 +90,9 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
         style={{
           display: 'flex',
           gap: '1px',
-          background: '#F0EDE8',
+          background: 'var(--bg-muted)',
           padding: '4px 4px 0',
-          borderBottom: '1px solid #E5DDD0',
+          borderBottom: `1px solid var(--border)`,
           overflowX: 'auto',
           scrollbarWidth: 'none',
           flexShrink: 0,
@@ -106,8 +106,8 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
               padding: '6px 12px',
               borderRadius: '6px 6px 0 0',
               border: 'none',
-              background: lang === key ? '#FDFCFA' : 'transparent',
-              color: lang === key ? '#1C1917' : '#78716C',
+              background: lang === key ? 'var(--bg-surface)' : 'transparent',
+              color: lang === key ? 'var(--text)' : 'var(--text-muted)',
               fontSize: '0.72rem',
               fontWeight: 600,
               cursor: 'pointer',
@@ -144,7 +144,7 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                background: isActive ? 'rgba(82,0,255,0.08)' : 'transparent',
+                background: isActive ? 'var(--code-active)' : 'transparent',
                 borderLeft: isActive ? '3px solid #5200FF' : '3px solid transparent',
                   paddingLeft: isActive ? '9px' : '12px',
                   paddingRight: '12px',
@@ -153,7 +153,7 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
               >
                 <span
                   style={{
-                    color: isActive ? '#5200FF' : '#C8BDB0',
+                    color: isActive ? '#5200FF' : 'var(--text-faint)',
                     fontSize: '0.7rem',
                     width: '28px',
                     flexShrink: 0,
@@ -164,7 +164,7 @@ export function CodePanel({ snippets, activeLine }: CodePanelProps) {
                 >
                   {line}
                 </span>
-                <code style={{ color: '#1C1917', whiteSpace: 'pre' }}>
+                <code style={{ color: 'var(--text)', whiteSpace: 'pre' }}>
                   {colorize(code, lang)}
                 </code>
               </div>

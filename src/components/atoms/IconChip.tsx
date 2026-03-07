@@ -25,7 +25,7 @@ export function IconChip({ color, size = 36, borderRadius = 9, children }: Props
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: '#1C1917',
+        color: 'var(--text)',
         flexShrink: 0,
       }}
     >

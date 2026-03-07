@@ -27,7 +27,7 @@ export default function ReferencePage() {
   )
 
   return (
-    <div style={{ background: '#F5F1EB', minHeight: 'calc(100vh - 64px)' }}>
+    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 64px)' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'clamp(40px,6vw,80px) 24px' }}>
 
         {/* ── Header ── */}
@@ -41,10 +41,10 @@ export default function ReferencePage() {
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: '#78716C',
+                color: 'var(--text-muted)',
               }}
             >
-              Big-O Reference
+              {t('reference.subtitle')}
             </span>
           </div>
           <h1
@@ -52,16 +52,16 @@ export default function ReferencePage() {
               fontFamily: 'var(--font-display)',
               fontSize: 'clamp(36px,6vw,64px)',
               fontWeight: 900,
-              color: '#1C1917',
+              color: 'var(--text)',
               letterSpacing: '-0.03em',
               lineHeight: 1.05,
               marginBottom: '12px',
             }}
           >
-            Complexity Cheat Sheet
+            {t('reference.title')}
           </h1>
-          <p style={{ color: '#78716C', fontSize: '16px', maxWidth: '520px', lineHeight: 1.65 }}>
-            Time and space complexity for all {allModules.length} algorithms, filterable by category.
+          <p style={{ color: 'var(--text-muted)', fontSize: '16px', maxWidth: '520px', lineHeight: 1.65 }}>
+            {t('reference.description', { count: allModules.length })}
           </p>
         </div>
 
@@ -78,9 +78,9 @@ export default function ReferencePage() {
                   padding: '6px 16px',
                   borderRadius: '999px',
                   border: '1.5px solid',
-                  borderColor: active ? color : '#E5DDD0',
-                  background: active ? `${color}18` : '#FDFCFA',
-                  color: active ? textColor : '#78716C',
+                  borderColor: active ? color : 'var(--border)',
+                  background: active ? `${color}18` : 'var(--bg-surface)',
+                  color: active ? textColor : 'var(--text-muted)',
                   fontSize: '12px',
                   fontWeight: 700,
                   letterSpacing: '0.04em',
@@ -90,7 +90,7 @@ export default function ReferencePage() {
                   textTransform: 'capitalize',
                 }}
               >
-                {cat === 'all' ? 'All' : cat === 'data-structures' ? 'Data Structures' : cat === 'dp' ? 'DP' : cat.charAt(0).toUpperCase() + cat.slice(1)}
+                {cat === 'all' ? t('reference.all') : cat === 'data-structures' ? 'Data Structures' : cat === 'dp' ? 'DP' : t(`nav.${cat}`)}
               </button>
             )
           })}
@@ -104,14 +104,14 @@ export default function ReferencePage() {
             borderRadius: '16px',
             overflow: 'hidden',
             marginBottom: '48px',
-            boxShadow: '0 2px 12px rgba(28,25,23,0.05)',
+            boxShadow: '0 2px 12px var(--shadow-sm)',
           }}
         >
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{ background: '#F0EDE8' }}>
-                  {['Algorithm', 'Category', 'Best', 'Average', 'Worst', 'Space', 'Tags'].map(h => (
+                <tr style={{ background: 'var(--bg-muted)' }}>
+                  {[t('reference.headers.algorithm'), t('reference.headers.category'), t('reference.headers.best'), t('reference.headers.avg'), t('reference.headers.worst'), t('reference.headers.space'), t('reference.headers.tags')].map(h => (
                     <th
                       key={h}
                       style={{
@@ -122,8 +122,8 @@ export default function ReferencePage() {
                         fontWeight: 700,
                         letterSpacing: '0.1em',
                         textTransform: 'uppercase',
-                        color: '#78716C',
-                        borderBottom: '1px solid #E5DDD0',
+                        color: 'var(--text-muted)',
+                        borderBottom: `1px solid var(--border)`,
                         whiteSpace: 'nowrap',
                       }}
                     >
@@ -139,32 +139,32 @@ export default function ReferencePage() {
                   return (
                     <tr
                       key={mod.meta.slug}
-                      style={{ background: isEven ? '#FDFCFA' : '#F5F1EB' }}
-                      onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = '#F0EDE8' }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = isEven ? '#FDFCFA' : '#F5F1EB' }}
+                      style={{ background: isEven ? 'var(--bg-surface)' : 'var(--bg)' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'var(--bg-muted)' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = isEven ? 'var(--bg-surface)' : 'var(--bg)' }}
                     >
                       {/* Algorithm name */}
-                      <td style={{ padding: '11px 16px', borderBottom: '1px solid #F0EDE8' }}>
+                      <td style={{ padding: '11px 16px', borderBottom: `1px solid var(--bg-muted)` }}>
                         <Link
                           href={`/visualizer/${mod.meta.category}/${mod.meta.slug}`}
                           style={{
-                            color: '#1C1917',
+                            color: 'var(--text)',
                             textDecoration: 'none',
                             fontSize: '13px',
                             fontWeight: 600,
                             letterSpacing: '-0.01em',
-                            borderBottom: '1px dotted #C8BDB0',
+                            borderBottom: '1px dotted var(--text-faint)',
                             transition: 'color 0.12s',
                           }}
                           onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#5200FF' }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#1C1917' }}
+                          onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text)' }}
                         >
                           {t(mod.meta.nameKey)}
                         </Link>
                       </td>
 
                       {/* Category badge */}
-                      <td style={{ padding: '11px 16px', borderBottom: '1px solid #F0EDE8' }}>
+                      <td style={{ padding: '11px 16px', borderBottom: `1px solid var(--bg-muted)` }}>
                         <span
                           style={{
                             display: 'inline-block',
@@ -187,7 +187,7 @@ export default function ReferencePage() {
 
                       {/* Complexity cells */}
                       {[mod.meta.complexity.time.best, mod.meta.complexity.time.avg, mod.meta.complexity.time.worst, mod.meta.complexity.space].map((val, ci) => (
-                        <td key={ci} style={{ padding: '11px 16px', borderBottom: '1px solid #F0EDE8' }}>
+                        <td key={ci} style={{ padding: '11px 16px', borderBottom: `1px solid var(--bg-muted)` }}>
                           <span
                             style={{
                               fontFamily: 'var(--font-mono)',
@@ -203,7 +203,7 @@ export default function ReferencePage() {
                       ))}
 
                       {/* Tags */}
-                      <td style={{ padding: '11px 16px', borderBottom: '1px solid #F0EDE8' }}>
+                      <td style={{ padding: '11px 16px', borderBottom: `1px solid var(--bg-muted)` }}>
                         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                           {mod.meta.tags.slice(0, 3).map(tag => (
                             <Tag key={tag}>{tag}</Tag>
@@ -226,13 +226,13 @@ export default function ReferencePage() {
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '16px',
-            background: '#FDFCFA',
-            border: '1.5px solid #E5DDD0',
+            background: 'var(--bg-surface)',
+            border: `1.5px solid var(--border)`,
             borderLeft: '4px solid #5200FF',
             borderRadius: '12px',
             padding: '20px 24px',
             marginBottom: '48px',
-            boxShadow: '0 1px 6px rgba(28,25,23,0.04)',
+            boxShadow: '0 1px 6px var(--shadow-sm)',
             textDecoration: 'none',
             transition: 'box-shadow 0.15s, border-color 0.15s',
           }}
@@ -242,7 +242,7 @@ export default function ReferencePage() {
           }}
           onMouseLeave={e => {
             ;(e.currentTarget as HTMLAnchorElement).style.boxShadow = '0 1px 6px rgba(28,25,23,0.04)'
-            ;(e.currentTarget as HTMLAnchorElement).style.borderColor = '#E5DDD0'
+            ;(e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)'
           }}
         >
           <div>
@@ -251,15 +251,15 @@ export default function ReferencePage() {
                 fontFamily: 'var(--font-display)',
                 fontSize: '18px',
                 fontWeight: 800,
-                color: '#1C1917',
+                color: 'var(--text)',
                 letterSpacing: '-0.02em',
                 marginBottom: '4px',
               }}
             >
-              Big-O Notation Guide
+              {t('reference.bigOGuide')}
             </div>
-            <p style={{ color: '#78716C', fontSize: '13px', lineHeight: 1.55, margin: 0 }}>
-              Interactive growth curves, complexity cards, and algorithm examples — all in one place.
+            <p style={{ color: 'var(--text-muted)', fontSize: '13px', lineHeight: 1.55, margin: 0 }}>
+              {t('reference.bigODesc')}
             </p>
           </div>
           <span
@@ -271,22 +271,22 @@ export default function ReferencePage() {
               flexShrink: 0,
             }}
           >
-            → Open Guide
+            {t('reference.openGuide')}
           </span>
         </Link>
 
         {/* Footer */}
         <div
           style={{
-            borderTop: '1px solid #E5DDD0',
+            borderTop: `1px solid var(--border)`,
             paddingTop: '24px',
-            color: '#C8BDB0',
+            color: 'var(--text-faint)',
             fontSize: '12px',
             fontFamily: 'var(--font-mono)',
             textAlign: 'center',
           }}
         >
-          Click any algorithm name to open its interactive visualizer.
+          {t('reference.footerLink')}
         </div>
       </div>
     </div>

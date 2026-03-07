@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Github, Search } from 'lucide-react'
+import { Github, Search, Moon, Sun } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
+import { useTheme } from '@/i18n/theme-context'
 import type { Locale } from '@/i18n/context'
 import { NavLink } from '@/components/atoms/NavLink'
 import { Kbd } from '@/components/atoms/Kbd'
@@ -11,8 +12,10 @@ import { SearchOverlay } from '@/components/organisms/SearchOverlay'
 
 export function Nav() {
   const { locale, setLocale } = useI18n()
+  const { theme, toggleTheme } = useTheme()
   const [scrolled, setScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const isDark = theme === 'dark'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4)
@@ -35,13 +38,12 @@ export function Nav() {
     <>
       <nav
         style={{
-          background: '#F5F1EB',
-          borderBottom: '1px solid #E5DDD0',
+          background: 'var(--bg)',
+          borderBottom: `1px solid var(--border)`,
           position: 'sticky',
           top: 0,
           zIndex: 50,
-          transition: 'box-shadow 0.2s ease',
-          boxShadow: scrolled ? '0 1px 12px rgba(28,25,23,0.06)' : 'none',
+          boxShadow: scrolled ? `0 1px 12px var(--shadow-sm)` : 'none',
         }}
       >
         <div
@@ -70,14 +72,14 @@ export function Nav() {
               flexShrink: 0,
             }}
           >
-            <span style={{ color: '#1C1917' }}>Algo</span>
+            <span style={{ color: 'var(--text)' }}>Algo</span>
             <span style={{ color: '#CCFF00' }}>F</span>
             <span style={{ color: '#FF6B00' }}>l</span>
             <span style={{ color: '#F900FF' }}>o</span>
             <span style={{ color: '#5200FF' }}>w</span>
           </Link>
 
-          {/* Nav links — using NavLink atom */}
+          {/* Nav links */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <NavLink href="/reference">Reference</NavLink>
             <NavLink href="/big-o">Big-O</NavLink>
@@ -95,24 +97,23 @@ export function Nav() {
               alignItems: 'center',
               gap: '8px',
               padding: '7px 14px',
-              background: '#FDFCFA',
-              border: '1px solid #E5DDD0',
+              background: 'var(--bg-surface)',
+              border: `1px solid var(--border)`,
               borderRadius: '999px',
-              color: '#78716C',
+              color: 'var(--text-muted)',
               fontSize: '12px',
               fontWeight: 500,
               cursor: 'pointer',
-              transition: 'all 0.15s',
-              boxShadow: '0 1px 3px rgba(28,25,23,0.05)',
+              boxShadow: `0 1px 3px var(--shadow-sm)`,
               fontFamily: 'var(--font-body)',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#C8BDB0'
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(28,25,23,0.08)'
+              e.currentTarget.style.borderColor = 'var(--border-hover)'
+              e.currentTarget.style.boxShadow = `0 2px 8px var(--shadow-md)`
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.borderColor = '#E5DDD0'
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(28,25,23,0.05)'
+              e.currentTarget.style.borderColor = 'var(--border)'
+              e.currentTarget.style.boxShadow = `0 1px 3px var(--shadow-sm)`
             }}
           >
             <Search size={13} strokeWidth={2} />
@@ -130,18 +131,50 @@ export function Nav() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              color: '#78716C',
+              color: 'var(--text-muted)',
               textDecoration: 'none',
-              transition: 'color 0.15s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#1C1917' }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#78716C' }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)' }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)' }}
           >
             <Github size={18} strokeWidth={1.75} />
           </a>
 
+          {/* Dark mode toggle */}
+          <button
+            onClick={toggleTheme}
+            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '34px',
+              height: '34px',
+              borderRadius: '8px',
+              border: `1.5px solid var(--border)`,
+              background: isDark ? 'rgba(82,0,255,0.12)' : 'transparent',
+              color: isDark ? '#5200FF' : 'var(--text-muted)',
+              cursor: 'pointer',
+              flexShrink: 0,
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = 'var(--border-hover)'
+              e.currentTarget.style.background = isDark ? 'rgba(82,0,255,0.18)' : 'var(--bg-muted)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = 'var(--border)'
+              e.currentTarget.style.background = isDark ? 'rgba(82,0,255,0.12)' : 'transparent'
+            }}
+          >
+            {isDark
+              ? <Sun size={15} strokeWidth={2} />
+              : <Moon size={15} strokeWidth={2} />
+            }
+          </button>
+
           {/* Divider */}
-          <div style={{ width: '1px', height: '20px', background: '#E5DDD0' }} />
+          <div style={{ width: '1px', height: '20px', background: 'var(--border)' }} />
 
           {/* Language toggle */}
           <div style={{ display: 'flex', gap: '4px' }}>
@@ -155,13 +188,12 @@ export function Nav() {
                   border: '1.5px solid',
                   borderColor: locale === lang ? '#5200FF' : 'transparent',
                   background: locale === lang ? 'rgba(82,0,255,0.06)' : 'transparent',
-                  color: locale === lang ? '#5200FF' : '#78716C',
+                  color: locale === lang ? '#5200FF' : 'var(--text-muted)',
                   fontSize: '11px',
                   fontWeight: 700,
                   cursor: 'pointer',
                   textTransform: 'uppercase',
                   letterSpacing: '0.07em',
-                  transition: 'all 0.15s',
                   fontFamily: 'var(--font-mono)',
                 }}
               >

@@ -58,11 +58,11 @@ export function VisualizerControlsDock({
       {/* ─ Playback controls ─ */}
       <div
         style={{
-          borderTop: '1px solid #E5DDD0',
-          background: '#FDFCFA',
+          borderTop: `1px solid var(--border)`,
+          background: 'var(--bg-surface)',
           padding: '16px 24px',
           flexShrink: 0,
-          boxShadow: '0 -1px 8px rgba(28,25,23,0.04)',
+          boxShadow: '0 -1px 8px var(--shadow-sm)',
         }}
       >
         <PlaybackControls player={player} message={message} />
@@ -72,8 +72,8 @@ export function VisualizerControlsDock({
       {showArrayInput && (
         <div
           style={{
-            borderTop: '1px solid rgba(0,0,0,0.05)',
-            background: '#F5F1EB',
+            borderTop: `1px solid var(--border)`,
+            background: 'var(--bg)',
             padding: '12px 24px',
             display: 'flex',
             alignItems: 'center',
@@ -94,9 +94,9 @@ export function VisualizerControlsDock({
                     gap: '5px',
                     padding: '6px 12px',
                     borderRadius: '8px',
-                    border: '1.5px solid #E5DDD0',
-                    background: '#FDFCFA',
-                    color: '#78716C',
+                    border: `1.5px solid var(--border)`,
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-muted)',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -109,7 +109,7 @@ export function VisualizerControlsDock({
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.borderColor = 'rgba(0,0,0,0.09)'
-                    e.currentTarget.style.color = '#78716C'
+                    e.currentTarget.style.color = 'var(--text-muted)'
                   }}
                 >
                   {p.icon}{p.label}
@@ -127,9 +127,9 @@ export function VisualizerControlsDock({
                   style={{
                     padding: '6px 12px',
                     borderRadius: '8px',
-                    border: '1.5px solid #E5DDD0',
-                    background: '#FDFCFA',
-                    color: '#78716C',
+                    border: `1.5px solid var(--border)`,
+                    background: 'var(--bg-surface)',
+                    color: 'var(--text-muted)',
                     fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
@@ -142,7 +142,7 @@ export function VisualizerControlsDock({
             </div>
           )}
 
-          <div style={{ width: '1px', height: '22px', background: 'rgba(0,0,0,0.08)' }} />
+          <div style={{ width: '1px', height: '22px', background: 'var(--border)' }} />
 
           <input
             type="text"
@@ -153,11 +153,11 @@ export function VisualizerControlsDock({
             style={{
               flex: 1,
               minWidth: '160px',
-              background: '#FDFCFA',
-              border: '1.5px solid #E5DDD0',
+              background: 'var(--bg-surface)',
+              border: `1.5px solid var(--border)`,
               borderRadius: '8px',
               padding: '6px 12px',
-              color: '#1C1917',
+              color: 'var(--text)',
               fontSize: '13px',
               fontWeight: 500,
               outline: 'none',

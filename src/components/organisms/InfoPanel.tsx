@@ -17,8 +17,8 @@ export function InfoPanel({ complexity, descriptionKey, textColor }: Props) {
   return (
     <div
       style={{
-        borderTop: '1px solid #E5DDD0',
-        background: '#FDFCFA',
+        borderTop: `1px solid var(--border)`,
+        background: 'var(--bg-surface)',
         flexShrink: 0,
       }}
     >
@@ -26,7 +26,7 @@ export function InfoPanel({ complexity, descriptionKey, textColor }: Props) {
       <div
         style={{
           display: 'flex',
-          borderBottom: '1px solid #E5DDD0',
+          borderBottom: `1px solid var(--border)`,
           padding: '0 24px',
         }}
       >
@@ -40,7 +40,7 @@ export function InfoPanel({ complexity, descriptionKey, textColor }: Props) {
               border: 'none',
               borderBottom: `2px solid ${activeTab === tab ? textColor : 'transparent'}`,
               background: 'transparent',
-              color: activeTab === tab ? '#1C1917' : '#78716C',
+              color: activeTab === tab ? 'var(--text)' : 'var(--text-muted)',
               fontSize: '11px',
               fontWeight: 700,
               letterSpacing: '0.08em',
@@ -67,7 +67,7 @@ export function InfoPanel({ complexity, descriptionKey, textColor }: Props) {
               <div key={row.label} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <span
                   style={{
-                    color: '#C8BDB0',
+                    color: 'var(--text-faint)',
                     fontSize: '10px',
                     fontWeight: 700,
                     textTransform: 'uppercase',
@@ -92,7 +92,7 @@ export function InfoPanel({ complexity, descriptionKey, textColor }: Props) {
         ) : (
           <p
             style={{
-              color: '#78716C',
+              color: 'var(--text-muted)',
               fontSize: '14px',
               lineHeight: 1.7,
               margin: 0,

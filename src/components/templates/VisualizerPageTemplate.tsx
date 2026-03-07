@@ -118,7 +118,7 @@ export function VisualizerPageTemplate({
   const isArrayAlgo   = isSortingAlgo || isSearchAlgo || slug === 'array-ops'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', background: '#F5F1EB' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', background: 'var(--bg)' }}>
 
       {/* ── Top bar ── */}
       <VisualizerTopBar
@@ -146,7 +146,7 @@ export function VisualizerPageTemplate({
           style={{
             position: 'relative',
             minHeight: '52vh',
-            background: '#F0EDE8',
+            background: 'var(--bg-muted)',
             flex: showCode ? `0 0 ${100 - codeWidthPct}%` : '1 1 100%',
             minWidth: 0,
             overflow: 'hidden',
@@ -168,7 +168,7 @@ export function VisualizerPageTemplate({
                 gap: '2px',
                 background: 'rgba(253,252,250,0.92)',
                 borderRadius: '8px',
-                border: '1px solid #E5DDD0',
+                border: `1px solid var(--border)`,
                 padding: '3px',
                 backdropFilter: 'blur(8px)',
               }}
@@ -211,15 +211,15 @@ export function VisualizerPageTemplate({
             style={{
               width: '5px',
               flexShrink: 0,
-              background: isDragging ? '#C8BDB0' : '#E5DDD0',
+              background: isDragging ? 'var(--border-hover)' : 'var(--border)',
               cursor: 'col-resize',
               zIndex: 10,
               transition: 'background 0.15s',
               borderLeft:  '1px solid rgba(0,0,0,0.08)',
               borderRight: '1px solid rgba(0,0,0,0.08)',
             }}
-            onMouseEnter={e => { if (!isDragging) e.currentTarget.style.background = '#C8BDB0' }}
-            onMouseLeave={e => { if (!isDragging) e.currentTarget.style.background = '#E5DDD0' }}
+            onMouseEnter={e => { if (!isDragging) e.currentTarget.style.background = 'var(--border-hover)' }}
+            onMouseLeave={e => { if (!isDragging) e.currentTarget.style.background = 'var(--border)' }}
           />
         )}
 
@@ -230,7 +230,7 @@ export function VisualizerPageTemplate({
               flex: `0 0 ${codeWidthPct}%`,
               minWidth: 0,
               overflow: 'auto',
-              background: '#F0EDE8',
+              background: 'var(--bg-muted)',
             }}
           >
             <CodePanel snippets={algo.codeSnippets} activeLine={frame?.codeLine ?? 0} />

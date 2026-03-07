@@ -15,9 +15,9 @@ export function Tag({ children }: Props) {
     <span
       style={{
         fontSize: '10px',
-        color: '#78716C',
-        background: '#F0EDE8',
-        border: '1px solid #E5DDD0',
+        color: 'var(--text-muted)',
+        background: 'var(--bg-muted)',
+        border: `1px solid var(--border)`,
         padding: '2px 7px',
         borderRadius: '4px',
         fontWeight: 600,

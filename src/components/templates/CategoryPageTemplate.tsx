@@ -27,7 +27,7 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
     <div
       style={{
         minHeight: 'calc(100vh - 64px)',
-        background: '#F5F1EB',
+        background: 'var(--bg)',
         animation: 'pageIn 0.2s ease',
       }}
     >
@@ -36,7 +36,7 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
       {/* ── Page header ── */}
       <div
         style={{
-          borderBottom: '1px solid #E5DDD0',
+          borderBottom: `1px solid var(--border)`,
           padding: '32px 24px 28px',
         }}
       >
@@ -47,7 +47,7 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '6px',
-              color: '#78716C',
+              color: 'var(--text-muted)',
               textDecoration: 'none',
               fontSize: '12px',
               fontWeight: 600,
@@ -56,8 +56,8 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
               fontFamily: 'var(--font-mono)',
               letterSpacing: '0.05em',
             }}
-            onMouseEnter={e => { e.currentTarget.style.color = '#1C1917' }}
-            onMouseLeave={e => { e.currentTarget.style.color = '#78716C' }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)' }}
+            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)' }}
           >
             <ArrowLeft size={13} strokeWidth={2.5} />
             Home
@@ -80,7 +80,7 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
               style={{
                 fontSize: 'clamp(28px, 5vw, 40px)',
                 fontWeight: 900,
-                color: '#1C1917',
+                color: 'var(--text)',
                 letterSpacing: '-0.03em',
                 lineHeight: 1.1,
                 margin: 0,
@@ -94,7 +94,7 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
                 fontSize: '11px',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
-                color: '#78716C',
+                color: 'var(--text-muted)',
                 textTransform: 'uppercase',
                 marginBottom: '6px',
                 fontFamily: 'var(--font-mono)',

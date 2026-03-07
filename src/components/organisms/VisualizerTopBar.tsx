@@ -29,9 +29,9 @@ export function VisualizerTopBar({
   return (
     <div
       style={{
-        background: '#FDFCFA',
-        borderBottom: '1px solid #E5DDD0',
-        boxShadow: '0 1px 4px rgba(28,25,23,0.04)',
+        background: 'var(--bg-surface)',
+        borderBottom: `1px solid var(--border)`,
+        boxShadow: '0 1px 4px var(--shadow-sm)',
         padding: '0 24px',
         height: '52px',
         display: 'flex',
@@ -47,7 +47,7 @@ export function VisualizerTopBar({
           display: 'inline-flex',
           alignItems: 'center',
           gap: '5px',
-          color: '#78716C',
+          color: 'var(--text-muted)',
           textDecoration: 'none',
           fontSize: '12px',
           fontWeight: 600,
@@ -56,19 +56,19 @@ export function VisualizerTopBar({
           fontFamily: 'var(--font-mono)',
           letterSpacing: '0.04em',
         }}
-        onMouseEnter={e => { e.currentTarget.style.color = '#1C1917' }}
-        onMouseLeave={e => { e.currentTarget.style.color = '#78716C' }}
+        onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)' }}
+        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)' }}
       >
         <ArrowLeft size={13} strokeWidth={2.5} />
         {t(`categories.${category}.name`)}
       </Link>
 
-      <span style={{ color: '#E5DDD0', fontSize: '16px', fontWeight: 300 }}>/</span>
+      <span style={{ color: 'var(--border)', fontSize: '16px', fontWeight: 300 }}>/</span>
 
       {/* Algorithm name */}
       <span
         style={{
-          color: '#1C1917',
+          color: 'var(--text)',
           fontWeight: 700,
           fontSize: '14px',
           letterSpacing: '-0.01em',
@@ -111,9 +111,9 @@ export function VisualizerTopBar({
           gap: '6px',
           padding: '6px 14px',
           borderRadius: '8px',
-          border: `1.5px solid ${showCode ? '#5200FF' : 'rgba(0,0,0,0.1)'}`,
+          border: `1.5px solid ${showCode ? '#5200FF' : 'var(--border)'}`,
           background: showCode ? '#5200FF' : 'transparent',
-          color: showCode ? '#ffffff' : '#78716C',
+          color: showCode ? '#ffffff' : 'var(--text-muted)',
           fontSize: '12px',
           fontWeight: 700,
           cursor: 'pointer',

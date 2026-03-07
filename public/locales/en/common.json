@@ -52,5 +52,62 @@
   "tags": "Tags",
   "description": "Description",
   "whenToUse": "When to use",
-  "codeline": "Line"
+  "codeline": "Line",
+  "compare": {
+    "subtitle": "Side-by-Side",
+    "title": "Compare Algorithms",
+    "algoA": "Algorithm A",
+    "algoB": "Algorithm B",
+    "vs": "VS",
+    "linkedPlayback": "Linked Playback",
+    "linkPlayback": "Link Playback",
+    "selectAlgoA": "Select Algorithm A",
+    "selectAlgoB": "Select Algorithm B",
+    "complexityComparison": "Complexity Comparison",
+    "metric": "Metric",
+    "winner": "Winner",
+    "tie": "Tie",
+    "selectAlgorithm": "Select algorithm…",
+    "noAlgorithm": "No algorithm selected",
+    "loading": "Loading…"
+  },
+  "reference": {
+    "subtitle": "Big-O Reference",
+    "title": "Complexity Cheat Sheet",
+    "description": "Time and space complexity for all {{count}} algorithms, filterable by category.",
+    "all": "All",
+    "headers": {
+      "algorithm": "Algorithm",
+      "category": "Category",
+      "best": "Best",
+      "avg": "Average",
+      "worst": "Worst",
+      "space": "Space",
+      "tags": "Tags"
+    },
+    "bigOGuide": "Big-O Notation Guide",
+    "bigODesc": "Interactive growth curves, complexity cards, and algorithm examples — all in one place.",
+    "openGuide": "→ Open Guide",
+    "footerLink": "Click any algorithm name to open its interactive visualizer."
+  },
+  "bigo": {
+    "subtitle": "Complexity Theory",
+    "title": "Big-O Notation",
+    "description": "How algorithms scale with input size n — the lens every engineer needs.",
+    "curvesTitle": "Growth Curves",
+    "curvesDesc": "Operations vs. input size n = 1..20 — y-axis capped at {{ymax}} for readability",
+    "ymax": "y max",
+    "inputSize": "Input size (n)",
+    "classesTitle": "The Six Classes",
+    "examples": "Examples in AlgoFlow",
+    "fullCheatSheet": "→ Full Cheat Sheet",
+    "classes": {
+      "constant": { "label": "Constant", "desc": "Fixed time regardless of input size. The gold standard — as close to instant as algorithms get." },
+      "logarithmic": { "label": "Logarithmic", "desc": "Halves the search space each step. Blazingly fast even on inputs with millions of elements." },
+      "linear": { "label": "Linear", "desc": "Grows directly with input size. Acceptable for most real-world workloads." },
+      "linearithmic": { "label": "Linearithmic", "desc": "The theoretical lower bound for comparison sorts. Most efficient general-purpose sorts land here." },
+      "quadratic": { "label": "Quadratic", "desc": "Nested iteration. Fine for small datasets — painfully slow beyond ~1,000 elements." },
+      "exponential": { "label": "Exponential", "desc": "Doubles with each additional element. Only practical for tiny inputs — think n < 20." }
+    }
+  }
 }

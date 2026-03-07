@@ -40,7 +40,7 @@ export default function HomePage() {
   const totalAlgos = categories.reduce((n, c) => n + getCategory(c.id).length, 0)
 
   return (
-    <div style={{ background: '#F5F1EB', minHeight: 'calc(100vh - 64px)' }}>
+    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 64px)' }}>
 
       {/* ── Page header ── */}
       <section style={{
@@ -52,7 +52,7 @@ export default function HomePage() {
           fontFamily: 'var(--font-display)',
           fontSize: 'clamp(28px, 4vw, 36px)',
           fontWeight: 900,
-          color: '#1C1917',
+          color: 'var(--text)',
           letterSpacing: '-0.025em',
           marginBottom: '6px',
         }}>
@@ -62,7 +62,7 @@ export default function HomePage() {
           fontFamily: 'var(--font-mono)',
           fontSize: '12px',
           fontWeight: 600,
-          color: '#78716C',
+          color: 'var(--text-muted)',
           letterSpacing: '0.04em',
         }}>
           {categories.length} categories · {totalAlgos} algorithms
@@ -94,16 +94,16 @@ export default function HomePage() {
                 <div
                   style={{
                     flex: 1,
-                    background: '#FDFCFA',
+                    background: 'var(--bg-surface)',
                     borderRadius: '16px',
-                    border: '1.5px solid #E5DDD0',
+                    border: `1.5px solid var(--border)`,
                     borderTop: `4px solid ${color}`,
                     padding: '24px 24px 20px',
                     cursor: 'pointer',
                     position: 'relative',
                     overflow: 'hidden',
                     transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-                    boxShadow: '0 2px 8px rgba(28,25,23,0.05)',
+                    boxShadow: '0 2px 8px var(--shadow-sm)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '0',
@@ -112,12 +112,12 @@ export default function HomePage() {
                   onMouseEnter={e => {
                     const el = e.currentTarget as HTMLDivElement
                     el.style.transform = 'translateY(-4px)'
-                    el.style.boxShadow = '0 12px 32px rgba(28,25,23,0.10)'
+                    el.style.boxShadow = '0 12px 32px var(--shadow-md)'
                   }}
                   onMouseLeave={e => {
                     const el = e.currentTarget as HTMLDivElement
                     el.style.transform = 'translateY(0)'
-                    el.style.boxShadow = '0 2px 8px rgba(28,25,23,0.05)'
+                    el.style.boxShadow = '0 2px 8px var(--shadow-sm)'
                   }}
                 >
                   {/* Ghost number */}
@@ -147,7 +147,7 @@ export default function HomePage() {
                   {/* Name */}
                   <h2
                     style={{
-                      color: '#1C1917',
+                      color: 'var(--text)',
                       fontWeight: 800,
                       fontSize: '20px',
                       letterSpacing: '-0.025em',
@@ -162,7 +162,7 @@ export default function HomePage() {
                   {/* Count */}
                   <p
                     style={{
-                      color: '#78716C',
+                      color: 'var(--text-muted)',
                       fontSize: '13px',
                       fontWeight: 500,
                       margin: 0,

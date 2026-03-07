@@ -16,9 +16,9 @@ export function Kbd({ children }: Props) {
       style={{
         fontFamily: 'var(--font-mono)',
         fontSize: '10px',
-        color: '#C8BDB0',
-        background: '#F0EDE8',
-        border: '1px solid #E5DDD0',
+        color: 'var(--text-faint)',
+        background: 'var(--bg-muted)',
+        border: `1px solid var(--border)`,
         borderRadius: '4px',
         padding: '1px 5px',
         display: 'inline-block',

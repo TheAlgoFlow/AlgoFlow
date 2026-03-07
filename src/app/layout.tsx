@@ -3,6 +3,7 @@ import Script from 'next/script'
 import { Fraunces, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { I18nProvider } from '@/i18n/context'
+import { ThemeProvider } from '@/i18n/theme-context'
 import { Nav } from '@/components/organisms/Nav'
 
 const fraunces = Fraunces({
@@ -49,10 +50,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
       </head>
       <body>
-        <I18nProvider>
-          <Nav />
-          <main>{children}</main>
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            <Nav />
+            <main>{children}</main>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

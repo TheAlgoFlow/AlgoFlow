@@ -128,14 +128,14 @@ function ComparePageInner() {
   const msgB = playerB.currentFrame ? interpolateMessage(t(playerB.currentFrame.message), playerB.currentFrame.auxState as Record<string, unknown> | undefined) : ''
 
   const complexityRows = algoA && algoB ? [
-    { label: 'Best', a: algoA.meta.complexity.time.best, b: algoB.meta.complexity.time.best },
-    { label: 'Average', a: algoA.meta.complexity.time.avg, b: algoB.meta.complexity.time.avg },
-    { label: 'Worst', a: algoA.meta.complexity.time.worst, b: algoB.meta.complexity.time.worst },
-    { label: 'Space', a: algoA.meta.complexity.space, b: algoB.meta.complexity.space },
+    { label: t('complexity.best'), a: algoA.meta.complexity.time.best, b: algoB.meta.complexity.time.best },
+    { label: t('complexity.average'), a: algoA.meta.complexity.time.avg, b: algoB.meta.complexity.time.avg },
+    { label: t('complexity.worst'), a: algoA.meta.complexity.time.worst, b: algoB.meta.complexity.time.worst },
+    { label: t('complexity.space'), a: algoA.meta.complexity.space, b: algoB.meta.complexity.space },
   ] : []
 
   return (
-    <div style={{ background: '#F5F1EB', minHeight: 'calc(100vh - 64px)' }}>
+    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 64px)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'clamp(32px,5vw,60px) 24px' }}>
 
         {/* ── Header ── */}
@@ -149,10 +149,10 @@ function ComparePageInner() {
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: '#78716C',
+                color: 'var(--text-muted)',
               }}
             >
-              Side-by-Side
+              {t('compare.subtitle')}
             </span>
           </div>
           <h1
@@ -160,12 +160,12 @@ function ComparePageInner() {
               fontFamily: 'var(--font-display)',
               fontSize: 'clamp(32px,5vw,56px)',
               fontWeight: 900,
-              color: '#1C1917',
+              color: 'var(--text)',
               letterSpacing: '-0.03em',
               lineHeight: 1.05,
             }}
           >
-            Compare Algorithms
+            {t('compare.title')}
           </h1>
         </div>
 
@@ -179,22 +179,22 @@ function ComparePageInner() {
             marginBottom: '20px',
           }}
         >
-          <AlgorithmPicker value={slotASlug} onChange={setSlotASlug} label="Algorithm A" accent="#5200FF" />
+          <AlgorithmPicker value={slotASlug} onChange={setSlotASlug} label={t('compare.algoA')} accent="#5200FF" />
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              color: '#C8BDB0',
+              color: 'var(--text-faint)',
               fontFamily: 'var(--font-mono)',
               fontSize: '13px',
               fontWeight: 700,
               letterSpacing: '0.06em',
             }}
           >
-            VS
+            {t('compare.vs')}
           </div>
-          <AlgorithmPicker value={slotBSlug} onChange={setSlotBSlug} label="Algorithm B" accent="#FF6B00" />
+          <AlgorithmPicker value={slotBSlug} onChange={setSlotBSlug} label={t('compare.algoB')} accent="#FF6B00" />
         </div>
 
         {/* ── Link toggle ── */}
@@ -207,9 +207,9 @@ function ComparePageInner() {
               gap: '8px',
               padding: '8px 20px',
               borderRadius: '10px',
-              border: `1.5px solid ${linked ? '#5200FF' : '#E5DDD0'}`,
-              background: linked ? 'rgba(82,0,255,0.07)' : '#FDFCFA',
-              color: linked ? '#5200FF' : '#78716C',
+              border: `1.5px solid ${linked ? '#5200FF' : 'var(--border)'}`,
+              background: linked ? 'rgba(82,0,255,0.07)' : 'var(--bg-surface)',
+              color: linked ? '#5200FF' : 'var(--text-muted)',
               fontSize: '13px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -218,7 +218,7 @@ function ComparePageInner() {
             }}
           >
             {linked ? <Link2 size={14} strokeWidth={2} /> : <Unlink2 size={14} strokeWidth={2} />}
-            {linked ? 'Linked Playback' : 'Link Playback'}
+            {linked ? t('compare.linkedPlayback') : t('compare.linkPlayback')}
           </button>
         </div>
 
@@ -238,7 +238,7 @@ function ComparePageInner() {
             message={msgA}
             showControls={!linked}
             accentColor={algoA ? (CATEGORY_COLORS[algoA.meta.category] ?? '#5200FF') : '#5200FF'}
-            label={algoA ? t(algoA.meta.nameKey) : 'Select Algorithm A'}
+            label={algoA ? t(algoA.meta.nameKey) : t('compare.selectAlgoA')}
           />
           {/* Slot B */}
           <VisualizerSlot
@@ -247,7 +247,7 @@ function ComparePageInner() {
             message={msgB}
             showControls={!linked}
             accentColor={algoB ? (CATEGORY_COLORS[algoB.meta.category] ?? '#FF6B00') : '#FF6B00'}
-            label={algoB ? t(algoB.meta.nameKey) : 'Select Algorithm B'}
+            label={algoB ? t(algoB.meta.nameKey) : t('compare.selectAlgoB')}
           />
         </div>
 
@@ -255,8 +255,8 @@ function ComparePageInner() {
         {linked && (
           <div
             style={{
-              background: '#FDFCFA',
-              border: '1.5px solid #E5DDD0',
+              background: 'var(--bg-surface)',
+              border: `1.5px solid var(--border)`,
               borderRadius: '12px',
               padding: '16px 24px',
               marginTop: '8px',
@@ -271,8 +271,8 @@ function ComparePageInner() {
         {algoA && algoB && (
           <div
             style={{
-              background: '#FDFCFA',
-              border: '1.5px solid #E5DDD0',
+              background: 'var(--bg-surface)',
+              border: `1.5px solid var(--border)`,
               borderRadius: '16px',
               overflow: 'hidden',
               boxShadow: '0 2px 12px rgba(28,25,23,0.05)',
@@ -280,9 +280,9 @@ function ComparePageInner() {
           >
             <div
               style={{
-                background: '#F0EDE8',
+                background: 'var(--bg-muted)',
                 padding: '12px 20px',
-                borderBottom: '1px solid #E5DDD0',
+                borderBottom: `1px solid var(--border)`,
               }}
             >
               <h3
@@ -292,25 +292,25 @@ function ComparePageInner() {
                   fontWeight: 700,
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
-                  color: '#78716C',
+                  color: 'var(--text-muted)',
                   margin: 0,
                 }}
               >
-                Complexity Comparison
+                {t('compare.complexityComparison')}
               </h3>
             </div>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Metric</th>
+                    <th style={thStyle}>{t('compare.metric')}</th>
                     <th style={{ ...thStyle, color: getCategoryTheme(algoA.meta.category).textColor }}>
                       {t(algoA.meta.nameKey)}
                     </th>
                     <th style={{ ...thStyle, color: getCategoryTheme(algoB.meta.category).textColor }}>
                       {t(algoB.meta.nameKey)}
                     </th>
-                    <th style={thStyle}>Winner</th>
+                    <th style={thStyle}>{t('compare.winner')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -321,25 +321,25 @@ function ComparePageInner() {
                     const bWins = rankB < rankA
                     const tie = rankA === rankB
                     return (
-                      <tr key={row.label} style={{ background: i % 2 === 0 ? '#FDFCFA' : '#F5F1EB' }}>
+                      <tr key={row.label} style={{ background: i % 2 === 0 ? 'var(--bg-surface)' : 'var(--bg)' }}>
                         <td style={tdStyle}>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: '#78716C' }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.07em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>
                             {row.label}
                           </span>
                         </td>
                         <td style={{ ...tdStyle, background: aWins ? 'rgba(15,113,66,0.06)' : undefined }}>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700, color: aWins ? '#0f7142' : '#78716C' }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700, color: aWins ? '#0f7142' : 'var(--text-muted)' }}>
                             {row.a}
                           </span>
                         </td>
                         <td style={{ ...tdStyle, background: bWins ? 'rgba(15,113,66,0.06)' : undefined }}>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700, color: bWins ? '#0f7142' : '#78716C' }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700, color: bWins ? '#0f7142' : 'var(--text-muted)' }}>
                             {row.b}
                           </span>
                         </td>
                         <td style={tdStyle}>
                           {tie ? (
-                            <span style={{ fontSize: '12px', color: '#C8BDB0', fontWeight: 600 }}>Tie</span>
+                            <span style={{ fontSize: '12px', color: 'var(--text-faint)', fontWeight: 600 }}>{t('compare.tie')}</span>
                           ) : (
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                               <CheckCircle2 size={13} style={{ color: '#0f7142' }} />
@@ -369,13 +369,13 @@ const thStyle: React.CSSProperties = {
   fontSize: '11px',
   fontWeight: 700,
   letterSpacing: '0.06em',
-  color: '#78716C',
-  borderBottom: '1px solid #E5DDD0',
+  color: 'var(--text-muted)',
+  borderBottom: `1px solid var(--border)`,
 }
 
 const tdStyle: React.CSSProperties = {
   padding: '12px 16px',
-  borderBottom: '1px solid #F0EDE8',
+  borderBottom: `1px solid var(--bg-muted)`,
 }
 
 function AlgorithmPicker({
@@ -396,7 +396,7 @@ function AlgorithmPicker({
           fontWeight: 700,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
-          color: '#78716C',
+          color: 'var(--text-muted)',
         }}
       >
         {label}
@@ -406,10 +406,10 @@ function AlgorithmPicker({
         onChange={e => onChange(e.target.value)}
         style={{
           padding: '10px 14px',
-          background: '#FDFCFA',
-          border: `1.5px solid ${value ? accent + '60' : '#E5DDD0'}`,
+          background: 'var(--bg-surface)',
+          border: `1.5px solid ${value ? accent + '60' : 'var(--border)'}`,
           borderRadius: '10px',
-          color: value ? '#1C1917' : '#C8BDB0',
+          color: value ? 'var(--text)' : 'var(--text-faint)',
           fontSize: '14px',
           fontWeight: 600,
           outline: 'none',
@@ -419,10 +419,10 @@ function AlgorithmPicker({
           transition: 'border-color 0.15s',
         }}
       >
-        <option value="">Select algorithm…</option>
+        <option value="">{t('compare.selectAlgorithm')}</option>
         {allModules.map(mod => (
           <option key={mod.meta.slug} value={mod.meta.slug}>
-            {t(mod.meta.nameKey)} ({mod.meta.category === 'data-structures' ? 'DS' : mod.meta.category === 'dp' ? 'DP' : mod.meta.category})
+            {t(mod.meta.nameKey)} ({mod.meta.category === 'data-structures' ? 'DS' : mod.meta.category === 'dp' ? 'DP' : t(`nav.${mod.meta.category}`)})
           </option>
         ))}
       </select>
@@ -440,11 +440,12 @@ function VisualizerSlot({
   accentColor: string
   label: string
 }) {
+  const { t } = useI18n()
   return (
     <div
       style={{
-        background: '#FDFCFA',
-        border: '1.5px solid #E5DDD0',
+        background: 'var(--bg-surface)',
+        border: `1.5px solid var(--border)`,
         borderTop: `3px solid ${accentColor}`,
         borderRadius: '12px',
         overflow: 'hidden',
@@ -456,8 +457,8 @@ function VisualizerSlot({
       <div
         style={{
           padding: '10px 16px',
-          borderBottom: '1px solid #E5DDD0',
-          background: '#F5F1EB',
+          borderBottom: `1px solid var(--border)`,
+          background: 'var(--bg)',
         }}
       >
         <span
@@ -465,7 +466,7 @@ function VisualizerSlot({
             fontFamily: 'var(--font-display)',
             fontSize: '14px',
             fontWeight: 700,
-            color: '#1C1917',
+            color: 'var(--text)',
             letterSpacing: '-0.01em',
           }}
         >
@@ -476,7 +477,7 @@ function VisualizerSlot({
       {/* Visualizer canvas */}
       <div
         style={{
-          background: '#F0EDE8',
+          background: 'var(--bg-muted)',
           minHeight: '240px',
           flex: 1,
           position: 'relative',
@@ -490,20 +491,20 @@ function VisualizerSlot({
               justifyContent: 'center',
               height: '100%',
               minHeight: '240px',
-              color: '#C8BDB0',
+              color: 'var(--text-faint)',
               fontSize: '13px',
               fontWeight: 600,
               fontFamily: 'var(--font-mono)',
             }}
           >
-            No algorithm selected
+            {t('compare.noAlgorithm')}
           </div>
         )}
       </div>
 
       {/* Controls */}
       {showControls && slug && (
-        <div style={{ padding: '12px 16px', borderTop: '1px solid #E5DDD0' }}>
+        <div style={{ padding: '12px 16px', borderTop: `1px solid var(--border)` }}>
           <PlaybackControls player={player} message={message} />
         </div>
       )}
@@ -512,10 +513,11 @@ function VisualizerSlot({
 }
 
 export default function ComparePage() {
+  const { t } = useI18n()
   return (
     <Suspense fallback={
-      <div style={{ background: '#F5F1EB', minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#78716C', fontFamily: 'var(--font-mono)', fontSize: '13px' }}>
-        Loading…
+      <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '13px' }}>
+        {t('compare.loading')}
       </div>
     }>
       <ComparePageInner />

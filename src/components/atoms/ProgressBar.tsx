@@ -19,7 +19,7 @@ export function ProgressBar({ progress, onSeek }: Props) {
       }}
       style={{
         height: '3px',
-        background: '#E5DDD0',
+        background: 'var(--border)',
         borderRadius: '2px',
         cursor: 'pointer',
         position: 'relative',

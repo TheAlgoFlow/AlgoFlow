@@ -111,7 +111,7 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
                   fontWeight: color ? 700 : 400,
                   border: '2px solid',
                   borderColor: color ?? 'rgba(0,0,0,0.12)',
-                  background: color ? `${color}18` : '#ffffff',
+                  background: color ? `${color}18` : 'var(--bg-surface)',
                   color: color ?? '#334155',
                   boxShadow: isFound || isCurrent ? `0 0 12px ${color}60` : 'none',
                   transform: isCurrent ? 'scale(1.1)' : 'scale(1)',

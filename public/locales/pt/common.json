@@ -52,5 +52,62 @@
   "tags": "Tags",
   "description": "Descrição",
   "whenToUse": "Quando usar",
-  "codeline": "Linha"
+  "codeline": "Linha",
+  "compare": {
+    "subtitle": "Lado a Lado",
+    "title": "Comparar Algoritmos",
+    "algoA": "Algoritmo A",
+    "algoB": "Algoritmo B",
+    "vs": "VS",
+    "linkedPlayback": "Reprodução Vinculada",
+    "linkPlayback": "Vincular Reprodução",
+    "selectAlgoA": "Selecione o Algoritmo A",
+    "selectAlgoB": "Selecione o Algoritmo B",
+    "complexityComparison": "Comparação de Complexidade",
+    "metric": "Métrica",
+    "winner": "Vencedor",
+    "tie": "Empate",
+    "selectAlgorithm": "Selecione o algoritmo…",
+    "noAlgorithm": "Nenhum algoritmo selecionado",
+    "loading": "Carregando…"
+  },
+  "reference": {
+    "subtitle": "Referência Big-O",
+    "title": "Guia de Complexidade",
+    "description": "Complexidade de tempo e espaço para todos os {{count}} algoritmos, filtráveis por categoria.",
+    "all": "Todos",
+    "headers": {
+      "algorithm": "Algoritmo",
+      "category": "Categoria",
+      "best": "Melhor",
+      "avg": "Médio",
+      "worst": "Pior",
+      "space": "Espaço",
+      "tags": "Tags"
+    },
+    "bigOGuide": "Guia de Notação Big-O",
+    "bigODesc": "Curvas de crescimento interativas, cartões de complexidade e exemplos de algoritmos — tudo em um só lugar.",
+    "openGuide": "→ Abrir Guia",
+    "footerLink": "Clique no nome de qualquer algoritmo para abrir seu visualizador interativo."
+  },
+  "bigo": {
+    "subtitle": "Teoria da Complexidade",
+    "title": "Notação Big-O",
+    "description": "Como algoritmos escalam em relação ao tamanho n — a base que todo engenheiro precisa.",
+    "curvesTitle": "Curvas de Crescimento",
+    "curvesDesc": "Operações vs. tamanho da entrada n = 1..20 — eixo y com limite em {{ymax}} para facilitar a leitura",
+    "ymax": "máx y",
+    "inputSize": "Tamanho da entrada (n)",
+    "classesTitle": "As Seis Classes",
+    "examples": "Exemplos no AlgoFlow",
+    "fullCheatSheet": "→ Guia de Bolso Completo",
+    "classes": {
+      "constant": { "label": "Constante", "desc": "Tempo fixo independentemente do tamanho da entrada. O padrão ouro — tão imediato quanto possível." },
+      "logarithmic": { "label": "Logarítmica", "desc": "Divide o espaço de busca pela metade a cada passo. Extremamente rápido mesmo com milhões de elementos." },
+      "linear": { "label": "Linear", "desc": "Cresce diretamente com o tamanho da entrada. Aceitável para a maioria das cargas de trabalho do mundo real." },
+      "linearithmic": { "label": "Linearítmica", "desc": "Limite inferior teórico de eficiência para ordenações de comparação. Quase todos caem aqui." },
+      "quadratic": { "label": "Quadrática", "desc": "Iterações alinhadas. Ótimo apenas para arquivos pequenos — desesperadamente lento além de 1.000 elementos." },
+      "exponential": { "label": "Exponencial", "desc": "Dobra com cada elemento adicional. Usado apenas para entradas ultracurtas — pense em n < 20." }
+    }
+  }
 }

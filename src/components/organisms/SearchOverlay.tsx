@@ -130,7 +130,7 @@ export function SearchOverlay({ open, onClose }: Props) {
         position: 'fixed',
         inset: 0,
         zIndex: 200,
-        background: 'rgba(28,25,23,0.4)',
+        background: 'var(--overlay-bg)',
         backdropFilter: 'blur(4px)',
         display: 'flex',
         alignItems: 'flex-start',
@@ -150,11 +150,11 @@ export function SearchOverlay({ open, onClose }: Props) {
         style={{
           width: '100%',
           maxWidth: '640px',
-          background: '#FDFCFA',
-          border: '1px solid #E5DDD0',
+          background: 'var(--bg-surface)',
+          border: `1px solid var(--border)`,
           borderRadius: '16px',
           overflow: 'hidden',
-          boxShadow: '0 24px 64px rgba(28,25,23,0.18)',
+          boxShadow: '0 24px 64px var(--shadow-lg)',
           animation: 'slideDown 0.18s ease',
         }}
       >
@@ -165,11 +165,11 @@ export function SearchOverlay({ open, onClose }: Props) {
             alignItems: 'center',
             gap: '12px',
             padding: '0 16px',
-            borderBottom: '1px solid #E5DDD0',
+            borderBottom: `1px solid var(--border)`,
             height: '52px',
           }}
         >
-          <Search size={16} strokeWidth={2} style={{ color: '#78716C', flexShrink: 0 }} />
+          <Search size={16} strokeWidth={2} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
           <input
             ref={inputRef}
             value={query}
@@ -182,7 +182,7 @@ export function SearchOverlay({ open, onClose }: Props) {
               background: 'transparent',
               fontSize: '15px',
               fontWeight: 500,
-              color: '#1C1917',
+              color: 'var(--text)',
               fontFamily: 'var(--font-body)',
             }}
           />
@@ -197,8 +197,8 @@ export function SearchOverlay({ open, onClose }: Props) {
                 height: '20px',
                 borderRadius: '50%',
                 border: 'none',
-                background: '#E5DDD0',
-                color: '#78716C',
+                background: 'var(--border)',
+                color: 'var(--text-muted)',
                 cursor: 'pointer',
                 padding: 0,
                 flexShrink: 0,
@@ -212,9 +212,9 @@ export function SearchOverlay({ open, onClose }: Props) {
             style={{
               padding: '3px 8px',
               borderRadius: '6px',
-              border: '1px solid #E5DDD0',
+              border: `1px solid var(--border)`,
               background: 'transparent',
-              color: '#78716C',
+              color: 'var(--text-muted)',
               fontSize: '11px',
               fontFamily: 'var(--font-mono)',
               cursor: 'pointer',
@@ -231,7 +231,7 @@ export function SearchOverlay({ open, onClose }: Props) {
             display: 'flex',
             gap: '6px',
             padding: '10px 16px',
-            borderBottom: '1px solid #E5DDD0',
+            borderBottom: `1px solid var(--border)`,
             overflowX: 'auto',
             scrollbarWidth: 'none',
           }}
@@ -248,9 +248,9 @@ export function SearchOverlay({ open, onClose }: Props) {
                   padding: '4px 12px',
                   borderRadius: '999px',
                   border: '1.5px solid',
-                  borderColor: active ? (color ?? '#5200FF') : '#E5DDD0',
+                  borderColor: active ? (color ?? '#5200FF') : 'var(--border)',
                   background: active ? (color ? `${color}18` : 'rgba(82,0,255,0.06)') : 'transparent',
-                  color: active ? (cat !== 'all' ? textColor : '#5200FF') : '#78716C',
+                  color: active ? (cat !== 'all' ? textColor : '#5200FF') : 'var(--text-muted)',
                   fontSize: '11px',
                   fontWeight: 700,
                   letterSpacing: '0.05em',
@@ -278,7 +278,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                   fontWeight: 700,
                   letterSpacing: '0.08em',
                   textTransform: 'uppercase',
-                  color: '#C8BDB0',
+                  color: 'var(--text-faint)',
                   fontFamily: 'var(--font-mono)',
                   marginBottom: '10px',
                 }}
@@ -302,7 +302,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                       textDecoration: 'none',
                       transition: 'background 0.12s',
                     }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = '#F5F1EB' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'var(--bg-muted)' }}
                     onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent' }}
                   >
                     <div
@@ -314,10 +314,10 @@ export function SearchOverlay({ open, onClose }: Props) {
                         flexShrink: 0,
                       }}
                     />
-                    <span style={{ color: '#1C1917', fontSize: '14px', fontWeight: 600, flex: 1 }}>
+                    <span style={{ color: 'var(--text)', fontSize: '14px', fontWeight: 600, flex: 1 }}>
                       {cat.id === 'data-structures' ? 'Data Structures' : cat.id === 'dp' ? 'Dynamic Programming' : cat.id.charAt(0).toUpperCase() + cat.id.slice(1)}
                     </span>
-                    <ChevronRight size={13} style={{ color: '#C8BDB0' }} />
+                    <ChevronRight size={13} style={{ color: 'var(--text-faint)' }} />
                   </a>
                 )
               })}
@@ -327,7 +327,7 @@ export function SearchOverlay({ open, onClose }: Props) {
               style={{
                 padding: '40px 16px',
                 textAlign: 'center',
-                color: '#C8BDB0',
+                color: 'var(--text-faint)',
                 fontSize: '14px',
                 fontWeight: 500,
               }}
@@ -343,7 +343,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                     fontWeight: 700,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
-                    color: '#C8BDB0',
+                    color: 'var(--text-faint)',
                     fontFamily: 'var(--font-mono)',
                     padding: '4px 8px 8px',
                     display: 'flex',
@@ -371,7 +371,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                       padding: '10px 12px',
                       borderRadius: '10px',
                       border: 'none',
-                      background: isHighlighted ? '#F5F1EB' : 'transparent',
+                      background: isHighlighted ? 'var(--bg-muted)' : 'transparent',
                       cursor: 'pointer',
                       textAlign: 'left',
                       transition: 'background 0.1s',
@@ -386,14 +386,14 @@ export function SearchOverlay({ open, onClose }: Props) {
                         flexShrink: 0,
                       }}
                     />
-                    <span style={{ flex: 1, color: '#1C1917', fontSize: '14px', fontWeight: 600 }}>
+                    <span style={{ flex: 1, color: 'var(--text)', fontSize: '14px', fontWeight: 600 }}>
                       {result.name}
                     </span>
                     <Badge accentColor={color} textColor={textColor}>{result.complexity}</Badge>
                     {result.tags.slice(0, 2).map(tag => (
                       <Tag key={tag}>{tag}</Tag>
                     ))}
-                    <ChevronRight size={13} style={{ color: isHighlighted ? '#78716C' : '#C8BDB0', flexShrink: 0 }} />
+                    <ChevronRight size={13} style={{ color: isHighlighted ? 'var(--text-muted)' : 'var(--text-faint)', flexShrink: 0 }} />
                   </button>
                 )
               })}
@@ -404,7 +404,7 @@ export function SearchOverlay({ open, onClose }: Props) {
         {/* ─ Footer ─ */}
         <div
           style={{
-            borderTop: '1px solid #E5DDD0',
+            borderTop: `1px solid var(--border)`,
             padding: '8px 16px',
             display: 'flex',
             gap: '16px',
@@ -423,7 +423,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                 alignItems: 'center',
                 gap: '5px',
                 fontSize: '10px',
-                color: '#C8BDB0',
+                color: 'var(--text-faint)',
                 fontFamily: 'var(--font-mono)',
               }}
             >

@@ -28,12 +28,12 @@ export function AlgorithmCard({ slug, categoryId, name, complexity, tags, accent
           alignItems: 'center',
           gap: '16px',
           padding: compact ? '12px 16px' : '16px 20px',
-          background: '#FDFCFA',
-          border: '1.5px solid #E5DDD0',
+          background: 'var(--bg-surface)',
+          border: `1.5px solid var(--border)`,
           borderRadius: '12px',
           cursor: 'pointer',
           transition: 'all 0.15s ease',
-          boxShadow: '0 1px 4px rgba(28,25,23,0.04)',
+          boxShadow: '0 1px 4px var(--shadow-sm)',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -49,7 +49,7 @@ export function AlgorithmCard({ slug, categoryId, name, complexity, tags, accent
           const el = e.currentTarget as HTMLDivElement
           el.style.transform = 'translateX(0)'
           el.style.boxShadow = '0 1px 4px rgba(28,25,23,0.04)'
-          el.style.borderColor = '#E5DDD0'
+          el.style.borderColor = 'var(--border)'
           const bar = el.querySelector('.accent-bar') as HTMLDivElement | null
           if (bar) bar.style.opacity = '0'
         }}
@@ -70,7 +70,7 @@ export function AlgorithmCard({ slug, categoryId, name, complexity, tags, accent
         {/* Index number */}
         <span
           style={{
-            color: '#C8BDB0',
+            color: 'var(--text-faint)',
             fontSize: '11px',
             fontWeight: 700,
             minWidth: '22px',
@@ -86,7 +86,7 @@ export function AlgorithmCard({ slug, categoryId, name, complexity, tags, accent
         <span
           style={{
             flex: 1,
-            color: '#1C1917',
+            color: 'var(--text)',
             fontSize: compact ? '14px' : '15px',
             fontWeight: 600,
             letterSpacing: '-0.01em',
@@ -105,7 +105,7 @@ export function AlgorithmCard({ slug, categoryId, name, complexity, tags, accent
         {/* Complexity badge */}
         <Badge accentColor={accentColor} textColor={textColor}>{complexity}</Badge>
 
-        <ChevronRight size={14} strokeWidth={2} style={{ color: '#C8BDB0', flexShrink: 0 }} />
+        <ChevronRight size={14} strokeWidth={2} style={{ color: 'var(--text-faint)', flexShrink: 0 }} />
       </div>
     </Link>
   )

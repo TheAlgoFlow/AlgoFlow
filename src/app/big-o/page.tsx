@@ -12,75 +12,9 @@ import {
 } from 'recharts'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { useI18n } from '@/i18n/context'
 
 /* ─── Data ──────────────────────────────────────────────────────────── */
-
-const COMPLEXITY_GUIDE = [
-  {
-    notation: 'O(1)',
-    label: 'Constant',
-    color: '#0f7142',
-    desc: 'Fixed time regardless of input size. The gold standard — as close to instant as algorithms get.',
-    examples: [
-      { name: 'Array Access', slug: 'array-ops', category: 'data-structures' },
-      { name: 'Hash Table Lookup', slug: 'hash-table', category: 'data-structures' },
-      { name: 'Stack Push / Pop', slug: 'stack', category: 'data-structures' },
-    ],
-  },
-  {
-    notation: 'O(log n)',
-    label: 'Logarithmic',
-    color: '#2563eb',
-    desc: 'Halves the search space each step. Blazingly fast even on inputs with millions of elements.',
-    examples: [
-      { name: 'Binary Search', slug: 'binary-search', category: 'searching' },
-      { name: 'BST Operations', slug: 'bst', category: 'data-structures' },
-    ],
-  },
-  {
-    notation: 'O(n)',
-    label: 'Linear',
-    color: '#78716C',
-    desc: 'Grows directly with input size. Acceptable for most real-world workloads.',
-    examples: [
-      { name: 'Linear Search', slug: 'linear-search', category: 'searching' },
-      { name: 'BFS', slug: 'bfs', category: 'searching' },
-      { name: 'DFS', slug: 'dfs', category: 'searching' },
-    ],
-  },
-  {
-    notation: 'O(n log n)',
-    label: 'Linearithmic',
-    color: '#b45309',
-    desc: 'The theoretical lower bound for comparison sorts. Most efficient general-purpose sorts land here.',
-    examples: [
-      { name: 'Merge Sort', slug: 'merge-sort', category: 'sorting' },
-      { name: 'Heap Sort', slug: 'heap-sort', category: 'sorting' },
-      { name: 'Quick Sort (avg)', slug: 'quick-sort', category: 'sorting' },
-    ],
-  },
-  {
-    notation: 'O(n²)',
-    label: 'Quadratic',
-    color: '#dc2626',
-    desc: 'Nested iteration. Fine for small datasets — painfully slow beyond ~1,000 elements.',
-    examples: [
-      { name: 'Bubble Sort', slug: 'bubble-sort', category: 'sorting' },
-      { name: 'Selection Sort', slug: 'selection-sort', category: 'sorting' },
-      { name: 'Insertion Sort', slug: 'insertion-sort', category: 'sorting' },
-    ],
-  },
-  {
-    notation: 'O(2ⁿ)',
-    label: 'Exponential',
-    color: '#9333ea',
-    desc: 'Doubles with each additional element. Only practical for tiny inputs — think n < 20.',
-    examples: [
-      { name: 'Fibonacci (naïve)', slug: 'fibonacci', category: 'dp' },
-      { name: 'Knapsack (brute)', slug: 'knapsack', category: 'dp' },
-    ],
-  },
-]
 
 type CurveKey = 'O(1)' | 'O(log n)' | 'O(n)' | 'O(n log n)' | 'O(n²)' | 'O(2ⁿ)'
 const CURVE_KEYS: CurveKey[] = ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)', 'O(n²)', 'O(2ⁿ)']
@@ -130,8 +64,8 @@ function CustomTooltip({
   return (
     <div
       style={{
-        background: '#FDFCFA',
-        border: '1.5px solid #E5DDD0',
+        background: 'var(--bg-surface)',
+        border: `1.5px solid var(--border)`,
         borderRadius: '10px',
         padding: '12px 16px',
         boxShadow: '0 8px 32px rgba(28,25,23,0.12)',
@@ -145,7 +79,7 @@ function CustomTooltip({
           fontWeight: 700,
           letterSpacing: '0.1em',
           textTransform: 'uppercase',
-          color: '#C8BDB0',
+          color: 'var(--text-faint)',
           marginBottom: '10px',
         }}
       >
@@ -169,7 +103,7 @@ function CustomTooltip({
             style={{
               fontSize: '12px',
               fontWeight: 600,
-              color: entry.value >= yMax ? '#C8BDB0' : entry.color,
+              color: entry.value >= yMax ? 'var(--text-faint)' : entry.color,
               fontStyle: entry.value >= yMax ? 'italic' : 'normal',
             }}
           >
@@ -184,8 +118,76 @@ function CustomTooltip({
 /* ─── Page ───────────────────────────────────────────────────────────── */
 
 export default function BigOPage() {
+  const { t } = useI18n()
   const [yMax, setYMax] = useState(30)
   const [inputVal, setInputVal] = useState('30')
+
+  const COMPLEXITY_GUIDE = [
+    {
+      notation: 'O(1)',
+      label: t('bigo.classes.constant.label'),
+      color: '#0f7142',
+      desc: t('bigo.classes.constant.desc'),
+      examples: [
+        { name: 'Array Access', slug: 'array-ops', category: 'data-structures' },
+        { name: 'Hash Table Lookup', slug: 'hash-table', category: 'data-structures' },
+        { name: 'Stack Push / Pop', slug: 'stack', category: 'data-structures' },
+      ],
+    },
+    {
+      notation: 'O(log n)',
+      label: t('bigo.classes.logarithmic.label'),
+      color: '#2563eb',
+      desc: t('bigo.classes.logarithmic.desc'),
+      examples: [
+        { name: 'Binary Search', slug: 'binary-search', category: 'searching' },
+        { name: 'BST Operations', slug: 'bst', category: 'data-structures' },
+      ],
+    },
+    {
+      notation: 'O(n)',
+      label: t('bigo.classes.linear.label'),
+      color: 'var(--text-muted)',
+      desc: t('bigo.classes.linear.desc'),
+      examples: [
+        { name: 'Linear Search', slug: 'linear-search', category: 'searching' },
+        { name: 'BFS', slug: 'bfs', category: 'searching' },
+        { name: 'DFS', slug: 'dfs', category: 'searching' },
+      ],
+    },
+    {
+      notation: 'O(n log n)',
+      label: t('bigo.classes.linearithmic.label'),
+      color: '#b45309',
+      desc: t('bigo.classes.linearithmic.desc'),
+      examples: [
+        { name: 'Merge Sort', slug: 'merge-sort', category: 'sorting' },
+        { name: 'Heap Sort', slug: 'heap-sort', category: 'sorting' },
+        { name: 'Quick Sort (avg)', slug: 'quick-sort', category: 'sorting' },
+      ],
+    },
+    {
+      notation: 'O(n²)',
+      label: t('bigo.classes.quadratic.label'),
+      color: '#dc2626',
+      desc: t('bigo.classes.quadratic.desc'),
+      examples: [
+        { name: 'Bubble Sort', slug: 'bubble-sort', category: 'sorting' },
+        { name: 'Selection Sort', slug: 'selection-sort', category: 'sorting' },
+        { name: 'Insertion Sort', slug: 'insertion-sort', category: 'sorting' },
+      ],
+    },
+    {
+      notation: 'O(2ⁿ)',
+      label: t('bigo.classes.exponential.label'),
+      color: '#9333ea',
+      desc: t('bigo.classes.exponential.desc'),
+      examples: [
+        { name: 'Fibonacci (naïve)', slug: 'fibonacci', category: 'dp' },
+        { name: 'Knapsack (brute)', slug: 'knapsack', category: 'dp' },
+      ],
+    },
+  ]
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -206,7 +208,7 @@ export default function BigOPage() {
   }))
 
   return (
-    <div style={{ background: '#F5F1EB', minHeight: 'calc(100vh - 64px)' }}>
+    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 64px)' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'clamp(40px,6vw,80px) 24px' }}>
 
         {/* ── Header ── */}
@@ -220,10 +222,10 @@ export default function BigOPage() {
                 fontWeight: 700,
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: '#78716C',
+                color: 'var(--text-muted)',
               }}
             >
-              Complexity Theory
+              {t('bigo.subtitle')}
             </span>
           </div>
           <h1
@@ -231,33 +233,33 @@ export default function BigOPage() {
               fontFamily: 'var(--font-display)',
               fontSize: 'clamp(36px,6vw,64px)',
               fontWeight: 900,
-              color: '#1C1917',
+              color: 'var(--text)',
               letterSpacing: '-0.03em',
               lineHeight: 1.05,
               marginBottom: '14px',
             }}
           >
-            Big-O Notation
+            {t('bigo.title')}
           </h1>
           <p
             style={{
               fontFamily: 'var(--font-mono)',
-              color: '#78716C',
+              color: 'var(--text-muted)',
               fontSize: '14px',
               maxWidth: '500px',
               lineHeight: 1.7,
               letterSpacing: '0.01em',
             }}
           >
-            How algorithms scale with input size <em>n</em> — the lens every engineer needs.
+            <span dangerouslySetInnerHTML={{ __html: t('bigo.description') }} />
           </p>
         </div>
 
         {/* ── Hero Chart ── */}
         <div
           style={{
-            background: '#FDFCFA',
-            border: '1.5px solid #E5DDD0',
+            background: 'var(--bg-surface)',
+            border: `1.5px solid var(--border)`,
             borderRadius: '20px',
             padding: '32px 28px 28px',
             marginBottom: '56px',
@@ -271,22 +273,22 @@ export default function BigOPage() {
                   fontFamily: 'var(--font-display)',
                   fontSize: '22px',
                   fontWeight: 800,
-                  color: '#1C1917',
+                  color: 'var(--text)',
                   letterSpacing: '-0.02em',
                   marginBottom: '6px',
                 }}
               >
-                Growth Curves
+                {t('bigo.curvesTitle')}
               </h2>
               <p
                 style={{
                   fontFamily: 'var(--font-mono)',
                   fontSize: '11px',
-                  color: '#C8BDB0',
+                  color: 'var(--text-faint)',
                   letterSpacing: '0.04em',
                 }}
               >
-                Operations vs. input size n = 1..20 — y-axis capped at {yMax} for readability
+                {t('bigo.curvesDesc', { ymax: yMax })}
               </p>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
@@ -298,10 +300,10 @@ export default function BigOPage() {
                   fontWeight: 700,
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
-                  color: '#C8BDB0',
+                  color: 'var(--text-faint)',
                 }}
               >
-                y max
+                {t('bigo.ymax')}
               </label>
               <input
                 id="ymax-input"
@@ -316,9 +318,9 @@ export default function BigOPage() {
                   fontFamily: 'var(--font-mono)',
                   fontSize: '13px',
                   fontWeight: 600,
-                  color: '#1C1917',
-                  background: '#FDFCFA',
-                  border: '1.5px solid #E5DDD0',
+                  color: 'var(--text)',
+                  background: 'var(--bg-surface)',
+                  border: `1.5px solid var(--border)`,
                   borderRadius: '6px',
                   outline: 'none',
                   textAlign: 'right',
@@ -329,22 +331,22 @@ export default function BigOPage() {
 
           <ResponsiveContainer width="100%" height={360}>
             <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 20, left: 0 }}>
-              <CartesianGrid strokeDasharray="4 4" stroke="#E5DDD0" />
+              <CartesianGrid strokeDasharray="4 4" stroke="var(--border)" />
               <XAxis
                 dataKey="n"
-                tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: '#78716C' }}
-                axisLine={{ stroke: '#E5DDD0' }}
+                tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 'var(--text-muted)' }}
+                axisLine={{ stroke: 'var(--border)' }}
                 tickLine={false}
                 label={{
-                  value: 'Input size (n)',
+                  value: t('bigo.inputSize'),
                   position: 'insideBottom',
                   offset: -12,
-                  style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: '#C8BDB0' },
+                  style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: 'var(--text-faint)' },
                 }}
               />
               <YAxis
-                tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: '#78716C' }}
-                axisLine={{ stroke: '#E5DDD0' }}
+                tick={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 'var(--text-muted)' }}
+                axisLine={{ stroke: 'var(--border)' }}
                 tickLine={false}
                 domain={[0, yMax]}
                 width={34}
@@ -372,7 +374,7 @@ export default function BigOPage() {
               flexWrap: 'wrap',
               marginTop: '20px',
               paddingTop: '20px',
-              borderTop: '1px solid #F0EDE8',
+              borderTop: `1px solid var(--bg-muted)`,
             }}
           >
             {COMPLEXITY_GUIDE.map(item => (
@@ -410,12 +412,12 @@ export default function BigOPage() {
             fontFamily: 'var(--font-display)',
             fontSize: 'clamp(24px,4vw,36px)',
             fontWeight: 900,
-            color: '#1C1917',
+            color: 'var(--text)',
             letterSpacing: '-0.025em',
             marginBottom: '20px',
           }}
         >
-          The Six Classes
+          {t('bigo.classesTitle')}
         </h2>
 
         <div
@@ -433,8 +435,8 @@ export default function BigOPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.07, ease: 'easeOut' }}
               style={{
-                background: '#FDFCFA',
-                border: '1.5px solid #E5DDD0',
+                background: 'var(--bg-surface)',
+                border: `1.5px solid var(--border)`,
                 borderTop: `3px solid ${item.color}`,
                 borderRadius: '12px',
                 padding: '20px',
@@ -468,7 +470,7 @@ export default function BigOPage() {
                       fontFamily: 'var(--font-mono)',
                       fontSize: '9px',
                       fontWeight: 700,
-                      color: '#1C1917',
+                      color: 'var(--text)',
                       letterSpacing: '0.1em',
                       textTransform: 'uppercase',
                     }}
@@ -500,7 +502,7 @@ export default function BigOPage() {
               {/* Description */}
               <p
                 style={{
-                  color: '#78716C',
+                  color: 'var(--text-muted)',
                   fontSize: '13px',
                   lineHeight: 1.65,
                   margin: '0 0 16px 0',
@@ -518,11 +520,11 @@ export default function BigOPage() {
                     fontWeight: 700,
                     letterSpacing: '0.1em',
                     textTransform: 'uppercase',
-                    color: '#C8BDB0',
+                    color: 'var(--text-faint)',
                     marginBottom: '8px',
                   }}
                 >
-                  Examples in AlgoFlow
+                  {t('bigo.examples')}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                   {item.examples.map(ex => (
@@ -535,7 +537,7 @@ export default function BigOPage() {
                         gap: '7px',
                         fontSize: '12px',
                         fontWeight: 500,
-                        color: '#78716C',
+                        color: 'var(--text-muted)',
                         textDecoration: 'none',
                         transition: 'color 0.12s',
                       }}
@@ -543,7 +545,7 @@ export default function BigOPage() {
                         ;(e.currentTarget as HTMLAnchorElement).style.color = item.color
                       }}
                       onMouseLeave={e => {
-                        ;(e.currentTarget as HTMLAnchorElement).style.color = '#78716C'
+                        ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-muted)'
                       }}
                     >
                       <span
@@ -568,9 +570,9 @@ export default function BigOPage() {
         {/* ── Footer ── */}
         <div
           style={{
-            borderTop: '1px solid #E5DDD0',
+            borderTop: `1px solid var(--border)`,
             paddingTop: '24px',
-            color: '#C8BDB0',
+            color: 'var(--text-faint)',
             fontSize: '12px',
             fontFamily: 'var(--font-mono)',
             textAlign: 'center',
@@ -581,7 +583,7 @@ export default function BigOPage() {
             href="/reference"
             style={{ color: '#5200FF', textDecoration: 'none', fontWeight: 700 }}
           >
-            → Full Cheat Sheet
+            {t('bigo.fullCheatSheet')}
           </Link>
         </div>
       </div>
