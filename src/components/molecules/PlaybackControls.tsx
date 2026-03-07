@@ -2,6 +2,7 @@
 
 import { SkipBack, ChevronLeft, Play, Pause, ChevronRight, SkipForward } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
+import { ProgressBar } from '@/components/atoms/ProgressBar'
 import type { PlayerState } from '@/hooks/useAlgorithmPlayer'
 
 const SPEEDS = [0.25, 0.5, 1, 2, 4]
@@ -19,7 +20,8 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-      {/* Message */}
+
+      {/* Step message */}
       <div
         style={{
           fontSize: '0.8rem',
@@ -32,33 +34,13 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
         {message}
       </div>
 
-      {/* Progress bar */}
-      <div
-        onClick={e => {
-          const rect = e.currentTarget.getBoundingClientRect()
-          const pct = (e.clientX - rect.left) / rect.width
-          seekTo(Math.round(pct * (totalFrames - 1)))
-        }}
-        style={{
-          height: '3px',
-          background: '#E5DDD0',
-          borderRadius: '2px',
-          cursor: 'pointer',
-          position: 'relative',
-        }}
-      >
-        <div
-          style={{
-            height: '100%',
-            width: `${progress}%`,
-            background: '#5200FF',
-            borderRadius: '2px',
-            transition: 'width 0.1s linear',
-          }}
-        />
-      </div>
+      {/* ─ Progress bar ─ */}
+      <ProgressBar
+        progress={progress}
+        onSeek={pct => seekTo(Math.round(pct * (totalFrames - 1)))}
+      />
 
-      {/* Controls row */}
+      {/* ─ Controls row ─ */}
       <div
         style={{
           display: 'flex',
@@ -151,6 +133,7 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
   )
 }
 
+/** Local atom-like helper — a small icon-only control button */
 function CtrlBtn({
   onClick,
   children,

@@ -5,7 +5,9 @@ import Link from 'next/link'
 import { Github, Search } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import type { Locale } from '@/i18n/context'
-import { SearchOverlay } from '@/components/molecules/SearchOverlay'
+import { NavLink } from '@/components/atoms/NavLink'
+import { Kbd } from '@/components/atoms/Kbd'
+import { SearchOverlay } from '@/components/organisms/SearchOverlay'
 
 export function Nav() {
   const { locale, setLocale } = useI18n()
@@ -75,7 +77,7 @@ export function Nav() {
             <span style={{ color: '#5200FF' }}>w</span>
           </Link>
 
-          {/* Nav links */}
+          {/* Nav links — using NavLink atom */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <NavLink href="/reference">Reference</NavLink>
             <NavLink href="/big-o">Big-O</NavLink>
@@ -105,30 +107,18 @@ export function Nav() {
               fontFamily: 'var(--font-body)',
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = '#C8BDB0'
-              ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 8px rgba(28,25,23,0.08)'
+              e.currentTarget.style.borderColor = '#C8BDB0'
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(28,25,23,0.08)'
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.borderColor = '#E5DDD0'
-              ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 1px 3px rgba(28,25,23,0.05)'
+              e.currentTarget.style.borderColor = '#E5DDD0'
+              e.currentTarget.style.boxShadow = '0 1px 3px rgba(28,25,23,0.05)'
             }}
           >
             <Search size={13} strokeWidth={2} />
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               Search algorithms…
-              <kbd
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '10px',
-                  color: '#C8BDB0',
-                  background: '#F0EDE8',
-                  border: '1px solid #E5DDD0',
-                  borderRadius: '4px',
-                  padding: '1px 5px',
-                }}
-              >
-                ⌘K
-              </kbd>
+              <Kbd>⌘K</Kbd>
             </span>
           </button>
 
@@ -144,8 +134,8 @@ export function Nav() {
               textDecoration: 'none',
               transition: 'color 0.15s',
             }}
-            onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#1C1917' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#78716C' }}
+            onMouseEnter={e => { e.currentTarget.style.color = '#1C1917' }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#78716C' }}
           >
             <Github size={18} strokeWidth={1.75} />
           </a>
@@ -184,27 +174,5 @@ export function Nav() {
 
       <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
-  )
-}
-
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      style={{
-        color: '#78716C',
-        textDecoration: 'none',
-        fontSize: '11px',
-        fontWeight: 600,
-        letterSpacing: '0.08em',
-        textTransform: 'uppercase',
-        fontFamily: 'var(--font-mono)',
-        transition: 'color 0.15s',
-      }}
-      onMouseEnter={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#1C1917' }}
-      onMouseLeave={e => { (e.currentTarget as HTMLAnchorElement).style.color = '#78716C' }}
-    >
-      {children}
-    </Link>
   )
 }

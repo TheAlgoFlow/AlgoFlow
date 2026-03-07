@@ -2,13 +2,9 @@
 
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
-
-const CATEGORY_TEXT_COLORS: Record<string, string> = {
-  sorting:           '#4a6600',
-  searching:         '#FF6B00',
-  'data-structures': '#c000cc',
-  dp:                '#5200FF',
-}
+import { Badge } from '@/components/atoms/Badge'
+import { Tag } from '@/components/atoms/Tag'
+import { getCategoryTheme } from '@/components/constants/categoryTheme'
 
 type Props = {
   slug: string
@@ -22,7 +18,7 @@ type Props = {
 }
 
 export function AlgorithmCard({ slug, categoryId, name, complexity, tags, accentColor, index, compact }: Props) {
-  const textColor = CATEGORY_TEXT_COLORS[categoryId] ?? '#5200FF'
+  const { textColor } = getCategoryTheme(categoryId)
 
   return (
     <Link href={`/visualizer/${categoryId}/${slug}`} style={{ textDecoration: 'none', display: 'block' }}>
@@ -63,9 +59,7 @@ export function AlgorithmCard({ slug, categoryId, name, complexity, tags, accent
           className="accent-bar"
           style={{
             position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
+            left: 0, top: 0, bottom: 0,
             width: '3px',
             background: accentColor,
             opacity: 0,
@@ -104,40 +98,12 @@ export function AlgorithmCard({ slug, categoryId, name, complexity, tags, accent
         {/* Tags */}
         <div style={{ display: 'flex', gap: '4px' }}>
           {tags.slice(0, 2).map(tag => (
-            <span
-              key={tag}
-              style={{
-                fontSize: '10px',
-                color: '#78716C',
-                background: '#F0EDE8',
-                border: '1px solid #E5DDD0',
-                padding: '2px 7px',
-                borderRadius: '4px',
-                fontWeight: 600,
-                letterSpacing: '0.03em',
-              }}
-            >
-              {tag}
-            </span>
+            <Tag key={tag}>{tag}</Tag>
           ))}
         </div>
 
         {/* Complexity badge */}
-        <span
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '11px',
-            color: textColor,
-            background: `${accentColor}18`,
-            border: `1.5px solid ${accentColor}35`,
-            padding: '3px 10px',
-            borderRadius: '6px',
-            fontWeight: 700,
-            flexShrink: 0,
-          }}
-        >
-          {complexity}
-        </span>
+        <Badge accentColor={accentColor} textColor={textColor}>{complexity}</Badge>
 
         <ChevronRight size={14} strokeWidth={2} style={{ color: '#C8BDB0', flexShrink: 0 }} />
       </div>

@@ -4,34 +4,32 @@ import Link from 'next/link'
 import { ArrowUpDown, Search, Database, BrainCircuit } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { categories, getCategory } from '@/algorithms/index'
+import { CATEGORY_COLORS } from '@/components/constants/categoryTheme'
+import { Tag } from '@/components/atoms/Tag'
+import { IconChip } from '@/components/atoms/IconChip'
 
 const CATEGORY_META: Record<string, {
   icon: React.ReactNode
-  color: string
   num: string
   tags: string[]
 }> = {
   sorting: {
     icon: <ArrowUpDown size={20} strokeWidth={2} />,
-    color: '#CCFF00',
     num: '01',
     tags: ['comparison', 'in-place'],
   },
   searching: {
     icon: <Search size={20} strokeWidth={2} />,
-    color: '#FF6B00',
     num: '02',
     tags: ['graph', 'binary'],
   },
   'data-structures': {
     icon: <Database size={20} strokeWidth={2} />,
-    color: '#F900FF',
     num: '03',
     tags: ['tree', 'linked-list'],
   },
   dp: {
     icon: <BrainCircuit size={20} strokeWidth={2} />,
-    color: '#5200FF',
     num: '04',
     tags: ['memoization', 'tabulation'],
   },
@@ -85,6 +83,7 @@ export default function HomePage() {
           {categories.map(cat => {
             const algos = getCategory(cat.id)
             const meta = CATEGORY_META[cat.id]
+            const color = CATEGORY_COLORS[cat.id]
 
             return (
               <Link
@@ -98,7 +97,7 @@ export default function HomePage() {
                     background: '#FDFCFA',
                     borderRadius: '16px',
                     border: '1.5px solid #E5DDD0',
-                    borderTop: `4px solid ${meta.color}`,
+                    borderTop: `4px solid ${color}`,
                     padding: '24px 24px 20px',
                     cursor: 'pointer',
                     position: 'relative',
@@ -140,22 +139,9 @@ export default function HomePage() {
                     {meta.num}
                   </span>
 
-                  {/* Icon chip */}
-                  <div
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '9px',
-                      background: `${meta.color}18`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#1C1917',
-                      marginBottom: '18px',
-                      flexShrink: 0,
-                    }}
-                  >
-                    {meta.icon}
+                  {/* Icon chip — using atom */}
+                  <div style={{ marginBottom: '18px' }}>
+                    <IconChip color={color}>{meta.icon}</IconChip>
                   </div>
 
                   {/* Name */}
@@ -186,25 +172,10 @@ export default function HomePage() {
                     {algos.length} algorithms
                   </p>
 
-                  {/* Tags */}
+                  {/* Tags — using atom */}
                   <div style={{ display: 'flex', gap: '5px', marginTop: '12px', flexWrap: 'wrap' }}>
                     {meta.tags.map(tag => (
-                      <span
-                        key={tag}
-                        style={{
-                          fontSize: '10px',
-                          color: '#78716C',
-                          background: '#F0EDE8',
-                          border: '1px solid #E5DDD0',
-                          padding: '2px 7px',
-                          borderRadius: '4px',
-                          fontWeight: 600,
-                          letterSpacing: '0.04em',
-                          fontFamily: 'var(--font-mono)',
-                        }}
-                      >
-                        {tag}
-                      </span>
+                      <Tag key={tag}>{tag}</Tag>
                     ))}
                   </div>
                 </div>

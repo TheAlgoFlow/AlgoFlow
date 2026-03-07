@@ -5,20 +5,10 @@ import { useRouter } from 'next/navigation'
 import { Search, X, Clock, ChevronRight } from 'lucide-react'
 import { allModules, categories } from '@/algorithms/index'
 import { useI18n } from '@/i18n/context'
-
-const CATEGORY_COLORS: Record<string, string> = {
-  sorting:           '#CCFF00',
-  searching:         '#FF6B00',
-  'data-structures': '#F900FF',
-  dp:                '#5200FF',
-}
-
-const CATEGORY_TEXT_COLORS: Record<string, string> = {
-  sorting:           '#4a6600',
-  searching:         '#FF6B00',
-  'data-structures': '#c000cc',
-  dp:                '#5200FF',
-}
+import { Badge } from '@/components/atoms/Badge'
+import { Tag } from '@/components/atoms/Tag'
+import { Kbd } from '@/components/atoms/Kbd'
+import { getCategoryTheme, CATEGORY_COLORS } from '@/components/constants/categoryTheme'
 
 const RECENT_KEY = 'algoflow_recent'
 const MAX_RECENT = 5
@@ -168,7 +158,7 @@ export function SearchOverlay({ open, onClose }: Props) {
           animation: 'slideDown 0.18s ease',
         }}
       >
-        {/* Input row */}
+        {/* ─ Input row ─ */}
         <div
           style={{
             display: 'flex',
@@ -235,7 +225,7 @@ export function SearchOverlay({ open, onClose }: Props) {
           </button>
         </div>
 
-        {/* Category filter chips */}
+        {/* ─ Category filter chips ─ */}
         <div
           style={{
             display: 'flex',
@@ -249,6 +239,7 @@ export function SearchOverlay({ open, onClose }: Props) {
           {['all', ...categories.map(c => c.id)].map(cat => {
             const active = activeCategory === cat
             const color = cat !== 'all' ? CATEGORY_COLORS[cat] : undefined
+            const { textColor } = cat !== 'all' ? getCategoryTheme(cat) : { textColor: '#5200FF' }
             return (
               <button
                 key={cat}
@@ -259,7 +250,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                   border: '1.5px solid',
                   borderColor: active ? (color ?? '#5200FF') : '#E5DDD0',
                   background: active ? (color ? `${color}18` : 'rgba(82,0,255,0.06)') : 'transparent',
-                  color: active ? (cat !== 'all' ? CATEGORY_TEXT_COLORS[cat] : '#5200FF') : '#78716C',
+                  color: active ? (cat !== 'all' ? textColor : '#5200FF') : '#78716C',
                   fontSize: '11px',
                   fontWeight: 700,
                   letterSpacing: '0.05em',
@@ -276,7 +267,7 @@ export function SearchOverlay({ open, onClose }: Props) {
           })}
         </div>
 
-        {/* Results */}
+        {/* ─ Results ─ */}
         <div style={{ maxHeight: '380px', overflowY: 'auto' }}>
           {showEmpty ? (
             /* Empty state — quick access by category */
@@ -295,8 +286,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                 Quick Access
               </p>
               {categories.map(cat => {
-                const color = CATEGORY_COLORS[cat.id]
-                const textColor = CATEGORY_TEXT_COLORS[cat.id]
+                const { color, textColor } = getCategoryTheme(cat.id)
                 return (
                   <a
                     key={cat.id}
@@ -366,8 +356,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                 </p>
               )}
               {displayResults.map((result, i) => {
-                const color = CATEGORY_COLORS[result.category]
-                const textColor = CATEGORY_TEXT_COLORS[result.category]
+                const { color, textColor } = getCategoryTheme(result.category)
                 const isHighlighted = i === highlighted
                 return (
                   <button
@@ -397,47 +386,12 @@ export function SearchOverlay({ open, onClose }: Props) {
                         flexShrink: 0,
                       }}
                     />
-                    <span
-                      style={{
-                        flex: 1,
-                        color: '#1C1917',
-                        fontSize: '14px',
-                        fontWeight: 600,
-                      }}
-                    >
+                    <span style={{ flex: 1, color: '#1C1917', fontSize: '14px', fontWeight: 600 }}>
                       {result.name}
                     </span>
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '11px',
-                        color: textColor,
-                        background: `${color}18`,
-                        border: `1.5px solid ${color}30`,
-                        padding: '2px 8px',
-                        borderRadius: '5px',
-                        fontWeight: 700,
-                        flexShrink: 0,
-                      }}
-                    >
-                      {result.complexity}
-                    </span>
+                    <Badge accentColor={color} textColor={textColor}>{result.complexity}</Badge>
                     {result.tags.slice(0, 2).map(tag => (
-                      <span
-                        key={tag}
-                        style={{
-                          fontSize: '10px',
-                          color: '#78716C',
-                          background: '#F0EDE8',
-                          border: '1px solid #E5DDD0',
-                          padding: '2px 6px',
-                          borderRadius: '4px',
-                          fontWeight: 600,
-                          letterSpacing: '0.04em',
-                        }}
-                      >
-                        {tag}
-                      </span>
+                      <Tag key={tag}>{tag}</Tag>
                     ))}
                     <ChevronRight size={13} style={{ color: isHighlighted ? '#78716C' : '#C8BDB0', flexShrink: 0 }} />
                   </button>
@@ -447,7 +401,7 @@ export function SearchOverlay({ open, onClose }: Props) {
           )}
         </div>
 
-        {/* Footer */}
+        {/* ─ Footer ─ */}
         <div
           style={{
             borderTop: '1px solid #E5DDD0',
@@ -459,7 +413,7 @@ export function SearchOverlay({ open, onClose }: Props) {
         >
           {[
             { key: '↑↓', label: 'Navigate' },
-            { key: '↵', label: 'Jump' },
+            { key: '↵',  label: 'Jump' },
             { key: 'Esc', label: 'Close' },
           ].map(item => (
             <span
@@ -473,17 +427,7 @@ export function SearchOverlay({ open, onClose }: Props) {
                 fontFamily: 'var(--font-mono)',
               }}
             >
-              <kbd
-                style={{
-                  background: '#F0EDE8',
-                  border: '1px solid #E5DDD0',
-                  borderRadius: '3px',
-                  padding: '1px 4px',
-                  fontSize: '10px',
-                }}
-              >
-                {item.key}
-              </kbd>
+              <Kbd>{item.key}</Kbd>
               {item.label}
             </span>
           ))}
