@@ -18,6 +18,11 @@ export const meta: AlgorithmMeta = {
       { name: 'C', weight: 3, value: 12 },
     ],
   },
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/partition-equal-subset-sum/',                       title: '#416 Partition Equal Subset Sum',  difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/unbounded-knapsack/problem',               title: 'Unbounded Knapsack',               difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/partition-equal-subset-sum',                        title: 'Partition Equal Subset Sum',       difficulty: 'Medium' },
+  ],
 }
 
 type KnapsackItem = { name: string; weight: number; value: number }

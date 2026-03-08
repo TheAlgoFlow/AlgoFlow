@@ -2,6 +2,7 @@
 
 import { SkipBack, ChevronLeft, Play, Pause, ChevronRight, SkipForward } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
+import { ProgressBar } from '@/components/atoms/ProgressBar'
 import type { PlayerState } from '@/hooks/useAlgorithmPlayer'
 
 const SPEEDS = [0.25, 0.5, 1, 2, 4]
@@ -19,11 +20,12 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-      {/* Message */}
+
+      {/* Step message */}
       <div
         style={{
           fontSize: '0.8rem',
-          color: '#94a3b8',
+          color: 'var(--text-muted)',
           minHeight: '1.2rem',
           textAlign: 'center',
           letterSpacing: '0.01em',
@@ -32,33 +34,13 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
         {message}
       </div>
 
-      {/* Progress bar */}
-      <div
-        onClick={e => {
-          const rect = e.currentTarget.getBoundingClientRect()
-          const pct = (e.clientX - rect.left) / rect.width
-          seekTo(Math.round(pct * (totalFrames - 1)))
-        }}
-        style={{
-          height: '3px',
-          background: 'rgba(0,0,0,0.08)',
-          borderRadius: '2px',
-          cursor: 'pointer',
-          position: 'relative',
-        }}
-      >
-        <div
-          style={{
-            height: '100%',
-            width: `${progress}%`,
-            background: '#5200FF',
-            borderRadius: '2px',
-            transition: 'width 0.1s linear',
-          }}
-        />
-      </div>
+      {/* ─ Progress bar ─ */}
+      <ProgressBar
+        progress={progress}
+        onSeek={pct => seekTo(Math.round(pct * (totalFrames - 1)))}
+      />
 
-      {/* Controls row */}
+      {/* ─ Controls row ─ */}
       <div
         style={{
           display: 'flex',
@@ -70,7 +52,7 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
         {/* Step counter */}
         <span
           style={{
-            color: '#c1c9d2',
+            color: 'var(--text-faint)',
             fontSize: '0.7rem',
             fontFamily: 'ui-monospace, monospace',
             minWidth: '72px',
@@ -98,8 +80,8 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
               height: '38px',
               borderRadius: '50%',
               border: 'none',
-              background: totalFrames === 0 ? '#f1f5f9' : '#5200FF',
-              color: totalFrames === 0 ? '#c1c9d2' : '#ffffff',
+              background: totalFrames === 0 ? 'var(--bg-muted)' : '#5200FF',
+              color: totalFrames === 0 ? 'var(--text-faint)' : '#ffffff',
               cursor: totalFrames === 0 ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -133,9 +115,9 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
                 padding: '2px 5px',
                 borderRadius: '4px',
                 border: '1px solid',
-                borderColor: speed === s ? '#5200FF' : 'rgba(0,0,0,0.1)',
-                background: speed === s ? '#5200FF' : '#ffffff',
-                color: speed === s ? '#ffffff' : '#94a3b8',
+                borderColor: speed === s ? '#5200FF' : 'var(--border)',
+                background: speed === s ? '#5200FF' : 'var(--bg-surface)',
+                color: speed === s ? '#ffffff' : 'var(--text-muted)',
                 fontSize: '0.63rem',
                 cursor: 'pointer',
                 fontWeight: speed === s ? 700 : 500,
@@ -151,6 +133,7 @@ export function PlaybackControls({ player, message }: PlaybackControlsProps) {
   )
 }
 
+/** Local atom-like helper — a small icon-only control button */
 function CtrlBtn({
   onClick,
   children,
@@ -171,9 +154,9 @@ function CtrlBtn({
         width: '30px',
         height: '30px',
         borderRadius: '6px',
-        border: '1px solid rgba(0,0,0,0.1)',
-        background: '#ffffff',
-        color: disabled ? '#d1d9e0' : '#475569',
+        border: `1px solid var(--border)`,
+        background: 'var(--bg-surface)',
+        color: disabled ? 'var(--text-faint)' : 'var(--text-muted)',
         cursor: disabled ? 'not-allowed' : 'pointer',
         display: 'flex',
         alignItems: 'center',

@@ -1,14 +1,30 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
-import { Poppins } from 'next/font/google'
+import { Fraunces, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { I18nProvider } from '@/i18n/context'
+import { ThemeProvider } from '@/i18n/theme-context'
+import { SidebarProvider } from '@/i18n/sidebar-context'
 import { Nav } from '@/components/organisms/Nav'
 
-const poppins = Poppins({
-  weight: ['400', '500', '600', '700', '800', '900'],
+const fraunces = Fraunces({
   subsets: ['latin'],
-  variable: '--font-poppins',
+  variable: '--font-fraunces',
+  display: 'swap',
+  axes: ['opsz', 'SOFT', 'WONK'],
+})
+
+const plusJakarta = Plus_Jakarta_Sans({
+  weight: ['400', '500', '600', '700', '800'],
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta',
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
   display: 'swap',
 })
 
@@ -19,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={poppins.variable}>
+    <html lang="en" className={`${fraunces.variable} ${plusJakarta.variable} ${jetbrainsMono.variable}`}>
       <head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-G397DGSNC6"
@@ -35,10 +51,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
       </head>
       <body>
-        <I18nProvider>
-          <Nav />
-          <main>{children}</main>
-        </I18nProvider>
+        <ThemeProvider>
+          <I18nProvider>
+            <SidebarProvider>
+              <Nav />
+              <main>
+                {children}
+              </main>
+            </SidebarProvider>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

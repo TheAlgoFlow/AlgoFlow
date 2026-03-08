@@ -174,7 +174,7 @@ export function ArrayBoxesVisualizer({ frame }: ArrayBoxesVisualizerProps) {
                   fontSize: `${Math.max(10, boxSize * 0.33)}px`,
                   fontWeight: color ? 700 : 500,
                   border: `2px solid ${color ?? 'rgba(0,0,0,0.12)'}`,
-                  background: color ? `${color}18` : '#ffffff',
+                  background: color ? `${color}18` : 'var(--bg-surface)',
                   color: color ?? '#334155',
                   boxShadow: isGlowing ? `0 0 8px ${color}55` : 'none',
                   transform: isActive ? 'translateY(-3px)' : 'none',

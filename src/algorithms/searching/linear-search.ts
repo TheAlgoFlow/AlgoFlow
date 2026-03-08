@@ -15,6 +15,10 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['simple', 'unsorted'],
   defaultInput: { array: [4, 2, 7, 1, 9, 3, 8, 5], target: 7 },
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/binary-search/',                  title: '#704 Binary Search', difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/find-digits/problem',     title: 'Find Digits',        difficulty: 'Easy' },
+  ],
 };
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {

@@ -1,4 +1,4 @@
-import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets } from '@/engine/types'
+import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets, DSOperationConfig } from '@/engine/types'
 
 export const meta: AlgorithmMeta = {
   slug: 'hash-table',
@@ -8,10 +8,22 @@ export const meta: AlgorithmMeta = {
   complexity: {
     time: { best: 'O(1)', avg: 'O(1)', worst: 'O(n)' },
     space: 'O(n)',
+    operations: [
+      { name: 'insert', best: 'O(1)', avg: 'O(1)', worst: 'O(n)' },
+      { name: 'remove', best: 'O(1)', avg: 'O(1)', worst: 'O(n)' },
+      { name: 'search', best: 'O(1)', avg: 'O(1)', worst: 'O(n)' },
+    ],
   },
   tags: ['hash', 'key-value', 'O(1)-lookup'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/two-sum/',                                   title: '#1 Two Sum',          difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/sherlock-and-anagrams/problem',      title: 'Sherlock and Anagrams', difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/two-integer-sum',                             title: 'Two Sum',             difficulty: 'Easy' },
+  ],
 }
+
+// ── Internal types ────────────────────────────────────────────────────────────
 
 type HashEntry = { key: string; value: string }
 type HashTableState = {
@@ -19,6 +31,8 @@ type HashTableState = {
   currentBucket: number | null
   operation: string
 }
+
+// ── Shared utilities ──────────────────────────────────────────────────────────
 
 const NUM_BUCKETS = 8
 
@@ -34,8 +48,30 @@ function cloneBuckets(buckets: Array<Array<HashEntry>>): Array<Array<HashEntry>>
   return buckets.map(bucket => bucket.map(e => ({ ...e })))
 }
 
+function emptyBuckets(): Array<Array<HashEntry>> {
+  return Array.from({ length: NUM_BUCKETS }, () => [])
+}
+
+/** Pre-populated buckets used by search and remove operations */
+function prepopulatedBuckets(): Array<Array<HashEntry>> {
+  const buckets = emptyBuckets()
+  const seed: Array<[string, string]> = [
+    ['10', 'val_10'],
+    ['20', 'val_20'],
+    ['30', 'val_30'],
+    ['42', 'val_42'],
+    ['55', 'val_55'],
+  ]
+  for (const [k, v] of seed) {
+    buckets[hashKey(k)].push({ key: k, value: v })
+  }
+  return buckets
+}
+
+// ── Top-level demo generator (kept from original) ────────────────────────────
+
 export function* generator(_input: unknown): Generator<AlgorithmFrame> {
-  const buckets: Array<Array<HashEntry>> = Array.from({ length: NUM_BUCKETS }, () => [])
+  const buckets = emptyBuckets()
 
   function makeState(currentBucket: number | null, operation: string): HashTableState {
     return { buckets: cloneBuckets(buckets), currentBucket, operation }
@@ -60,7 +96,6 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   for (const [key, value] of insertPairs) {
     const bucket = hashKey(key)
 
-    // Show hashing step
     yield {
       state: makeState(bucket, 'hash'),
       highlights: [{ index: bucket, role: 'current' }],
@@ -115,10 +150,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     }
   }
 
-  // Demonstrate a collision: 'lang' and show the chain
-  // 'lang' has already been inserted; insert 'gnal' which has the same char sum
-  // l=108,a=97,n=110,g=103 → sum=418 → 418%8=2
-  // g=103,n=110,a=97,l=108 → sum=418 → 418%8=2 (same bucket)
+  // Demonstrate a collision
   const collisionKey = 'gnal'
   const collisionBucket = hashKey(collisionKey)
 
@@ -155,6 +187,8 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     codeLine: 11,
   }
 }
+
+// ── Top-level codeSnippets (kept from original) ───────────────────────────────
 
 export const codeSnippets: CodeSnippets = {
   ts: [
@@ -228,3 +262,283 @@ export const codeSnippets: CodeSnippets = {
     { line: 12, code: '}' },
   ],
 }
+
+// ── Per-operation generators ──────────────────────────────────────────────────
+
+function* htInsertGenerator(value?: number): Generator<AlgorithmFrame> {
+  const val = value ?? 42
+  const key = String(val)
+  const entryValue = `val_${val}`
+  const buckets = emptyBuckets()
+  const hashIdx = hashKey(key)
+
+  function makeState(currentBucket: number | null, operation: string): HashTableState {
+    return { buckets: cloneBuckets(buckets), currentBucket, operation }
+  }
+
+  // Frame 1: show empty buckets
+  yield {
+    state: makeState(null, 'init'),
+    highlights: [],
+    message: 'ds.hashTable.insert.step1',
+    codeLine: 1,
+    auxState: { key, value: entryValue },
+  }
+
+  // Frame 2: compute hash, highlight bucket
+  yield {
+    state: makeState(hashIdx, 'hash'),
+    highlights: [{ index: hashIdx, role: 'active', label: 'hash' }],
+    message: 'ds.hashTable.insert.step2',
+    codeLine: 2,
+    auxState: { key, hashIdx },
+  }
+
+  // Frame 3: insert into bucket
+  buckets[hashIdx].push({ key, value: entryValue })
+  yield {
+    state: makeState(hashIdx, 'insert'),
+    highlights: [{ index: hashIdx, role: 'found', label: 'bucket' }],
+    message: 'ds.hashTable.insert.step3',
+    codeLine: 3,
+    auxState: { key, value: entryValue, hashIdx },
+  }
+}
+
+function* htSearchGenerator(value?: number): Generator<AlgorithmFrame> {
+  const val = value ?? 42
+  const key = String(val)
+  const buckets = prepopulatedBuckets()
+  const hashIdx = hashKey(key)
+
+  function makeState(currentBucket: number | null, operation: string): HashTableState {
+    return { buckets: cloneBuckets(buckets), currentBucket, operation }
+  }
+
+  // Frame 1: show populated buckets
+  yield {
+    state: makeState(null, 'init'),
+    highlights: [],
+    message: 'ds.hashTable.search.step1',
+    codeLine: 1,
+    auxState: { key },
+  }
+
+  // Frame 2: compute hash, highlight bucket
+  yield {
+    state: makeState(hashIdx, 'hash'),
+    highlights: [{ index: hashIdx, role: 'active', label: 'hash' }],
+    message: 'ds.hashTable.search.step2',
+    codeLine: 2,
+    auxState: { key, hashIdx },
+  }
+
+  // Frame 3: check bucket contents
+  yield {
+    state: makeState(hashIdx, 'scan'),
+    highlights: [{ index: hashIdx, role: 'current', label: 'i' }],
+    message: 'ds.hashTable.search.step3',
+    codeLine: 3,
+    auxState: { key, hashIdx },
+  }
+
+  // Frame 4: found or not found
+  const match = buckets[hashIdx].find(e => e.key === key)
+  if (match) {
+    yield {
+      state: makeState(hashIdx, 'found'),
+      highlights: [{ index: hashIdx, role: 'found', label: 'found' }],
+      message: 'ds.hashTable.search.found',
+      codeLine: 4,
+      auxState: { key, value: match.value, hashIdx },
+    }
+  } else {
+    yield {
+      state: makeState(hashIdx, 'notFound'),
+      highlights: [{ index: hashIdx, role: 'inactive', label: 'miss' }],
+      message: 'ds.hashTable.search.notFound',
+      codeLine: 6,
+      auxState: { key, hashIdx },
+    }
+  }
+}
+
+function* htRemoveGenerator(value?: number): Generator<AlgorithmFrame> {
+  const val = value ?? 42
+  const key = String(val)
+  const buckets = prepopulatedBuckets()
+  const hashIdx = hashKey(key)
+
+  function makeState(currentBucket: number | null, operation: string): HashTableState {
+    return { buckets: cloneBuckets(buckets), currentBucket, operation }
+  }
+
+  // Frame 1: show populated buckets
+  yield {
+    state: makeState(null, 'init'),
+    highlights: [],
+    message: 'ds.hashTable.remove.step1',
+    codeLine: 1,
+    auxState: { key },
+  }
+
+  // Frame 2: compute hash, highlight bucket
+  yield {
+    state: makeState(hashIdx, 'hash'),
+    highlights: [{ index: hashIdx, role: 'active', label: 'hash' }],
+    message: 'ds.hashTable.remove.step2',
+    codeLine: 2,
+    auxState: { key, hashIdx },
+  }
+
+  // Frame 3: filter out key, show updated bucket
+  buckets[hashIdx] = buckets[hashIdx].filter(e => e.key !== key)
+  yield {
+    state: makeState(hashIdx, 'remove'),
+    highlights: [{ index: hashIdx, role: 'swap', label: 'del' }],
+    message: 'ds.hashTable.remove.step3',
+    codeLine: 3,
+    auxState: { key, hashIdx },
+  }
+}
+
+// ── Per-operation codeSnippets ────────────────────────────────────────────────
+
+const insertSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'insert(key: string, val: string): void {' },
+    { line: 2, code: '  const i = this.hash(key)' },
+    { line: 3, code: '  this.buckets[i].push({ key, val })' },
+    { line: 4, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def insert(self, key, val):' },
+    { line: 2, code: '  i = self.hash(key)' },
+    { line: 3, code: '  self.buckets[i].append((key, val))' },
+  ],
+  c: [
+    { line: 1, code: 'void insert(const char* key, const char* val) {' },
+    { line: 2, code: '  int i = hashKey(key);' },
+    { line: 3, code: '  strcpy(table[i][sizes[i]].key, key);' },
+    { line: 4, code: '  strcpy(table[i][sizes[i]++].val, val);' },
+    { line: 5, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'void insert(String key, String val) {' },
+    { line: 2, code: '  int i = hash(key);' },
+    { line: 3, code: '  buckets.get(i).add(new String[]{key, val});' },
+    { line: 4, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func (h *HashTable) Insert(key, val string) {' },
+    { line: 2, code: '  i := h.hash(key)' },
+    { line: 3, code: '  h.buckets[i] = append(h.buckets[i], Entry{key, val})' },
+    { line: 4, code: '}' },
+  ],
+}
+
+const htSearchSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'search(key: string): string | null {' },
+    { line: 2, code: '  const i = this.hash(key)' },
+    { line: 3, code: '  for (const pair of this.buckets[i]) {' },
+    { line: 4, code: '    if (pair.key === key) return pair.val' },
+    { line: 5, code: '  }' },
+    { line: 6, code: '  return null' },
+    { line: 7, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def search(self, key):' },
+    { line: 2, code: '  i = self.hash(key)' },
+    { line: 3, code: '  for k, v in self.buckets[i]:' },
+    { line: 4, code: '    if k == key: return v' },
+    { line: 5, code: '  return None' },
+  ],
+  c: [
+    { line: 1, code: 'const char* search(const char* key) {' },
+    { line: 2, code: '  int i = hashKey(key);' },
+    { line: 3, code: '  for (int j = 0; j < sizes[i]; j++) {' },
+    { line: 4, code: '    if (!strcmp(table[i][j].key, key)) return table[i][j].val;' },
+    { line: 5, code: '  }' },
+    { line: 6, code: '  return NULL;' },
+    { line: 7, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'String search(String key) {' },
+    { line: 2, code: '  int i = hash(key);' },
+    { line: 3, code: '  for (String[] pair : buckets.get(i)) {' },
+    { line: 4, code: '    if (pair[0].equals(key)) return pair[1];' },
+    { line: 5, code: '  }' },
+    { line: 6, code: '  return null;' },
+    { line: 7, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func (h *HashTable) Search(key string) (string, bool) {' },
+    { line: 2, code: '  i := h.hash(key)' },
+    { line: 3, code: '  for _, e := range h.buckets[i] {' },
+    { line: 4, code: '    if e.key == key { return e.val, true }' },
+    { line: 5, code: '  }' },
+    { line: 6, code: '  return "", false' },
+    { line: 7, code: '}' },
+  ],
+}
+
+const removeSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'remove(key: string): void {' },
+    { line: 2, code: '  const i = this.hash(key)' },
+    { line: 3, code: '  this.buckets[i] = this.buckets[i].filter(p => p.key !== key)' },
+    { line: 4, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def remove(self, key):' },
+    { line: 2, code: '  i = self.hash(key)' },
+    { line: 3, code: '  self.buckets[i] = [(k,v) for k,v in self.buckets[i] if k != key]' },
+  ],
+  c: [
+    { line: 1, code: 'void removeKey(const char* key) {' },
+    { line: 2, code: '  int i = hashKey(key);' },
+    { line: 3, code: '  /* shift entries left, decrement sizes[i] */' },
+    { line: 4, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'void remove(String key) {' },
+    { line: 2, code: '  int i = hash(key);' },
+    { line: 3, code: '  buckets.get(i).removeIf(p -> p[0].equals(key));' },
+    { line: 4, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func (h *HashTable) Remove(key string) {' },
+    { line: 2, code: '  i := h.hash(key)' },
+    { line: 3, code: '  h.buckets[i] = slices.DeleteFunc(h.buckets[i], func(e Entry) bool {' },
+    { line: 4, code: '    return e.key == key' },
+    { line: 5, code: '  })' },
+    { line: 6, code: '}' },
+  ],
+}
+
+// ── dsOperations export ───────────────────────────────────────────────────────
+
+export const dsOperations: DSOperationConfig[] = [
+  {
+    type: 'insert',
+    label: 'Insert',
+    takesValue: true,
+    generator: htInsertGenerator,
+    codeSnippets: insertSnippets,
+  },
+  {
+    type: 'search',
+    label: 'Search',
+    takesValue: true,
+    generator: htSearchGenerator,
+    codeSnippets: htSearchSnippets,
+  },
+  {
+    type: 'remove',
+    label: 'Remove',
+    takesValue: true,
+    generator: htRemoveGenerator,
+    codeSnippets: removeSnippets,
+  },
+]

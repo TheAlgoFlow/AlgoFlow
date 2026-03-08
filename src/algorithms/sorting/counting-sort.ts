@@ -8,6 +8,10 @@ export const meta: AlgorithmMeta = {
   complexity: { time: { best: 'O(n+k)', avg: 'O(n+k)', worst: 'O(n+k)' }, space: 'O(k)' },
   tags: ['non-comparison', 'stable', 'integer-sort'],
   defaultInput: [4, 2, 2, 8, 3, 3, 1],
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/sort-an-array/',                 title: '#912 Sort an Array',  difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/countingsort1/problem',   title: 'Counting Sort 1',     difficulty: 'Easy' },
+  ],
 }
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {

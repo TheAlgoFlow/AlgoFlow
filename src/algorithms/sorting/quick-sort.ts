@@ -8,6 +8,10 @@ export const meta: AlgorithmMeta = {
   complexity: { time: { best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n²)' }, space: 'O(log n)' },
   tags: ['divide-and-conquer', 'in-place', 'unstable'],
   defaultInput: [10, 7, 8, 9, 1, 5],
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/sort-an-array/',              title: '#912 Sort an Array',  difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/quicksort1/problem',  title: 'Quicksort 1 - Partition', difficulty: 'Easy' },
+  ],
 }
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
@@ -85,7 +89,6 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     yield {
       state: { array: [...arr] },
       highlights: [
-        { index: pivotIdx, role: 'sorted' },
         ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
       ],
       message: 'algorithms.quickSort.steps.place',

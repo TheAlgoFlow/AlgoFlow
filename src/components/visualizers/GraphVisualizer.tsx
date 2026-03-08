@@ -61,10 +61,6 @@ export function GraphVisualizer({ frame }: GraphVisualizerProps) {
     return 'rgba(99,102,241,0.3)'
   }
 
-  // Scale to fit the visualization area
-  const scaleX = (x: number) => (x / 600) * 100
-  const scaleY = (y: number) => (y / 300) * 100
-
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', padding: '1rem' }}>
       <svg
@@ -96,6 +92,7 @@ export function GraphVisualizer({ frame }: GraphVisualizerProps) {
           const color = getNodeColor(node.id)
           const border = getNodeBorder(node.id)
           const isCurrent = current === node.id
+          const hl = frame.highlights.find(h => h.index === node.id)
 
           return (
             <g key={node.id}>
@@ -120,6 +117,30 @@ export function GraphVisualizer({ frame }: GraphVisualizerProps) {
               >
                 {node.label}
               </text>
+              {hl?.label && (
+                <>
+                  <text
+                    x={node.x}
+                    y={node.y + 34}
+                    textAnchor="middle"
+                    fill={ROLE_COLORS[hl.role] ?? color}
+                    fontSize="9"
+                  >
+                    ▲
+                  </text>
+                  <text
+                    x={node.x}
+                    y={node.y + 46}
+                    textAnchor="middle"
+                    fill={ROLE_COLORS[hl.role] ?? color}
+                    fontSize="11"
+                    fontFamily="monospace"
+                    fontWeight="bold"
+                  >
+                    {hl.label}
+                  </text>
+                </>
+              )}
             </g>
           )
         })}

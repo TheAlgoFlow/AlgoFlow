@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback } from 'react'
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react'
 import enCommon from '../../public/locales/en/common.json'
 import enAlgorithms from '../../public/locales/en/algorithms.json'
 import enCategories from '../../public/locales/en/categories.json'
@@ -64,7 +64,9 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     [locale]
   )
 
-  return <I18nContext.Provider value={{ locale, setLocale, t }}>{children}</I18nContext.Provider>
+  const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t])
+
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
 
 export function useI18n() {

@@ -91,11 +91,10 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
       <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
         {arr.map((val, i) => {
           const hl = getHighlight(i, frame.highlights)
-          const role = hl?.role
+          const role = hl?.role ?? null
           const color = role ? ROLE_COLORS[role] : null
           const isCurrent = role === 'current'
           const isFound = role === 'found'
-          const isRange = role === 'left' || role === 'right' || role === 'mid'
 
           return (
             <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
@@ -111,7 +110,7 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
                   fontWeight: color ? 700 : 400,
                   border: '2px solid',
                   borderColor: color ?? 'rgba(0,0,0,0.12)',
-                  background: color ? `${color}18` : '#ffffff',
+                  background: color ? `${color}18` : 'var(--bg-surface)',
                   color: color ?? '#334155',
                   boxShadow: isFound || isCurrent ? `0 0 12px ${color}60` : 'none',
                   transform: isCurrent ? 'scale(1.1)' : 'scale(1)',
@@ -121,7 +120,12 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
                 {val}
               </div>
               <div style={{ fontSize: '0.65rem', color: '#475569' }}>{i}</div>
-              {role && (
+              {hl?.label ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px' }}>
+                  <span style={{ fontSize: '9px', color: ROLE_COLORS[hl.role], lineHeight: 1 }}>▲</span>
+                  <span style={{ fontSize: '11px', fontFamily: 'monospace', color: ROLE_COLORS[hl.role], fontWeight: 700, whiteSpace: 'nowrap' }}>{hl.label}</span>
+                </div>
+              ) : role ? (
                 <div
                   style={{
                     fontSize: '0.6rem',
@@ -133,7 +137,7 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
                 >
                   {role}
                 </div>
-              )}
+              ) : null}
             </div>
           )
         })}

@@ -8,6 +8,10 @@ export const meta: AlgorithmMeta = {
   complexity: { time: { best: 'O(n²)', avg: 'O(n²)', worst: 'O(n²)' }, space: 'O(1)' },
   tags: ['comparison', 'in-place', 'unstable'],
   defaultInput: [29, 10, 14, 37, 13],
+  exercises: [
+    { platform: 'leetcode',  url: 'https://leetcode.com/problems/sort-an-array/', title: '#912 Sort an Array',          difficulty: 'Medium' },
+    { platform: 'beecrowd', url: 'https://www.beecrowd.com.br/judge/en/problems/view/1025', title: '#1025 Where is the Marble?', difficulty: 'Easy' },
+  ],
 }
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {

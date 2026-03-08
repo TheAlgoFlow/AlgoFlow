@@ -61,6 +61,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['graph', 'level-order', 'shortest-path'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/binary-tree-level-order-traversal/',       title: '#102 Level Order Traversal',           difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/bfsshortreach/problem',            title: 'BFS: Shortest Reach in a Graph',       difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/binary-tree-level-order-traversal',        title: 'Binary Tree Level Order Traversal',    difficulty: 'Medium' },
+  ],
 };
 
 // ---------------------------------------------------------------------------

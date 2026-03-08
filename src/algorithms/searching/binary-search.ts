@@ -15,6 +15,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['sorted', 'divide-and-conquer', 'efficient'],
   defaultInput: { array: [1, 3, 5, 7, 9, 11, 13, 15, 17, 19], target: 13 },
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/binary-search/',                          title: '#704 Binary Search',  difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/binary-search-fp/problem',        title: 'Binary Search (FP)',  difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/binary-search',                            title: 'Binary Search',       difficulty: 'Easy' },
+  ],
 };
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {

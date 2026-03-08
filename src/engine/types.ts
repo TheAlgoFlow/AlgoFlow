@@ -21,6 +21,7 @@ export type HighlightRole =
 export type Highlight = {
   index: number | string
   role: HighlightRole
+  label?: string   // e.g. 'curr', 'prev', 'temp', 'pivot', 'i', 'j'
 }
 
 export type AlgorithmFrame = {
@@ -31,6 +32,13 @@ export type AlgorithmFrame = {
   auxState?: unknown
 }
 
+export type OperationComplexity = {
+  name: string        // e.g. 'push', 'insert at head'
+  best: string
+  avg: string
+  worst: string
+}
+
 export type Complexity = {
   time: {
     best: string
@@ -38,6 +46,7 @@ export type Complexity = {
     worst: string
   }
   space: string
+  operations?: OperationComplexity[]  // for data structures only
 }
 
 export type AlgorithmCategory = 'sorting' | 'searching' | 'data-structures' | 'dp'
@@ -55,6 +64,15 @@ export type CodeLine = {
   code: string
 }
 
+export type ExercisePlatform = 'leetcode' | 'beecrowd' | 'hackerrank' | 'neetcode'
+
+export type ExerciseLink = {
+  platform: ExercisePlatform
+  url: string
+  title: string
+  difficulty: 'Easy' | 'Medium' | 'Hard'
+}
+
 export type AlgorithmMeta = {
   slug: string
   category: AlgorithmCategory
@@ -63,12 +81,24 @@ export type AlgorithmMeta = {
   complexity: Complexity
   tags: string[]
   defaultInput?: unknown
+  exercises?: ExerciseLink[]
+}
+
+export type DSOperationType = 'insert' | 'remove' | 'search' | 'traverse'
+
+export type DSOperationConfig = {
+  type: DSOperationType
+  label: string
+  takesValue: boolean
+  generator: (value?: number) => Generator<AlgorithmFrame>
+  codeSnippets: CodeSnippets
 }
 
 export type AlgorithmModule = {
   meta: AlgorithmMeta
   generator: (input: unknown) => Generator<AlgorithmFrame>
   codeSnippets: CodeSnippets
+  dsOperations?: DSOperationConfig[]
 }
 
 // Sorting-specific state

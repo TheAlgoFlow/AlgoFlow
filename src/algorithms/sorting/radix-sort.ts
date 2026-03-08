@@ -8,6 +8,10 @@ export const meta: AlgorithmMeta = {
   complexity: { time: { best: 'O(d·n)', avg: 'O(d·n)', worst: 'O(d·n)' }, space: 'O(n+k)' },
   tags: ['non-comparison', 'stable', 'integer-sort'],
   defaultInput: [170, 45, 75, 90, 802, 24, 2, 66],
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/maximum-gap/',               title: '#164 Maximum Gap', difficulty: 'Hard' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/radix-sort/problem', title: 'Radix Sort',       difficulty: 'Medium' },
+  ],
 }
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {

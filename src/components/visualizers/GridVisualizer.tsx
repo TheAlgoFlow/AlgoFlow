@@ -117,6 +117,7 @@ export function GridVisualizer({ frame }: GridVisualizerProps) {
                   {row.map((cell, j) => {
                     const color = getCellColor(i, j)
                     const isCurrent = current && current[0] === i && current[1] === j
+                    const hl = frame.highlights.find(h => h.index === `${i},${j}`)
                     return (
                       <td
                         key={j}
@@ -132,9 +133,27 @@ export function GridVisualizer({ frame }: GridVisualizerProps) {
                           transition: 'all 0.2s ease',
                           boxShadow: isCurrent ? `inset 0 0 0 2px ${color}` : 'none',
                           padding: 0,
+                          position: 'relative',
                         }}
                       >
                         {cell !== null && cell !== undefined ? cell : ''}
+                        {hl?.label && (
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '-18px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '1px',
+                            pointerEvents: 'none',
+                            zIndex: 1,
+                          }}>
+                            <span style={{ fontSize: '7px', color: ROLE_COLORS[hl.role] ?? color ?? '#6366f1', lineHeight: 1 }}>▲</span>
+                            <span style={{ fontSize: '9px', fontFamily: 'monospace', color: ROLE_COLORS[hl.role] ?? color ?? '#6366f1', fontWeight: 700, whiteSpace: 'nowrap' }}>{hl.label}</span>
+                          </div>
+                        )}
                       </td>
                     )
                   })}
@@ -174,25 +193,32 @@ export function GridVisualizer({ frame }: GridVisualizerProps) {
             const hl = frame.highlights.find(h => h.index === i)
             const color = hl ? (ROLE_COLORS[hl.role] ?? '#6366f1') : null
             return (
-              <div
-                key={i}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '1px solid',
-                  borderColor: color ?? 'rgba(99,102,241,0.2)',
-                  borderRadius: '4px',
-                  background: color ? `${color}20` : '#f1f5f9',
-                  color: color ?? '#64748b',
-                  fontSize: '0.875rem',
-                  fontWeight: color ? 700 : 400,
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {v}
+              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '1px solid',
+                    borderColor: color ?? 'rgba(99,102,241,0.2)',
+                    borderRadius: '4px',
+                    background: color ? `${color}20` : '#f1f5f9',
+                    color: color ?? '#64748b',
+                    fontSize: '0.875rem',
+                    fontWeight: color ? 700 : 400,
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {v}
+                </div>
+                {hl?.label && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px', marginTop: '2px' }}>
+                    <span style={{ fontSize: '9px', color: color ?? '#6366f1', lineHeight: 1 }}>▲</span>
+                    <span style={{ fontSize: '11px', fontFamily: 'monospace', color: color ?? '#6366f1', fontWeight: 700, whiteSpace: 'nowrap' }}>{hl.label}</span>
+                  </div>
+                )}
               </div>
             )
           })}

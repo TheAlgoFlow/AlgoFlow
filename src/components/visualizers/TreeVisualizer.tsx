@@ -39,7 +39,6 @@ function layoutTree(nodes: TreeNodeData[]): Map<number, { x: number; y: number }
 
   const nodeMap = new Map(nodes.map(n => [n.id, n]))
   const W = 560
-  const H = 200
 
   function assign(id: number | null, depth: number, leftBound: number, rightBound: number) {
     if (id === null || !nodeMap.has(id)) return
@@ -82,7 +81,6 @@ export function TreeVisualizer({ frame }: TreeVisualizerProps) {
   }
   const { nodes, current, visited = [], comparing } = state
   const positions = layoutTree(nodes)
-  const nodeMap = new Map(nodes.map(n => [n.id, n]))
 
   const getNodeColor = (id: number) => {
     const hl = frame.highlights.find(h => h.index === id)
@@ -95,7 +93,7 @@ export function TreeVisualizer({ frame }: TreeVisualizerProps) {
 
   return (
     <div style={{ width: '100%', height: '100%', padding: '0.5rem' }}>
-      <svg width="100%" height="100%" viewBox="0 0 560 260" style={{ overflow: 'visible' }}>
+      <svg width="100%" height="100%" viewBox="0 0 560 280" style={{ overflow: 'visible' }}>
         {/* Edges */}
         {nodes.map(node => {
           const pos = positions.get(node.id)
@@ -134,6 +132,7 @@ export function TreeVisualizer({ frame }: TreeVisualizerProps) {
           if (!pos) return null
           const color = getNodeColor(node.id)
           const isCurrent = node.id === current
+          const hl = frame.highlights.find(h => h.index === node.id)
 
           return (
             <g key={node.id}>
@@ -157,6 +156,30 @@ export function TreeVisualizer({ frame }: TreeVisualizerProps) {
               >
                 {node.value}
               </text>
+              {hl?.label && (
+                <>
+                  <text
+                    x={pos.x}
+                    y={pos.y + 30}
+                    textAnchor="middle"
+                    fill={ROLE_COLORS[hl.role] ?? color}
+                    fontSize="9"
+                  >
+                    ▲
+                  </text>
+                  <text
+                    x={pos.x}
+                    y={pos.y + 42}
+                    textAnchor="middle"
+                    fill={ROLE_COLORS[hl.role] ?? color}
+                    fontSize="11"
+                    fontFamily="monospace"
+                    fontWeight="bold"
+                  >
+                    {hl.label}
+                  </text>
+                </>
+              )}
             </g>
           )
         })}

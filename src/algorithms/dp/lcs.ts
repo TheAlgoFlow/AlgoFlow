@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['string', 'subsequence', 'diff'],
   defaultInput: { s1: 'ABCBDAB', s2: 'BDCAB' },
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/longest-common-subsequence/',                                                             title: '#1143 Longest Common Subsequence', difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/dynamic-programming-classics-the-longest-common-subsequence/problem',             title: 'Longest Common Subsequence',       difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/longest-common-subsequence',                                                               title: 'Longest Common Subsequence',       difficulty: 'Medium' },
+  ],
 }
 
 type LCSInput = { s1: string; s2: string }

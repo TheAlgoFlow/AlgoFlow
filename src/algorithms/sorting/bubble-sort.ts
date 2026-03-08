@@ -8,6 +8,11 @@ export const meta: AlgorithmMeta = {
   complexity: { time: { best: 'O(n)', avg: 'O(n²)', worst: 'O(n²)' }, space: 'O(1)' },
   tags: ['comparison', 'in-place', 'stable'],
   defaultInput: [64, 34, 25, 12, 22, 11, 90],
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/sort-an-array/',                        title: '#912 Sort an Array',    difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/ctci-bubble-sort/problem',      title: 'Bubble Sort',           difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/sort-an-array',                          title: 'Sort an Array',         difficulty: 'Medium' },
+  ],
 }
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {

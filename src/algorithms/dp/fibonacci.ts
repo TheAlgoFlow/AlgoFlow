@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['memoization', 'tabulation', 'overlapping-subproblems'],
   defaultInput: { n: 8 },
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/fibonacci-number/',                              title: '#509 Fibonacci Number',   difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/ctci-fibonacci-numbers/problem',        title: 'Fibonacci Numbers',       difficulty: 'Easy' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/climbing-stairs',                                 title: 'Climbing Stairs',         difficulty: 'Easy' },
+  ],
 }
 
 type FibInput = { n: number }
