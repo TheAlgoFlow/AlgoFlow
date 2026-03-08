@@ -91,6 +91,19 @@
         "done": "Array ordenado!"
       }
     },
+    "shellSort": {
+      "name": "Shell Sort",
+      "description": "Generalização do insertion sort que ordena elementos distantes primeiro usando uma sequência de intervalos decrescentes, finalizando com uma passagem de insertion sort.",
+      "whenToUse": "Bom desempenho prático para arrays de tamanho médio. Mais rápido que o insertion sort na maioria dos casos. Usado em sistemas embarcados e como sub-rotina em algoritmos mais complexos.",
+      "steps": {
+        "gap": "Novo intervalo h = {{h}} — ordenando sub-sequências com passo {{h}}",
+        "pick": "Selecionando elemento {{tmp}} no índice {{i}} (intervalo {{h}})",
+        "compare": "Comparando {{val}} com chave {{tmp}} — deslocando para direita",
+        "shift": "Deslocando {{val}} para posição {{pos}}",
+        "insert": "Inserindo {{tmp}} na posição {{pos}}",
+        "done": "Array ordenado!"
+      }
+    },
     "linearSearch": {
       "name": "Busca Linear",
       "description": "Verifica cada elemento sequencialmente até encontrar o alvo ou atingir o fim. Funciona em arrays ordenados e não-ordenados.",
@@ -148,6 +161,15 @@
         "shift": "Deslocando elementos para abrir espaço",
         "delete": "Deletando elemento no índice {{i}}",
         "search": "Buscando {{v}}"
+      }
+    },
+    "doublyLinkedList": {
+      "name": "Lista Duplamente Encadeada",
+      "description": "Sequência de nós onde cada nó armazena um valor e ponteiros para o nó seguinte e anterior, permitindo travessia eficiente em ambas as direções.",
+      "whenToUse": "Quando é necessária travessia bidirecional ou remoção O(1) em ambas as extremidades. Usado em histórico do navegador, caches LRU e pilhas de desfazer/refazer.",
+      "steps": {
+        "init": "Lista inicial pronta",
+        "done": "Operação concluída"
       }
     },
     "linkedList": {

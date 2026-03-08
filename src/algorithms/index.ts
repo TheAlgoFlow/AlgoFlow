@@ -9,6 +9,7 @@ import * as quickSort from './sorting/quick-sort'
 import * as heapSort from './sorting/heap-sort'
 import * as countingSort from './sorting/counting-sort'
 import * as radixSort from './sorting/radix-sort'
+import * as shellSort from './sorting/shell-sort'
 
 // Searching
 import * as linearSearch from './searching/linear-search'
@@ -19,6 +20,7 @@ import * as dfs from './searching/dfs'
 // Data Structures
 import * as arrayOps from './data-structures/array-ops'
 import * as linkedList from './data-structures/linked-list'
+import * as doublyLinkedList from './data-structures/doubly-linked-list'
 import * as stack from './data-structures/stack'
 import * as queue from './data-structures/queue'
 import * as binaryTree from './data-structures/binary-tree'
@@ -42,12 +44,14 @@ export const allModules: AlgorithmModule[] = [
   heapSort,
   countingSort,
   radixSort,
+  shellSort,
   linearSearch,
   binarySearch,
   bfs,
   dfs,
   arrayOps,
   linkedList,
+  doublyLinkedList,
   stack,
   queue,
   binaryTree,

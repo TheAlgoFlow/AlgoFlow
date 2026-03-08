@@ -19,7 +19,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const n = arr.length
   const sortedIndices = new Set<number>()
 
-  // Iterative quick sort using an explicit stack of [lo, hi] pairs
+  // AEDS2: iterative quick sort with middle pivot + Hoare-like two-pointer partition
   const stack: Array<[number, number]> = [[0, n - 1]]
 
   while (stack.length > 0) {
@@ -30,13 +30,14 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       continue
     }
 
-    // Choose last element as pivot
-    const pivotVal = arr[hi]
+    // AEDS2: pivot = A[(esq + dir) / 2]
+    const midIdx = Math.floor((lo + hi) / 2)
+    const pivotVal = arr[midIdx]
 
     yield {
       state: { array: [...arr] },
       highlights: [
-        { index: hi, role: 'pivot' },
+        { index: midIdx, role: 'pivot' },
         ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
       ],
       message: 'algorithms.quickSort.steps.pivot',
@@ -44,47 +45,51 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       auxState: { pivotVal, lo, hi },
     }
 
-    // Partition
-    let i = lo - 1
+    // Hoare-like partition: two pointers scanning inward
+    let i = lo
+    let j = hi
 
-    for (let j = lo; j < hi; j++) {
-      yield {
-        state: { array: [...arr] },
-        highlights: [
-          { index: hi, role: 'pivot' },
-          { index: j, role: 'compare' },
-          ...(i >= lo ? [{ index: i, role: 'current' as const }] : []),
-          ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
-        ],
-        message: 'algorithms.quickSort.steps.compare',
-        codeLine: 5,
-        auxState: { j, val: arr[j], pivotVal, i },
-      }
+    while (i <= j) {
+      while (arr[i] < pivotVal) i++
+      while (arr[j] > pivotVal) j--
 
-      if (arr[j] <= pivotVal) {
-        i++
+      if (i <= j) {
+        yield {
+          state: { array: [...arr] },
+          highlights: [
+            { index: i, role: 'compare' },
+            { index: j, role: 'compare' },
+            ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
+          ],
+          message: 'algorithms.quickSort.steps.compare',
+          codeLine: 7,
+          auxState: { i, j, a: arr[i], b: arr[j], pivotVal },
+        }
+
+        ;[arr[i], arr[j]] = [arr[j], arr[i]]
+
         if (i !== j) {
-          ;[arr[i], arr[j]] = [arr[j], arr[i]]
           yield {
             state: { array: [...arr] },
             highlights: [
-              { index: hi, role: 'pivot' },
               { index: i, role: 'swap' },
               { index: j, role: 'swap' },
               ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
             ],
             message: 'algorithms.quickSort.steps.swap',
-            codeLine: 7,
+            codeLine: 8,
             auxState: { i, j, a: arr[i], b: arr[j] },
           }
         }
+
+        i++
+        j--
       }
     }
 
-    // Place pivot in its correct position
-    const pivotIdx = i + 1
-    ;[arr[pivotIdx], arr[hi]] = [arr[hi], arr[pivotIdx]]
-    sortedIndices.add(pivotIdx)
+    // After partition: [lo..j] ≤ pivotVal, [i..hi] ≥ pivotVal
+    // Elements between j+1..i-1 equal pivotVal and are in final position
+    for (let k = j + 1; k < i; k++) sortedIndices.add(k)
 
     yield {
       state: { array: [...arr] },
@@ -92,122 +97,102 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
       ],
       message: 'algorithms.quickSort.steps.place',
-      codeLine: 9,
-      auxState: { pivotIdx, pivotVal: arr[pivotIdx] },
+      codeLine: 12,
+      auxState: { lo, hi, leftEnd: j, rightStart: i },
     }
 
-    // Push sub-problems
-    if (pivotIdx - 1 > lo) stack.push([lo, pivotIdx - 1])
-    else if (pivotIdx - 1 === lo) sortedIndices.add(lo)
+    if (lo < j) stack.push([lo, j])
+    else if (lo === j) sortedIndices.add(lo)
 
-    if (pivotIdx + 1 < hi) stack.push([pivotIdx + 1, hi])
-    else if (pivotIdx + 1 === hi) sortedIndices.add(hi)
+    if (i < hi) stack.push([i, hi])
+    else if (i === hi) sortedIndices.add(hi)
   }
 
   yield {
     state: { array: [...arr] },
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.quickSort.steps.done',
-    codeLine: 11,
+    codeLine: 14,
   }
 }
 
 export const codeSnippets: CodeSnippets = {
   ts: [
-    { line: 1, code: 'function quickSort(arr: number[], lo = 0, hi = arr.length - 1): number[] {' },
-    { line: 2, code: '  if (lo < hi) {' },
-    { line: 3, code: '    const p = partition(arr, lo, hi)' },
-    { line: 4, code: '    quickSort(arr, lo, p - 1)' },
-    { line: 5, code: '    quickSort(arr, p + 1, hi)' },
-    { line: 6, code: '  }' },
-    { line: 7, code: '  return arr' },
-    { line: 8, code: '}' },
-    { line: 9, code: 'function partition(arr: number[], lo: number, hi: number): number {' },
-    { line: 10, code: '  const pivot = arr[hi]' },
-    { line: 11, code: '  let i = lo - 1' },
-    { line: 12, code: '  for (let j = lo; j < hi; j++) {' },
-    { line: 13, code: '    if (arr[j] <= pivot) {' },
-    { line: 14, code: '      [arr[++i], arr[j]] = [arr[j], arr[i + 1]]' },
-    { line: 15, code: '    }' },
-    { line: 16, code: '  }' },
-    { line: 17, code: '  [arr[i + 1], arr[hi]] = [arr[hi], arr[i + 1]]' },
-    { line: 18, code: '  return i + 1' },
-    { line: 19, code: '}' },
+    { line: 1,  code: 'function quickSort(arr: number[], lo = 0, hi = arr.length - 1): void {' },
+    { line: 2,  code: '  let i = lo, j = hi' },
+    { line: 3,  code: '  const pivot = arr[Math.floor((lo + hi) / 2)]' },
+    { line: 4,  code: '  while (i <= j) {' },
+    { line: 5,  code: '    while (arr[i] < pivot) i++' },
+    { line: 6,  code: '    while (arr[j] > pivot) j--' },
+    { line: 7,  code: '    if (i <= j) {' },
+    { line: 8,  code: '      ;[arr[i], arr[j]] = [arr[j], arr[i]]' },
+    { line: 9,  code: '      i++; j--' },
+    { line: 10, code: '    }' },
+    { line: 11, code: '  }' },
+    { line: 12, code: '  if (lo < j) quickSort(arr, lo, j)' },
+    { line: 13, code: '  if (i < hi) quickSort(arr, i, hi)' },
+    { line: 14, code: '}' },
   ],
   python: [
-    { line: 1, code: 'def quick_sort(arr, lo=0, hi=None):' },
-    { line: 2, code: '    if hi is None: hi = len(arr) - 1' },
-    { line: 3, code: '    if lo < hi:' },
-    { line: 4, code: '        p = partition(arr, lo, hi)' },
-    { line: 5, code: '        quick_sort(arr, lo, p - 1)' },
-    { line: 6, code: '        quick_sort(arr, p + 1, hi)' },
-    { line: 7, code: 'def partition(arr, lo, hi):' },
-    { line: 8, code: '    pivot = arr[hi]' },
-    { line: 9, code: '    i = lo - 1' },
-    { line: 10, code: '    for j in range(lo, hi):' },
-    { line: 11, code: '        if arr[j] <= pivot:' },
-    { line: 12, code: '            i += 1' },
-    { line: 13, code: '            arr[i], arr[j] = arr[j], arr[i]' },
-    { line: 14, code: '    arr[i+1], arr[hi] = arr[hi], arr[i+1]' },
-    { line: 15, code: '    return i + 1' },
+    { line: 1,  code: 'def quick_sort(arr, lo=0, hi=None):' },
+    { line: 2,  code: '    if hi is None: hi = len(arr) - 1' },
+    { line: 3,  code: '    pivot = arr[(lo + hi) // 2]' },
+    { line: 4,  code: '    i, j = lo, hi' },
+    { line: 5,  code: '    while i <= j:' },
+    { line: 6,  code: '        while arr[i] < pivot: i += 1' },
+    { line: 7,  code: '        while arr[j] > pivot: j -= 1' },
+    { line: 8,  code: '        if i <= j:' },
+    { line: 9,  code: '            arr[i], arr[j] = arr[j], arr[i]' },
+    { line: 10, code: '            i += 1; j -= 1' },
+    { line: 11, code: '    if lo < j: quick_sort(arr, lo, j)' },
+    { line: 12, code: '    if i < hi: quick_sort(arr, i, hi)' },
   ],
   c: [
-    { line: 1, code: 'int partition(int arr[], int lo, int hi) {' },
-    { line: 2, code: '    int pivot = arr[hi], i = lo - 1;' },
-    { line: 3, code: '    for (int j = lo; j < hi; j++) {' },
-    { line: 4, code: '        if (arr[j] <= pivot) {' },
-    { line: 5, code: '            int tmp = arr[++i]; arr[i] = arr[j]; arr[j] = tmp;' },
-    { line: 6, code: '        }' },
-    { line: 7, code: '    }' },
-    { line: 8, code: '    int tmp = arr[i+1]; arr[i+1] = arr[hi]; arr[hi] = tmp;' },
-    { line: 9, code: '    return i + 1;' },
-    { line: 10, code: '}' },
-    { line: 11, code: 'void quickSort(int arr[], int lo, int hi) {' },
-    { line: 12, code: '    if (lo < hi) {' },
-    { line: 13, code: '        int p = partition(arr, lo, hi);' },
-    { line: 14, code: '        quickSort(arr, lo, p - 1);' },
-    { line: 15, code: '        quickSort(arr, p + 1, hi);' },
-    { line: 16, code: '    }' },
-    { line: 17, code: '}' },
+    { line: 1,  code: 'void quickSort(int* A, int esq, int dir) {' },
+    { line: 2,  code: '    int i = esq, j = dir, tmp;' },
+    { line: 3,  code: '    int pivo = A[(esq + dir) / 2];' },
+    { line: 4,  code: '    while (i <= j) {' },
+    { line: 5,  code: '        while (A[i] < pivo) i++;' },
+    { line: 6,  code: '        while (A[j] > pivo) j--;' },
+    { line: 7,  code: '        if (i <= j) {' },
+    { line: 8,  code: '            tmp = A[i]; A[i] = A[j]; A[j] = tmp;' },
+    { line: 9,  code: '            i++; j--;' },
+    { line: 10, code: '        }' },
+    { line: 11, code: '    }' },
+    { line: 12, code: '    if (esq < j) quickSort(A, esq, j);' },
+    { line: 13, code: '    if (i < dir) quickSort(A, i, dir);' },
+    { line: 14, code: '}' },
   ],
   java: [
-    { line: 1, code: 'void quickSort(int[] arr, int lo, int hi) {' },
-    { line: 2, code: '    if (lo < hi) {' },
-    { line: 3, code: '        int p = partition(arr, lo, hi);' },
-    { line: 4, code: '        quickSort(arr, lo, p - 1);' },
-    { line: 5, code: '        quickSort(arr, p + 1, hi);' },
-    { line: 6, code: '    }' },
-    { line: 7, code: '}' },
-    { line: 8, code: 'int partition(int[] arr, int lo, int hi) {' },
-    { line: 9, code: '    int pivot = arr[hi], i = lo - 1;' },
-    { line: 10, code: '    for (int j = lo; j < hi; j++) {' },
-    { line: 11, code: '        if (arr[j] <= pivot) {' },
-    { line: 12, code: '            int tmp = arr[++i]; arr[i] = arr[j]; arr[j] = tmp;' },
-    { line: 13, code: '        }' },
-    { line: 14, code: '    }' },
-    { line: 15, code: '    int tmp = arr[i+1]; arr[i+1] = arr[hi]; arr[hi] = tmp;' },
-    { line: 16, code: '    return i + 1;' },
-    { line: 17, code: '}' },
+    { line: 1,  code: 'void quickSort(int[] A, int esq, int dir) {' },
+    { line: 2,  code: '    int i = esq, j = dir;' },
+    { line: 3,  code: '    int pivo = A[(esq + dir) / 2];' },
+    { line: 4,  code: '    while (i <= j) {' },
+    { line: 5,  code: '        while (A[i] < pivo) i++;' },
+    { line: 6,  code: '        while (A[j] > pivo) j--;' },
+    { line: 7,  code: '        if (i <= j) {' },
+    { line: 8,  code: '            int tmp = A[i]; A[i] = A[j]; A[j] = tmp;' },
+    { line: 9,  code: '            i++; j--;' },
+    { line: 10, code: '        }' },
+    { line: 11, code: '    }' },
+    { line: 12, code: '    if (esq < j) quickSort(A, esq, j);' },
+    { line: 13, code: '    if (i < dir) quickSort(A, i, dir);' },
+    { line: 14, code: '}' },
   ],
   go: [
-    { line: 1, code: 'func quickSort(arr []int, lo, hi int) {' },
-    { line: 2, code: '    if lo < hi {' },
-    { line: 3, code: '        p := partition(arr, lo, hi)' },
-    { line: 4, code: '        quickSort(arr, lo, p-1)' },
-    { line: 5, code: '        quickSort(arr, p+1, hi)' },
-    { line: 6, code: '    }' },
-    { line: 7, code: '}' },
-    { line: 8, code: 'func partition(arr []int, lo, hi int) int {' },
-    { line: 9, code: '    pivot := arr[hi]' },
-    { line: 10, code: '    i := lo - 1' },
-    { line: 11, code: '    for j := lo; j < hi; j++ {' },
-    { line: 12, code: '        if arr[j] <= pivot {' },
-    { line: 13, code: '            i++' },
-    { line: 14, code: '            arr[i], arr[j] = arr[j], arr[i]' },
-    { line: 15, code: '        }' },
-    { line: 16, code: '    }' },
-    { line: 17, code: '    arr[i+1], arr[hi] = arr[hi], arr[i+1]' },
-    { line: 18, code: '    return i + 1' },
-    { line: 19, code: '}' },
+    { line: 1,  code: 'func quickSort(arr []int, lo, hi int) {' },
+    { line: 2,  code: '    i, j := lo, hi' },
+    { line: 3,  code: '    pivot := arr[(lo+hi)/2]' },
+    { line: 4,  code: '    for i <= j {' },
+    { line: 5,  code: '        for arr[i] < pivot { i++ }' },
+    { line: 6,  code: '        for arr[j] > pivot { j-- }' },
+    { line: 7,  code: '        if i <= j {' },
+    { line: 8,  code: '            arr[i], arr[j] = arr[j], arr[i]' },
+    { line: 9,  code: '            i++; j--' },
+    { line: 10, code: '        }' },
+    { line: 11, code: '    }' },
+    { line: 12, code: '    if lo < j { quickSort(arr, lo, j) }' },
+    { line: 13, code: '    if i < hi { quickSort(arr, i, hi) }' },
+    { line: 14, code: '}' },
   ],
 }

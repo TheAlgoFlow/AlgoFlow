@@ -91,6 +91,19 @@
         "done": "Array is sorted!"
       }
     },
+    "shellSort": {
+      "name": "Shell Sort",
+      "description": "A generalisation of insertion sort that sorts elements far apart first using a shrinking gap sequence, then finishes with a standard insertion sort pass.",
+      "whenToUse": "Good practical performance for medium-sized arrays. Faster than insertion sort in most cases. Used in embedded systems and as a subroutine in more complex algorithms.",
+      "steps": {
+        "gap": "New gap h = {{h}} — sorting sub-sequences with stride {{h}}",
+        "pick": "Picking element {{tmp}} at index {{i}} (gap {{h}})",
+        "compare": "Comparing {{val}} with key {{tmp}} — shifting right",
+        "shift": "Shifting {{val}} to position {{pos}}",
+        "insert": "Inserting {{tmp}} at position {{pos}}",
+        "done": "Array is sorted!"
+      }
+    },
     "linearSearch": {
       "name": "Linear Search",
       "description": "Sequentially checks each element until the target is found or the array ends. Works on both sorted and unsorted arrays.",
@@ -148,6 +161,15 @@
         "shift": "Shifting elements to make room",
         "delete": "Deleting element at index {{i}}",
         "search": "Searching for {{v}}"
+      }
+    },
+    "doublyLinkedList": {
+      "name": "Doubly Linked List",
+      "description": "A sequence of nodes where each node holds a value and pointers to both the next and previous nodes, enabling efficient traversal in both directions.",
+      "whenToUse": "When bidirectional traversal or O(1) removal at both ends is needed. Used in browser history, LRU caches, and undo/redo stacks.",
+      "steps": {
+        "init": "Initial list ready",
+        "done": "Operation complete"
       }
     },
     "linkedList": {
