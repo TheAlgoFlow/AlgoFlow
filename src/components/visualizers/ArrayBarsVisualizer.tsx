@@ -25,9 +25,8 @@ const ROLE_COLORS: Record<HighlightRole, string> = {
 
 const DEFAULT_COLOR = '#6366f1'
 
-function getHighlightRole(index: number, highlights: Highlight[]): HighlightRole | null {
-  const h = highlights.find(h => h.index === index)
-  return h ? h.role : null
+function getHighlight(index: number, highlights: Highlight[]): Highlight | null {
+  return highlights.find(h => h.index === index) ?? null
 }
 
 type ArrayBarsVisualizerProps = {
@@ -73,12 +72,13 @@ export function ArrayBarsVisualizer({ frame }: ArrayBarsVisualizerProps) {
           alignItems: 'flex-end',
           gap: '3px',
           height: 'calc(100% - 2rem)',
-          paddingBottom: '1.5rem',
+          paddingBottom: '2.5rem',
           position: 'relative',
         }}
       >
         {arr.map((val, i) => {
-          const role = getHighlightRole(i, frame.highlights)
+          const hl = getHighlight(i, frame.highlights)
+          const role = hl?.role ?? null
           const color = role ? ROLE_COLORS[role] : DEFAULT_COLOR
           const heightPct = (val / maxVal) * 100
 
@@ -119,6 +119,22 @@ export function ArrayBarsVisualizer({ frame }: ArrayBarsVisualizerProps) {
                   }}
                 >
                   {val}
+                </div>
+              )}
+              {hl?.label && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '-2.5rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '1px',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <span style={{ fontSize: '9px', color: ROLE_COLORS[hl.role], lineHeight: 1 }}>▲</span>
+                  <span style={{ fontSize: '11px', fontFamily: 'monospace', color: ROLE_COLORS[hl.role], fontWeight: 700, whiteSpace: 'nowrap' }}>{hl.label}</span>
                 </div>
               )}
             </div>

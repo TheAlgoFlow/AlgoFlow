@@ -1,4 +1,4 @@
-import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets } from '@/engine/types'
+import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets, DSOperationConfig } from '@/engine/types'
 
 export const meta: AlgorithmMeta = {
   slug: 'bst',
@@ -8,6 +8,11 @@ export const meta: AlgorithmMeta = {
   complexity: {
     time: { best: 'O(log n)', avg: 'O(log n)', worst: 'O(n)' },
     space: 'O(n)',
+    operations: [
+      { name: 'insert', best: 'O(log n)', avg: 'O(log n)', worst: 'O(n)' },
+      { name: 'remove', best: 'O(log n)', avg: 'O(log n)', worst: 'O(n)' },
+      { name: 'search', best: 'O(log n)', avg: 'O(log n)', worst: 'O(n)' },
+    ],
   },
   tags: ['tree', 'hierarchical', 'ordered', 'search'],
   defaultInput: null,
@@ -18,232 +23,619 @@ export const meta: AlgorithmMeta = {
   ],
 }
 
-type BSTNode = {
+// ─── Flat-node tree type used by TreeVisualizer ───────────────────────────────
+type TreeNodeData = {
   id: number
   value: number
   left: number | null
   right: number | null
 }
 
-type BSTState = {
-  nodes: BSTNode[]
+type State = {
+  nodes: TreeNodeData[]
   current: number | null
-  comparing: number | null
+  visited?: number[]
+  comparing?: number | null
 }
 
-export function* generator(_input: unknown): Generator<AlgorithmFrame> {
-  const nodes: BSTNode[] = []
-  let nextId = 1
+// ─── Initial BST built from [50, 30, 70, 20, 40] ─────────────────────────────
+//
+//         50 (id:0)
+//        /         \
+//     30 (id:1)   70 (id:2)
+//     /    \
+//  20(id:3) 40(id:4)
+//
+function makeBaseNodes(): TreeNodeData[] {
+  return [
+    { id: 0, value: 50, left: 1, right: 2 },
+    { id: 1, value: 30, left: 3, right: 4 },
+    { id: 2, value: 70, left: null, right: null },
+    { id: 3, value: 20, left: null, right: null },
+    { id: 4, value: 40, left: null, right: null },
+  ]
+}
 
-  function cloneNodes(): BSTNode[] {
-    return nodes.map(n => ({ ...n }))
+function cloneNodes(nodes: TreeNodeData[]): TreeNodeData[] {
+  return nodes.map(n => ({ ...n }))
+}
+
+// ─── dsOperation 1: Insert ───────────────────────────────────────────────────
+function* insertGenerator(value = 45): Generator<AlgorithmFrame> {
+  const nodes = makeBaseNodes()
+  let nextId = 5
+
+  function snap(current: number | null): State {
+    return { nodes: cloneNodes(nodes), current }
   }
 
-  function makeState(current: number | null, comparing: number | null): BSTState {
-    return { nodes: cloneNodes(), current, comparing }
+  yield {
+    state: snap(null),
+    highlights: [],
+    message: 'ds.bst.insert.start',
+    codeLine: 1,
+    auxState: { v: value },
   }
 
-  // Insert a value into BST, yielding comparison frames
-  function* insertValue(value: number): Generator<AlgorithmFrame> {
-    if (nodes.length === 0) {
-      const id = nextId++
-      nodes.push({ id, value, left: null, right: null })
+  let currId: number = nodes[0].id
+
+  while (true) {
+    const curr = nodes.find(n => n.id === currId)!
+
+    yield {
+      state: snap(currId),
+      highlights: [{ index: currId, role: 'current', label: 'curr' }],
+      message: 'ds.bst.insert.compare',
+      codeLine: 5,
+      auxState: { v: value, nodeV: curr.value },
+    }
+
+    if (value < curr.value) {
+      if (curr.left === null) {
+        const newId = nextId++
+        curr.left = newId
+        nodes.push({ id: newId, value, left: null, right: null })
+        yield {
+          state: snap(newId),
+          highlights: [{ index: newId, role: 'found', label: 'curr' }],
+          message: 'ds.bst.insert.placed',
+          codeLine: 6,
+          auxState: { v: value },
+        }
+        break
+      }
+      currId = curr.left
+    } else {
+      if (curr.right === null) {
+        const newId = nextId++
+        curr.right = newId
+        nodes.push({ id: newId, value, left: null, right: null })
+        yield {
+          state: snap(newId),
+          highlights: [{ index: newId, role: 'found', label: 'curr' }],
+          message: 'ds.bst.insert.placed',
+          codeLine: 9,
+          auxState: { v: value },
+        }
+        break
+      }
+      currId = curr.right
+    }
+  }
+
+  yield {
+    state: snap(null),
+    highlights: [],
+    message: 'ds.bst.insert.done',
+    codeLine: 13,
+    auxState: { v: value },
+  }
+}
+
+// ─── dsOperation 2: Search ───────────────────────────────────────────────────
+function* searchGenerator(value = 30): Generator<AlgorithmFrame> {
+  const nodes = makeBaseNodes()
+
+  function snap(current: number | null): State {
+    return { nodes: cloneNodes(nodes), current }
+  }
+
+  yield {
+    state: snap(null),
+    highlights: [],
+    message: 'ds.bst.search.start',
+    codeLine: 1,
+    auxState: { target: value },
+  }
+
+  let currId: number | null = nodes[0].id
+
+  while (currId !== null) {
+    const curr = nodes.find(n => n.id === currId)!
+
+    yield {
+      state: snap(currId),
+      highlights: [{ index: currId, role: 'current', label: 'curr' }],
+      message: 'ds.bst.search.visiting',
+      codeLine: 3,
+      auxState: { target: value, nodeV: curr.value },
+    }
+
+    if (curr.value === value) {
       yield {
-        state: makeState(id, null),
-        highlights: [{ index: id, role: 'current' }],
-        message: 'algorithms.bst.steps.insert',
-        codeLine: 2,
-        auxState: { v: value },
+        state: snap(currId),
+        highlights: [{ index: currId, role: 'found', label: 'found' }],
+        message: 'ds.bst.search.found',
+        codeLine: 4,
+        auxState: { v: curr.value },
       }
       return
     }
 
-    let currentId: number | null = nodes[0].id
-    while (currentId !== null) {
-      const node = nodes.find(n => n.id === currentId)!
-
+    if (value < curr.value) {
       yield {
-        state: makeState(currentId, currentId),
-        highlights: [{ index: currentId, role: 'compare' }],
-        message: 'algorithms.bst.steps.compare',
-        codeLine: 4,
-        auxState: { v: value, nodeV: node.value },
+        state: snap(currId),
+        highlights: [{ index: currId, role: 'current', label: 'curr' }],
+        message: 'ds.bst.search.goLeft',
+        codeLine: 5,
+        auxState: { target: value, nodeV: curr.value },
       }
-
-      if (value < node.value) {
-        if (node.left === null) {
-          const newId = nextId++
-          node.left = newId
-          nodes.push({ id: newId, value, left: null, right: null })
-          yield {
-            state: makeState(newId, null),
-            highlights: [{ index: newId, role: 'current' }],
-            message: 'algorithms.bst.steps.placed',
-            codeLine: 6,
-            auxState: { v: value },
-          }
-          return
-        }
-        currentId = node.left
-      } else {
-        if (node.right === null) {
-          const newId = nextId++
-          node.right = newId
-          nodes.push({ id: newId, value, left: null, right: null })
-          yield {
-            state: makeState(newId, null),
-            highlights: [{ index: newId, role: 'current' }],
-            message: 'algorithms.bst.steps.placed',
-            codeLine: 8,
-            auxState: { v: value },
-          }
-          return
-        }
-        currentId = node.right
-      }
-    }
-  }
-
-  // Insert values: 50, 30, 70, 20, 40, 60, 80
-  const insertValues = [50, 30, 70, 20, 40, 60, 80]
-
-  for (const v of insertValues) {
-    yield {
-      state: makeState(null, null),
-      highlights: [],
-      message: 'algorithms.bst.steps.insert',
-      codeLine: 1,
-      auxState: { v },
-    }
-    yield* insertValue(v)
-  }
-
-  // Search for 60
-  const searchTarget = 60
-
-  yield {
-    state: makeState(null, null),
-    highlights: [],
-    message: 'algorithms.bst.steps.search',
-    codeLine: 11,
-    auxState: { target: searchTarget },
-  }
-
-  let searchCurrent: number | null = nodes[0].id
-  while (searchCurrent !== null) {
-    const node = nodes.find(n => n.id === searchCurrent)!
-
-    yield {
-      state: makeState(searchCurrent, searchCurrent),
-      highlights: [{ index: searchCurrent, role: 'compare' }],
-      message: 'algorithms.bst.steps.compare',
-      codeLine: 12,
-      auxState: { v: node.value, target: searchTarget },
-    }
-
-    if (node.value === searchTarget) {
-      yield {
-        state: makeState(searchCurrent, null),
-        highlights: [{ index: searchCurrent, role: 'found' }],
-        message: 'algorithms.bst.steps.found',
-        codeLine: 13,
-        auxState: { v: node.value },
-      }
-      break
-    } else if (searchTarget < node.value) {
-      searchCurrent = node.left
+      currId = curr.left
     } else {
-      searchCurrent = node.right
+      yield {
+        state: snap(currId),
+        highlights: [{ index: currId, role: 'current', label: 'curr' }],
+        message: 'ds.bst.search.goRight',
+        codeLine: 6,
+        auxState: { target: value, nodeV: curr.value },
+      }
+      currId = curr.right
     }
   }
 
   yield {
-    state: makeState(null, null),
+    state: snap(null),
     highlights: [],
-    message: 'algorithms.bst.steps.done',
-    codeLine: 15,
+    message: 'ds.bst.search.notFound',
+    codeLine: 8,
+    auxState: { target: value },
   }
 }
 
+// ─── dsOperation 3: Remove ───────────────────────────────────────────────────
+function* removeGenerator(value = 30): Generator<AlgorithmFrame> {
+  const nodes = makeBaseNodes()
+
+  function snap(current: number | null): State {
+    return { nodes: cloneNodes(nodes), current }
+  }
+
+  function findNode(id: number | null): TreeNodeData | null {
+    if (id === null) return null
+    return nodes.find(n => n.id === id) ?? null
+  }
+
+  yield {
+    state: snap(null),
+    highlights: [],
+    message: 'ds.bst.remove.start',
+    codeLine: 1,
+    auxState: { v: value },
+  }
+
+  // Phase 1: Find the node to remove
+  let currId: number | null = nodes[0].id
+  let parentId: number | null = null
+  let foundId: number | null = null
+
+  while (currId !== null) {
+    const curr = nodes.find(n => n.id === currId)!
+
+    yield {
+      state: snap(currId),
+      highlights: [{ index: currId, role: 'current', label: 'curr' }],
+      message: 'ds.bst.remove.searching',
+      codeLine: 5,
+      auxState: { v: value, nodeV: curr.value },
+    }
+
+    if (curr.value === value) {
+      foundId = currId
+      break
+    } else if (value < curr.value) {
+      parentId = currId
+      currId = curr.left
+    } else {
+      parentId = currId
+      currId = curr.right
+    }
+  }
+
+  if (foundId === null) {
+    yield {
+      state: snap(null),
+      highlights: [],
+      message: 'ds.bst.remove.notFound',
+      codeLine: 5,
+      auxState: { v: value },
+    }
+    return
+  }
+
+  // Phase 2: Highlight node to remove
+  yield {
+    state: snap(foundId),
+    highlights: [{ index: foundId, role: 'swap', label: 'del' }],
+    message: 'ds.bst.remove.found',
+    codeLine: 8,
+    auxState: { v: value },
+  }
+
+  // Phase 3: Perform removal
+  const nodeToRemove = nodes.find(n => n.id === foundId)!
+
+  if (nodeToRemove.left === null && nodeToRemove.right === null) {
+    // Leaf node: simply remove
+    const idx = nodes.findIndex(n => n.id === foundId)
+    nodes.splice(idx, 1)
+
+    // Update parent pointer
+    if (parentId !== null) {
+      const parent = nodes.find(n => n.id === parentId)!
+      if (parent.left === foundId) parent.left = null
+      else parent.right = null
+    }
+  } else if (nodeToRemove.left === null || nodeToRemove.right === null) {
+    // One child: replace with child
+    const childId = nodeToRemove.left !== null ? nodeToRemove.left : nodeToRemove.right
+
+    if (parentId !== null) {
+      const parent = nodes.find(n => n.id === parentId)!
+      if (parent.left === foundId) parent.left = childId
+      else parent.right = childId
+    }
+
+    const idx = nodes.findIndex(n => n.id === foundId)
+    nodes.splice(idx, 1)
+  } else {
+    // Two children: replace with in-order successor (leftmost in right subtree)
+    let successorParentId: number = foundId
+    let successorId: number = nodeToRemove.right
+
+    let successorNode = findNode(successorId)!
+    while (successorNode.left !== null) {
+      successorParentId = successorId
+      successorId = successorNode.left
+      successorNode = findNode(successorId)!
+    }
+
+    // Copy successor value into current node
+    nodeToRemove.value = successorNode.value
+
+    // Remove successor (it has at most one right child)
+    const successorParent = nodes.find(n => n.id === successorParentId)!
+    if (successorParent.left === successorId) {
+      successorParent.left = successorNode.right
+    } else {
+      successorParent.right = successorNode.right
+    }
+
+    const idx = nodes.findIndex(n => n.id === successorId)
+    nodes.splice(idx, 1)
+  }
+
+  yield {
+    state: snap(null),
+    highlights: [],
+    message: 'ds.bst.remove.done',
+    codeLine: 16,
+    auxState: { v: value },
+  }
+}
+
+// ─── dsOperations export ─────────────────────────────────────────────────────
+export const dsOperations: DSOperationConfig[] = [
+  {
+    type: 'insert',
+    label: 'Insert',
+    takesValue: true,
+    generator: (value = 45) => insertGenerator(value),
+    codeSnippets: {
+      ts: [
+        { line: 1,  code: 'insert(val: number): void {' },
+        { line: 2,  code: '  if (!this.root) { this.root = new Node(val); return }' },
+        { line: 3,  code: '  let curr = this.root' },
+        { line: 4,  code: '  while (curr) {' },
+        { line: 5,  code: '    if (val < curr.val) {' },
+        { line: 6,  code: '      if (!curr.left) { curr.left = new Node(val); return }' },
+        { line: 7,  code: '      curr = curr.left' },
+        { line: 8,  code: '    } else {' },
+        { line: 9,  code: '      if (!curr.right) { curr.right = new Node(val); return }' },
+        { line: 10, code: '      curr = curr.right' },
+        { line: 11, code: '    }' },
+        { line: 12, code: '  }' },
+        { line: 13, code: '}' },
+      ],
+      python: [
+        { line: 1,  code: 'def insert(self, val):' },
+        { line: 2,  code: '    if not self.root:' },
+        { line: 3,  code: '        self.root = Node(val); return' },
+        { line: 4,  code: '    curr = self.root' },
+        { line: 5,  code: '    while curr:' },
+        { line: 6,  code: '        if val < curr.val:' },
+        { line: 7,  code: '            if not curr.left:' },
+        { line: 8,  code: '                curr.left = Node(val); return' },
+        { line: 9,  code: '            curr = curr.left' },
+        { line: 10, code: '        else:' },
+        { line: 11, code: '            if not curr.right:' },
+        { line: 12, code: '                curr.right = Node(val); return' },
+        { line: 13, code: '            curr = curr.right' },
+      ],
+      c: [
+        { line: 1,  code: 'void insert(Node** root, int val) {' },
+        { line: 2,  code: '    if (!*root) { *root = newNode(val); return; }' },
+        { line: 3,  code: '    Node* curr = *root;' },
+        { line: 4,  code: '    while (curr) {' },
+        { line: 5,  code: '        if (val < curr->val) {' },
+        { line: 6,  code: '            if (!curr->left) { curr->left = newNode(val); return; }' },
+        { line: 7,  code: '            curr = curr->left;' },
+        { line: 8,  code: '        } else {' },
+        { line: 9,  code: '            if (!curr->right) { curr->right = newNode(val); return; }' },
+        { line: 10, code: '            curr = curr->right;' },
+        { line: 11, code: '        }' },
+        { line: 12, code: '    }' },
+        { line: 13, code: '}' },
+      ],
+      java: [
+        { line: 1,  code: 'void insert(int val) {' },
+        { line: 2,  code: '    if (root == null) { root = new Node(val); return; }' },
+        { line: 3,  code: '    Node curr = root;' },
+        { line: 4,  code: '    while (curr != null) {' },
+        { line: 5,  code: '        if (val < curr.val) {' },
+        { line: 6,  code: '            if (curr.left == null) { curr.left = new Node(val); return; }' },
+        { line: 7,  code: '            curr = curr.left;' },
+        { line: 8,  code: '        } else {' },
+        { line: 9,  code: '            if (curr.right == null) { curr.right = new Node(val); return; }' },
+        { line: 10, code: '            curr = curr.right;' },
+        { line: 11, code: '        }' },
+        { line: 12, code: '    }' },
+        { line: 13, code: '}' },
+      ],
+      go: [
+        { line: 1,  code: 'func (t *BST) Insert(val int) {' },
+        { line: 2,  code: '    if t.root == nil { t.root = &Node{Val: val}; return }' },
+        { line: 3,  code: '    curr := t.root' },
+        { line: 4,  code: '    for curr != nil {' },
+        { line: 5,  code: '        if val < curr.Val {' },
+        { line: 6,  code: '            if curr.Left == nil { curr.Left = &Node{Val: val}; return }' },
+        { line: 7,  code: '            curr = curr.Left' },
+        { line: 8,  code: '        } else {' },
+        { line: 9,  code: '            if curr.Right == nil { curr.Right = &Node{Val: val}; return }' },
+        { line: 10, code: '            curr = curr.Right' },
+        { line: 11, code: '        }' },
+        { line: 12, code: '    }' },
+        { line: 13, code: '}' },
+      ],
+    },
+  },
+  {
+    type: 'search',
+    label: 'Search',
+    takesValue: true,
+    generator: (value = 30) => searchGenerator(value),
+    codeSnippets: {
+      ts: [
+        { line: 1, code: 'search(val: number): boolean {' },
+        { line: 2, code: '  let curr = this.root' },
+        { line: 3, code: '  while (curr) {' },
+        { line: 4, code: '    if (curr.val === val) return true' },
+        { line: 5, code: '    if (val < curr.val) curr = curr.left' },
+        { line: 6, code: '    else curr = curr.right' },
+        { line: 7, code: '  }' },
+        { line: 8, code: '  return false' },
+        { line: 9, code: '}' },
+      ],
+      python: [
+        { line: 1, code: 'def search(self, val):' },
+        { line: 2, code: '    curr = self.root' },
+        { line: 3, code: '    while curr:' },
+        { line: 4, code: '        if curr.val == val: return True' },
+        { line: 5, code: '        if val < curr.val: curr = curr.left' },
+        { line: 6, code: '        else: curr = curr.right' },
+        { line: 7, code: '    return False' },
+      ],
+      c: [
+        { line: 1, code: 'int search(Node* root, int val) {' },
+        { line: 2, code: '    Node* curr = root;' },
+        { line: 3, code: '    while (curr) {' },
+        { line: 4, code: '        if (curr->val == val) return 1;' },
+        { line: 5, code: '        if (val < curr->val) curr = curr->left;' },
+        { line: 6, code: '        else curr = curr->right;' },
+        { line: 7, code: '    }' },
+        { line: 8, code: '    return 0;' },
+        { line: 9, code: '}' },
+      ],
+      java: [
+        { line: 1, code: 'boolean search(int val) {' },
+        { line: 2, code: '    Node curr = root;' },
+        { line: 3, code: '    while (curr != null) {' },
+        { line: 4, code: '        if (curr.val == val) return true;' },
+        { line: 5, code: '        if (val < curr.val) curr = curr.left;' },
+        { line: 6, code: '        else curr = curr.right;' },
+        { line: 7, code: '    }' },
+        { line: 8, code: '    return false;' },
+        { line: 9, code: '}' },
+      ],
+      go: [
+        { line: 1, code: 'func (t *BST) Search(val int) bool {' },
+        { line: 2, code: '    curr := t.root' },
+        { line: 3, code: '    for curr != nil {' },
+        { line: 4, code: '        if curr.Val == val { return true }' },
+        { line: 5, code: '        if val < curr.Val { curr = curr.Left }' },
+        { line: 6, code: '        else { curr = curr.Right }' },
+        { line: 7, code: '    }' },
+        { line: 8, code: '    return false' },
+        { line: 9, code: '}' },
+      ],
+    },
+  },
+  {
+    type: 'remove',
+    label: 'Remove',
+    takesValue: true,
+    generator: (value = 30) => removeGenerator(value),
+    codeSnippets: {
+      ts: [
+        { line: 1,  code: 'remove(val: number): void {' },
+        { line: 2,  code: '  this.root = this._remove(this.root, val)' },
+        { line: 3,  code: '}' },
+        { line: 4,  code: '_remove(node: Node | null, val: number): Node | null {' },
+        { line: 5,  code: '  if (!node) return null' },
+        { line: 6,  code: '  if (val < node.val) node.left = this._remove(node.left, val)' },
+        { line: 7,  code: '  else if (val > node.val) node.right = this._remove(node.right, val)' },
+        { line: 8,  code: '  else {' },
+        { line: 9,  code: '    if (!node.left) return node.right' },
+        { line: 10, code: '    if (!node.right) return node.left' },
+        { line: 11, code: '    let min = node.right' },
+        { line: 12, code: '    while (min.left) min = min.left' },
+        { line: 13, code: '    node.val = min.val' },
+        { line: 14, code: '    node.right = this._remove(node.right, min.val)' },
+        { line: 15, code: '  }' },
+        { line: 16, code: '  return node' },
+        { line: 17, code: '}' },
+      ],
+      python: [
+        { line: 1,  code: 'def remove(self, val):' },
+        { line: 2,  code: '    self.root = self._remove(self.root, val)' },
+        { line: 3,  code: 'def _remove(self, node, val):' },
+        { line: 4,  code: '    if node is None: return None' },
+        { line: 5,  code: '    if val < node.val: node.left = self._remove(node.left, val)' },
+        { line: 6,  code: '    elif val > node.val: node.right = self._remove(node.right, val)' },
+        { line: 7,  code: '    else:' },
+        { line: 8,  code: '        if not node.left: return node.right' },
+        { line: 9,  code: '        if not node.right: return node.left' },
+        { line: 10, code: '        m = node.right' },
+        { line: 11, code: '        while m.left: m = m.left' },
+        { line: 12, code: '        node.val = m.val' },
+        { line: 13, code: '        node.right = self._remove(node.right, m.val)' },
+        { line: 14, code: '    return node' },
+      ],
+      c: [
+        { line: 1,  code: 'Node* remove(Node* node, int val) {' },
+        { line: 2,  code: '    if (!node) return NULL;' },
+        { line: 3,  code: '    if (val < node->val)' },
+        { line: 4,  code: '        node->left = remove(node->left, val);' },
+        { line: 5,  code: '    else if (val > node->val)' },
+        { line: 6,  code: '        node->right = remove(node->right, val);' },
+        { line: 7,  code: '    else {' },
+        { line: 8,  code: '        if (!node->left) return node->right;' },
+        { line: 9,  code: '        if (!node->right) return node->left;' },
+        { line: 10, code: '        Node* m = node->right;' },
+        { line: 11, code: '        while (m->left) m = m->left;' },
+        { line: 12, code: '        node->val = m->val;' },
+        { line: 13, code: '        node->right = remove(node->right, m->val);' },
+        { line: 14, code: '    }' },
+        { line: 15, code: '    return node;' },
+        { line: 16, code: '}' },
+      ],
+      java: [
+        { line: 1,  code: 'Node remove(Node node, int val) {' },
+        { line: 2,  code: '    if (node == null) return null;' },
+        { line: 3,  code: '    if (val < node.val)' },
+        { line: 4,  code: '        node.left = remove(node.left, val);' },
+        { line: 5,  code: '    else if (val > node.val)' },
+        { line: 6,  code: '        node.right = remove(node.right, val);' },
+        { line: 7,  code: '    else {' },
+        { line: 8,  code: '        if (node.left == null) return node.right;' },
+        { line: 9,  code: '        if (node.right == null) return node.left;' },
+        { line: 10, code: '        Node m = node.right;' },
+        { line: 11, code: '        while (m.left != null) m = m.left;' },
+        { line: 12, code: '        node.val = m.val;' },
+        { line: 13, code: '        node.right = remove(node.right, m.val);' },
+        { line: 14, code: '    }' },
+        { line: 15, code: '    return node;' },
+        { line: 16, code: '}' },
+      ],
+      go: [
+        { line: 1,  code: 'func remove(node *Node, val int) *Node {' },
+        { line: 2,  code: '    if node == nil { return nil }' },
+        { line: 3,  code: '    if val < node.Val {' },
+        { line: 4,  code: '        node.Left = remove(node.Left, val)' },
+        { line: 5,  code: '    } else if val > node.Val {' },
+        { line: 6,  code: '        node.Right = remove(node.Right, val)' },
+        { line: 7,  code: '    } else {' },
+        { line: 8,  code: '        if node.Left == nil { return node.Right }' },
+        { line: 9,  code: '        if node.Right == nil { return node.Left }' },
+        { line: 10, code: '        m := node.Right' },
+        { line: 11, code: '        for m.Left != nil { m = m.Left }' },
+        { line: 12, code: '        node.Val = m.Val' },
+        { line: 13, code: '        node.Right = remove(node.Right, m.Val)' },
+        { line: 14, code: '    }' },
+        { line: 15, code: '    return node' },
+        { line: 16, code: '}' },
+      ],
+    },
+  },
+]
+
+// ─── Top-level generator (search demo: find 30) ──────────────────────────────
+export function* generator(_input: unknown): Generator<AlgorithmFrame> {
+  yield* searchGenerator(30)
+}
+
+// ─── Top-level codeSnippets (search) ─────────────────────────────────────────
 export const codeSnippets: CodeSnippets = {
   ts: [
-    { line: 1, code: 'function insert(root: BSTNode | null, val: number): BSTNode {' },
-    { line: 2, code: '  if (!root) return new BSTNode(val)' },
-    { line: 3, code: '  if (val < root.val)' },
-    { line: 4, code: '    root.left = insert(root.left, val)' },
-    { line: 5, code: '  else' },
-    { line: 6, code: '    root.right = insert(root.right, val)' },
-    { line: 7, code: '  return root' },
-    { line: 8, code: '}' },
-    { line: 9, code: 'function search(root: BSTNode | null, val: number): boolean {' },
-    { line: 10, code: '  if (!root) return false' },
-    { line: 11, code: '  if (root.val === val) return true' },
-    { line: 12, code: '  if (val < root.val) return search(root.left, val)' },
-    { line: 13, code: '  return search(root.right, val)' },
-    { line: 14, code: '}' },
-    { line: 15, code: '// search(root, 60) → true' },
+    { line: 1, code: 'search(val: number): boolean {' },
+    { line: 2, code: '  let curr = this.root' },
+    { line: 3, code: '  while (curr) {' },
+    { line: 4, code: '    if (curr.val === val) return true' },
+    { line: 5, code: '    if (val < curr.val) curr = curr.left' },
+    { line: 6, code: '    else curr = curr.right' },
+    { line: 7, code: '  }' },
+    { line: 8, code: '  return false' },
+    { line: 9, code: '}' },
   ],
   python: [
-    { line: 1, code: 'def insert(root, val):' },
-    { line: 2, code: '    if root is None: return Node(val)' },
-    { line: 3, code: '    if val < root.val:' },
-    { line: 4, code: '        root.left = insert(root.left, val)' },
-    { line: 5, code: '    else:' },
-    { line: 6, code: '        root.right = insert(root.right, val)' },
-    { line: 7, code: '    return root' },
-    { line: 8, code: 'def search(root, val):' },
-    { line: 9, code: '    if root is None: return False' },
-    { line: 10, code: '    if root.val == val: return True' },
-    { line: 11, code: '    if val < root.val: return search(root.left, val)' },
-    { line: 12, code: '    return search(root.right, val)' },
+    { line: 1, code: 'def search(self, val):' },
+    { line: 2, code: '    curr = self.root' },
+    { line: 3, code: '    while curr:' },
+    { line: 4, code: '        if curr.val == val: return True' },
+    { line: 5, code: '        if val < curr.val: curr = curr.left' },
+    { line: 6, code: '        else: curr = curr.right' },
+    { line: 7, code: '    return False' },
   ],
   c: [
-    { line: 1, code: 'Node* insert(Node* root, int val) {' },
-    { line: 2, code: '    if (!root) return newNode(val);' },
-    { line: 3, code: '    if (val < root->val)' },
-    { line: 4, code: '        root->left = insert(root->left, val);' },
-    { line: 5, code: '    else' },
-    { line: 6, code: '        root->right = insert(root->right, val);' },
-    { line: 7, code: '    return root;' },
-    { line: 8, code: '}' },
-    { line: 9, code: 'int search(Node* root, int val) {' },
-    { line: 10, code: '    if (!root) return 0;' },
-    { line: 11, code: '    if (root->val == val) return 1;' },
-    { line: 12, code: '    if (val < root->val) return search(root->left, val);' },
-    { line: 13, code: '    return search(root->right, val);' },
-    { line: 14, code: '}' },
+    { line: 1, code: 'int search(Node* root, int val) {' },
+    { line: 2, code: '    Node* curr = root;' },
+    { line: 3, code: '    while (curr) {' },
+    { line: 4, code: '        if (curr->val == val) return 1;' },
+    { line: 5, code: '        if (val < curr->val) curr = curr->left;' },
+    { line: 6, code: '        else curr = curr->right;' },
+    { line: 7, code: '    }' },
+    { line: 8, code: '    return 0;' },
+    { line: 9, code: '}' },
   ],
   java: [
-    { line: 1, code: 'TreeNode insert(TreeNode root, int val) {' },
-    { line: 2, code: '    if (root == null) return new TreeNode(val);' },
-    { line: 3, code: '    if (val < root.val)' },
-    { line: 4, code: '        root.left = insert(root.left, val);' },
-    { line: 5, code: '    else' },
-    { line: 6, code: '        root.right = insert(root.right, val);' },
-    { line: 7, code: '    return root;' },
-    { line: 8, code: '}' },
-    { line: 9, code: 'boolean search(TreeNode root, int val) {' },
-    { line: 10, code: '    if (root == null) return false;' },
-    { line: 11, code: '    if (root.val == val) return true;' },
-    { line: 12, code: '    if (val < root.val) return search(root.left, val);' },
-    { line: 13, code: '    return search(root.right, val);' },
-    { line: 14, code: '}' },
+    { line: 1, code: 'boolean search(int val) {' },
+    { line: 2, code: '    Node curr = root;' },
+    { line: 3, code: '    while (curr != null) {' },
+    { line: 4, code: '        if (curr.val == val) return true;' },
+    { line: 5, code: '        if (val < curr.val) curr = curr.left;' },
+    { line: 6, code: '        else curr = curr.right;' },
+    { line: 7, code: '    }' },
+    { line: 8, code: '    return false;' },
+    { line: 9, code: '}' },
   ],
   go: [
-    { line: 1, code: 'func insert(root *TreeNode, val int) *TreeNode {' },
-    { line: 2, code: '    if root == nil { return &TreeNode{Val: val} }' },
-    { line: 3, code: '    if val < root.Val {' },
-    { line: 4, code: '        root.Left = insert(root.Left, val)' },
-    { line: 5, code: '    } else {' },
-    { line: 6, code: '        root.Right = insert(root.Right, val)' },
+    { line: 1, code: 'func (t *BST) Search(val int) bool {' },
+    { line: 2, code: '    curr := t.root' },
+    { line: 3, code: '    for curr != nil {' },
+    { line: 4, code: '        if curr.Val == val { return true }' },
+    { line: 5, code: '        if val < curr.Val { curr = curr.Left }' },
+    { line: 6, code: '        else { curr = curr.Right }' },
     { line: 7, code: '    }' },
-    { line: 8, code: '    return root' },
+    { line: 8, code: '    return false' },
     { line: 9, code: '}' },
-    { line: 10, code: 'func search(root *TreeNode, val int) bool {' },
-    { line: 11, code: '    if root == nil { return false }' },
-    { line: 12, code: '    if root.Val == val { return true }' },
-    { line: 13, code: '    if val < root.Val { return search(root.Left, val) }' },
-    { line: 14, code: '    return search(root.Right, val)' },
-    { line: 15, code: '}' },
   ],
 }

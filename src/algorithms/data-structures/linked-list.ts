@@ -1,4 +1,10 @@
-import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets, LinkedListState } from '@/engine/types'
+import type {
+  AlgorithmMeta,
+  AlgorithmFrame,
+  CodeSnippets,
+  LinkedListState,
+  DSOperationConfig,
+} from '@/engine/types'
 
 export const meta: AlgorithmMeta = {
   slug: 'linked-list',
@@ -8,15 +14,25 @@ export const meta: AlgorithmMeta = {
   complexity: {
     time: { best: 'O(1)', avg: 'O(n)', worst: 'O(n)' },
     space: 'O(n)',
+    operations: [
+      { name: 'insert head', best: 'O(1)', avg: 'O(1)', worst: 'O(1)' },
+      { name: 'insert tail', best: 'O(n)', avg: 'O(n)', worst: 'O(n)' },
+      { name: 'remove',      best: 'O(1)', avg: 'O(n)', worst: 'O(n)' },
+      { name: 'search',      best: 'O(1)', avg: 'O(n)', worst: 'O(n)' },
+    ],
   },
   tags: ['dynamic', 'sequential', 'pointer'],
   defaultInput: null,
   exercises: [
-    { platform: 'leetcode',   url: 'https://leetcode.com/problems/reverse-linked-list/',                              title: '#206 Reverse Linked List',        difficulty: 'Easy' },
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/reverse-linked-list/',                               title: '#206 Reverse Linked List',        difficulty: 'Easy' },
     { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/print-the-elements-of-a-linked-list/problem', title: 'Print Elements of a Linked List', difficulty: 'Easy' },
-    { platform: 'neetcode',   url: 'https://neetcode.io/problems/reverse-a-linked-list',                              title: 'Reverse a Linked List',           difficulty: 'Easy' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/reverse-a-linked-list',                               title: 'Reverse a Linked List',           difficulty: 'Easy' },
   ],
 }
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function cloneState(state: LinkedListState): LinkedListState {
   return {
@@ -28,13 +44,394 @@ function cloneState(state: LinkedListState): LinkedListState {
   }
 }
 
-export function* generator(_input: unknown): Generator<AlgorithmFrame> {
-  const state: LinkedListState = {
-    nodes: [],
-    head: null,
+/** Build a fresh LinkedListState with values inserted at head in order.
+ *  insertValues = [10, 20, 30] => list order 30->20->10 (head=n2) */
+function buildList(insertValues: number[]): { state: LinkedListState; nodeIds: string[] } {
+  const state: LinkedListState = { nodes: [], head: null }
+  const nodeIds: string[] = []
+  insertValues.forEach((val, i) => {
+    const id = `n${i}`
+    nodeIds.push(id)
+    state.nodes.unshift({ value: val, id, next: state.head })
+    state.head = id
+  })
+  return { state, nodeIds }
+}
+
+// ---------------------------------------------------------------------------
+// dsOperations generators
+// ---------------------------------------------------------------------------
+
+function* insertHeadGenerator(value?: number): Generator<AlgorithmFrame> {
+  const val = value ?? 42
+  const state: LinkedListState = { nodes: [], head: null }
+
+  // Step 1: Show empty list
+  yield {
+    state: cloneState(state),
+    highlights: [],
+    message: 'ds.linkedList.insertHead.init',
+    codeLine: 1,
   }
 
-  // Step 1: Start empty list
+  // Step 2: Create node and set as head
+  const newId = 'n0'
+  state.nodes.unshift({ value: val, id: newId, next: null })
+  state.head = newId
+
+  yield {
+    state: cloneState(state),
+    highlights: [{ index: newId, role: 'head', label: 'new' }],
+    message: 'ds.linkedList.insertHead.done',
+    codeLine: 2,
+  }
+}
+
+function* insertTailGenerator(value?: number): Generator<AlgorithmFrame> {
+  const val = value ?? 42
+
+  // Build initial list [10, 20, 30] inserted at head => 30->20->10
+  const { state, nodeIds } = buildList([10, 20, 30])
+  // nodeIds[0]='n0'(10), nodeIds[1]='n1'(20), nodeIds[2]='n2'(30)
+  // head = 'n2' (value 30)
+
+  // Step 1: show initial list
+  yield {
+    state: cloneState(state),
+    highlights: [],
+    message: 'ds.linkedList.insertTail.init',
+    codeLine: 1,
+  }
+
+  // Step 2: traverse to find tail, highlighting each node as curr
+  // Walk order: n2(30) -> n1(20) -> n0(10) -> null
+  let currId: string | null = state.head
+  let tailId: string | null = null
+  while (currId !== null) {
+    const node = state.nodes.find(n => n.id === currId)!
+    tailId = currId
+    yield {
+      state: cloneState(state),
+      highlights: [{ index: currId, role: 'current', label: 'curr' }],
+      message: 'ds.linkedList.insertTail.traversing',
+      codeLine: 3,
+    }
+    currId = node.next
+  }
+
+  // Step 3: insert new node at tail
+  const newId = `n${nodeIds.length}`
+  state.nodes.push({ value: val, id: newId, next: null })
+  // Update tail's next pointer
+  const tailNode = state.nodes.find(n => n.id === tailId)!
+  tailNode.next = newId
+
+  yield {
+    state: cloneState(state),
+    highlights: [
+      { index: tailId!, role: 'tail', label: 'curr' },
+      { index: newId,   role: 'head', label: 'new' },
+    ],
+    message: 'ds.linkedList.insertTail.done',
+    codeLine: 4,
+  }
+}
+
+function* searchGenerator(value?: number): Generator<AlgorithmFrame> {
+  const target = value ?? 20
+
+  // Build list [10, 20, 30] inserted at head => 30->20->10
+  const { state } = buildList([10, 20, 30])
+
+  // Step 1: init
+  yield {
+    state: cloneState(state),
+    highlights: [],
+    message: 'ds.linkedList.search.init',
+    codeLine: 1,
+  }
+
+  // Step 2: traverse searching for target
+  let currId: string | null = state.head
+  let found = false
+  while (currId !== null) {
+    const node = state.nodes.find(n => n.id === currId)!
+    if (node.value === target) {
+      // Step 3: found
+      yield {
+        state: cloneState(state),
+        highlights: [{ index: currId, role: 'found', label: 'found' }],
+        message: 'ds.linkedList.search.found',
+        codeLine: 4,
+      }
+      found = true
+      break
+    } else {
+      yield {
+        state: cloneState(state),
+        highlights: [{ index: currId, role: 'current', label: 'curr' }],
+        message: 'ds.linkedList.search.checking',
+        codeLine: 3,
+      }
+    }
+    currId = node.next
+  }
+
+  // Step 4: not found
+  if (!found) {
+    yield {
+      state: cloneState(state),
+      highlights: [],
+      message: 'ds.linkedList.search.notFound',
+      codeLine: 5,
+    }
+  }
+}
+
+function* traverseGenerator(_value?: number): Generator<AlgorithmFrame> {
+  // Build list [10, 20, 30] inserted at head => 30->20->10
+  const { state } = buildList([10, 20, 30])
+
+  // Step 1: show full list
+  yield {
+    state: cloneState(state),
+    highlights: [],
+    message: 'ds.linkedList.traverse.init',
+    codeLine: 1,
+  }
+
+  // Step 2: traverse each node
+  let currId: string | null = state.head
+  while (currId !== null) {
+    const node = state.nodes.find(n => n.id === currId)!
+    yield {
+      state: cloneState(state),
+      highlights: [{ index: currId, role: 'current', label: 'curr' }],
+      message: 'ds.linkedList.traverse.visiting',
+      codeLine: 3,
+    }
+    currId = node.next
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Per-operation code snippets
+// ---------------------------------------------------------------------------
+
+const insertHeadSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'function insertAtHead(val: number) {' },
+    { line: 2, code: '  head = new ListNode(val, head)' },
+    { line: 3, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def insert_at_head(val):' },
+    { line: 2, code: '    head = ListNode(val, head)' },
+    { line: 3, code: '' },
+  ],
+  c: [
+    { line: 1, code: 'void insertAtHead(int val) {' },
+    { line: 2, code: '    Node* n = malloc(sizeof(Node)); n->val = val; n->next = head; head = n;' },
+    { line: 3, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'void insertAtHead(int val) {' },
+    { line: 2, code: '    ListNode n = new ListNode(val); n.next = head; head = n;' },
+    { line: 3, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func insertAtHead(val int) {' },
+    { line: 2, code: '    head = &ListNode{Val: val, Next: head}' },
+    { line: 3, code: '}' },
+  ],
+}
+
+const insertTailSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'function insertAtTail(val: number) {' },
+    { line: 2, code: '  if (!head) { head = new ListNode(val); return }' },
+    { line: 3, code: '  let curr = head' },
+    { line: 4, code: '  while (curr.next) curr = curr.next' },
+    { line: 5, code: '  curr.next = new ListNode(val)' },
+    { line: 6, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def insert_at_tail(val):' },
+    { line: 2, code: '    if not head: head = ListNode(val); return' },
+    { line: 3, code: '    curr = head' },
+    { line: 4, code: '    while curr.next: curr = curr.next' },
+    { line: 5, code: '    curr.next = ListNode(val)' },
+    { line: 6, code: '' },
+  ],
+  c: [
+    { line: 1, code: 'void insertAtTail(int val) {' },
+    { line: 2, code: '    if (!head) { head = newNode(val); return; }' },
+    { line: 3, code: '    Node* curr = head;' },
+    { line: 4, code: '    while (curr->next) curr = curr->next;' },
+    { line: 5, code: '    curr->next = newNode(val);' },
+    { line: 6, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'void insertAtTail(int val) {' },
+    { line: 2, code: '    if (head == null) { head = new ListNode(val); return; }' },
+    { line: 3, code: '    ListNode curr = head;' },
+    { line: 4, code: '    while (curr.next != null) curr = curr.next;' },
+    { line: 5, code: '    curr.next = new ListNode(val);' },
+    { line: 6, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func insertAtTail(val int) {' },
+    { line: 2, code: '    if head == nil { head = &ListNode{Val: val}; return }' },
+    { line: 3, code: '    curr := head' },
+    { line: 4, code: '    for curr.Next != nil { curr = curr.Next }' },
+    { line: 5, code: '    curr.Next = &ListNode{Val: val}' },
+    { line: 6, code: '}' },
+  ],
+}
+
+const searchSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'function search(val: number): boolean {' },
+    { line: 2, code: '  let curr = head' },
+    { line: 3, code: '  while (curr) {' },
+    { line: 4, code: '    if (curr.val === val) return true' },
+    { line: 5, code: '    curr = curr.next' },
+    { line: 6, code: '  }' },
+    { line: 7, code: '  return false' },
+    { line: 8, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def search(val) -> bool:' },
+    { line: 2, code: '    curr = head' },
+    { line: 3, code: '    while curr:' },
+    { line: 4, code: '        if curr.val == val: return True' },
+    { line: 5, code: '        curr = curr.next' },
+    { line: 6, code: '    return False' },
+    { line: 7, code: '' },
+    { line: 8, code: '' },
+  ],
+  c: [
+    { line: 1, code: 'int search(int val) {' },
+    { line: 2, code: '    Node* curr = head;' },
+    { line: 3, code: '    while (curr) {' },
+    { line: 4, code: '        if (curr->val == val) return 1;' },
+    { line: 5, code: '        curr = curr->next;' },
+    { line: 6, code: '    }' },
+    { line: 7, code: '    return 0;' },
+    { line: 8, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'boolean search(int val) {' },
+    { line: 2, code: '    ListNode curr = head;' },
+    { line: 3, code: '    while (curr != null) {' },
+    { line: 4, code: '        if (curr.val == val) return true;' },
+    { line: 5, code: '        curr = curr.next;' },
+    { line: 6, code: '    }' },
+    { line: 7, code: '    return false;' },
+    { line: 8, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func search(val int) bool {' },
+    { line: 2, code: '    curr := head' },
+    { line: 3, code: '    for curr != nil {' },
+    { line: 4, code: '        if curr.Val == val { return true }' },
+    { line: 5, code: '        curr = curr.Next' },
+    { line: 6, code: '    }' },
+    { line: 7, code: '    return false' },
+    { line: 8, code: '}' },
+  ],
+}
+
+const traverseSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'function traverse() {' },
+    { line: 2, code: '  let curr = head' },
+    { line: 3, code: '  while (curr) {' },
+    { line: 4, code: '    console.log(curr.val)' },
+    { line: 5, code: '    curr = curr.next' },
+    { line: 6, code: '  }' },
+    { line: 7, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def traverse():' },
+    { line: 2, code: '    curr = head' },
+    { line: 3, code: '    while curr:' },
+    { line: 4, code: '        print(curr.val)' },
+    { line: 5, code: '        curr = curr.next' },
+    { line: 6, code: '' },
+    { line: 7, code: '' },
+  ],
+  c: [
+    { line: 1, code: 'void traverse() {' },
+    { line: 2, code: '    Node* curr = head;' },
+    { line: 3, code: '    while (curr) {' },
+    { line: 4, code: '        printf("%d ", curr->val);' },
+    { line: 5, code: '        curr = curr->next;' },
+    { line: 6, code: '    }' },
+    { line: 7, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'void traverse() {' },
+    { line: 2, code: '    ListNode curr = head;' },
+    { line: 3, code: '    while (curr != null) {' },
+    { line: 4, code: '        System.out.println(curr.val);' },
+    { line: 5, code: '        curr = curr.next;' },
+    { line: 6, code: '    }' },
+    { line: 7, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func traverse() {' },
+    { line: 2, code: '    curr := head' },
+    { line: 3, code: '    for curr != nil {' },
+    { line: 4, code: '        fmt.Println(curr.Val)' },
+    { line: 5, code: '        curr = curr.Next' },
+    { line: 6, code: '    }' },
+    { line: 7, code: '}' },
+  ],
+}
+
+// ---------------------------------------------------------------------------
+// dsOperations export
+// ---------------------------------------------------------------------------
+
+export const dsOperations: DSOperationConfig[] = [
+  {
+    type: 'insert',
+    label: 'Insert Head',
+    takesValue: true,
+    generator: insertHeadGenerator,
+    codeSnippets: insertHeadSnippets,
+  },
+  {
+    type: 'insert',
+    label: 'Insert Tail',
+    takesValue: true,
+    generator: insertTailGenerator,
+    codeSnippets: insertTailSnippets,
+  },
+  {
+    type: 'search',
+    label: 'Search',
+    takesValue: true,
+    generator: searchGenerator,
+    codeSnippets: searchSnippets,
+  },
+  {
+    type: 'traverse',
+    label: 'Traverse',
+    takesValue: false,
+    generator: traverseGenerator,
+    codeSnippets: traverseSnippets,
+  },
+]
+
+// ---------------------------------------------------------------------------
+// Backwards-compat generator (traverse demo)
+// ---------------------------------------------------------------------------
+
+export function* generator(_input: unknown): Generator<AlgorithmFrame> {
+  const state: LinkedListState = { nodes: [], head: null }
+
   yield {
     state: cloneState(state),
     highlights: [],
@@ -42,7 +439,6 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     codeLine: 1,
   }
 
-  // Insert helper: insert at head
   let nodeCounter = 0
 
   function insertAtHead(value: number): string {
@@ -53,7 +449,6 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     return id
   }
 
-  // Step 2: Insert 10 at head
   const id10 = insertAtHead(10)
   state.current = id10
   yield {
@@ -64,7 +459,6 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     auxState: { v: 10 },
   }
 
-  // Step 3: Insert 20 at head
   const id20 = insertAtHead(20)
   state.current = id20
   yield {
@@ -75,7 +469,6 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     auxState: { v: 20 },
   }
 
-  // Step 4: Insert 30 at head
   const id30 = insertAtHead(30)
   state.current = id30
   yield {
@@ -86,8 +479,6 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     auxState: { v: 30 },
   }
 
-  // Step 5: Traverse: move current pointer through all nodes
-  // List is: 30 -> 20 -> 10 -> null (head = id30)
   state.current = undefined
   state.prev = undefined
 
@@ -112,7 +503,9 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     cursor = node.next
   }
 
-  // Step 6: Delete node with value 20
+  let prevId: string | null = null
+  let currId: string | null = state.head
+
   yield {
     state: cloneState(state),
     highlights: [],
@@ -121,8 +514,6 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     auxState: { target: 20 },
   }
 
-  let prevId: string | null = null
-  let currId: string | null = state.head
   while (currId !== null) {
     const node = state.nodes.find(n => n.id === currId)!
     state.current = currId
@@ -140,14 +531,12 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     }
 
     if (node.value === 20) {
-      // Found: update pointers
       if (prevId === null) {
         state.head = node.next
       } else {
         const prevNode = state.nodes.find(n => n.id === prevId)!
         prevNode.next = node.next
       }
-      // Remove from nodes array
       state.nodes = state.nodes.filter(n => n.id !== currId)
       state.current = undefined
       state.prev = undefined
@@ -174,17 +563,21 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Top-level codeSnippets (backwards compat — full class view)
+// ---------------------------------------------------------------------------
+
 export const codeSnippets: CodeSnippets = {
   ts: [
-    { line: 1, code: 'class ListNode { constructor(public val: number, public next: ListNode | null = null) {} }' },
-    { line: 2, code: 'let head: ListNode | null = null' },
-    { line: 3, code: 'function insertAtHead(val: number) {' },
-    { line: 4, code: '  head = new ListNode(val, head)' },
-    { line: 5, code: '}' },
-    { line: 6, code: 'function traverse() {' },
-    { line: 7, code: '  let cur = head' },
-    { line: 8, code: '  while (cur) { console.log(cur.val); cur = cur.next }' },
-    { line: 9, code: '}' },
+    { line: 1,  code: 'class ListNode { constructor(public val: number, public next: ListNode | null = null) {} }' },
+    { line: 2,  code: 'let head: ListNode | null = null' },
+    { line: 3,  code: 'function insertAtHead(val: number) {' },
+    { line: 4,  code: '  head = new ListNode(val, head)' },
+    { line: 5,  code: '}' },
+    { line: 6,  code: 'function traverse() {' },
+    { line: 7,  code: '  let cur = head' },
+    { line: 8,  code: '  while (cur) { console.log(cur.val); cur = cur.next }' },
+    { line: 9,  code: '}' },
     { line: 10, code: 'function deleteVal(val: number) {' },
     { line: 11, code: '  if (!head) return' },
     { line: 12, code: '  if (head.val === val) { head = head.next; return }' },
@@ -194,15 +587,15 @@ export const codeSnippets: CodeSnippets = {
     { line: 16, code: '}' },
   ],
   python: [
-    { line: 1, code: 'class ListNode:' },
-    { line: 2, code: '    def __init__(self, val, next=None):' },
-    { line: 3, code: '        self.val = val; self.next = next' },
-    { line: 4, code: 'head = None' },
-    { line: 5, code: 'def insert_at_head(val):' },
-    { line: 6, code: '    global head' },
-    { line: 7, code: '    head = ListNode(val, head)' },
-    { line: 8, code: 'def traverse():' },
-    { line: 9, code: '    cur = head' },
+    { line: 1,  code: 'class ListNode:' },
+    { line: 2,  code: '    def __init__(self, val, next=None):' },
+    { line: 3,  code: '        self.val = val; self.next = next' },
+    { line: 4,  code: 'head = None' },
+    { line: 5,  code: 'def insert_at_head(val):' },
+    { line: 6,  code: '    global head' },
+    { line: 7,  code: '    head = ListNode(val, head)' },
+    { line: 8,  code: 'def traverse():' },
+    { line: 9,  code: '    cur = head' },
     { line: 10, code: '    while cur: print(cur.val); cur = cur.next' },
     { line: 11, code: 'def delete_val(val):' },
     { line: 12, code: '    global head' },
@@ -213,15 +606,15 @@ export const codeSnippets: CodeSnippets = {
     { line: 17, code: '        cur = cur.next' },
   ],
   c: [
-    { line: 1, code: 'typedef struct Node { int val; struct Node* next; } Node;' },
-    { line: 2, code: 'Node* head = NULL;' },
-    { line: 3, code: 'void insertAtHead(int val) {' },
-    { line: 4, code: '    Node* n = malloc(sizeof(Node));' },
-    { line: 5, code: '    n->val = val; n->next = head; head = n;' },
-    { line: 6, code: '}' },
-    { line: 7, code: 'void traverse() {' },
-    { line: 8, code: '    Node* cur = head;' },
-    { line: 9, code: '    while (cur) { printf("%d ", cur->val); cur = cur->next; }' },
+    { line: 1,  code: 'typedef struct Node { int val; struct Node* next; } Node;' },
+    { line: 2,  code: 'Node* head = NULL;' },
+    { line: 3,  code: 'void insertAtHead(int val) {' },
+    { line: 4,  code: '    Node* n = malloc(sizeof(Node));' },
+    { line: 5,  code: '    n->val = val; n->next = head; head = n;' },
+    { line: 6,  code: '}' },
+    { line: 7,  code: 'void traverse() {' },
+    { line: 8,  code: '    Node* cur = head;' },
+    { line: 9,  code: '    while (cur) { printf("%d ", cur->val); cur = cur->next; }' },
     { line: 10, code: '}' },
     { line: 11, code: 'void deleteVal(int val) {' },
     { line: 12, code: '    if (!head) return;' },
@@ -232,15 +625,15 @@ export const codeSnippets: CodeSnippets = {
     { line: 17, code: '}' },
   ],
   java: [
-    { line: 1, code: 'class ListNode { int val; ListNode next; ListNode(int v) { val = v; } }' },
-    { line: 2, code: 'ListNode head = null;' },
-    { line: 3, code: 'void insertAtHead(int val) {' },
-    { line: 4, code: '    ListNode n = new ListNode(val);' },
-    { line: 5, code: '    n.next = head; head = n;' },
-    { line: 6, code: '}' },
-    { line: 7, code: 'void traverse() {' },
-    { line: 8, code: '    ListNode cur = head;' },
-    { line: 9, code: '    while (cur != null) { System.out.print(cur.val); cur = cur.next; }' },
+    { line: 1,  code: 'class ListNode { int val; ListNode next; ListNode(int v) { val = v; } }' },
+    { line: 2,  code: 'ListNode head = null;' },
+    { line: 3,  code: 'void insertAtHead(int val) {' },
+    { line: 4,  code: '    ListNode n = new ListNode(val);' },
+    { line: 5,  code: '    n.next = head; head = n;' },
+    { line: 6,  code: '}' },
+    { line: 7,  code: 'void traverse() {' },
+    { line: 8,  code: '    ListNode cur = head;' },
+    { line: 9,  code: '    while (cur != null) { System.out.print(cur.val); cur = cur.next; }' },
     { line: 10, code: '}' },
     { line: 11, code: 'void deleteVal(int val) {' },
     { line: 12, code: '    if (head == null) return;' },
@@ -251,15 +644,15 @@ export const codeSnippets: CodeSnippets = {
     { line: 17, code: '}' },
   ],
   go: [
-    { line: 1, code: 'type ListNode struct { Val int; Next *ListNode }' },
-    { line: 2, code: 'var head *ListNode' },
-    { line: 3, code: 'func insertAtHead(val int) {' },
-    { line: 4, code: '    head = &ListNode{Val: val, Next: head}' },
-    { line: 5, code: '}' },
-    { line: 6, code: 'func traverse() {' },
-    { line: 7, code: '    cur := head' },
-    { line: 8, code: '    for cur != nil { fmt.Print(cur.Val); cur = cur.Next }' },
-    { line: 9, code: '}' },
+    { line: 1,  code: 'type ListNode struct { Val int; Next *ListNode }' },
+    { line: 2,  code: 'var head *ListNode' },
+    { line: 3,  code: 'func insertAtHead(val int) {' },
+    { line: 4,  code: '    head = &ListNode{Val: val, Next: head}' },
+    { line: 5,  code: '}' },
+    { line: 6,  code: 'func traverse() {' },
+    { line: 7,  code: '    cur := head' },
+    { line: 8,  code: '    for cur != nil { fmt.Print(cur.Val); cur = cur.Next }' },
+    { line: 9,  code: '}' },
     { line: 10, code: 'func deleteVal(val int) {' },
     { line: 11, code: '    if head == nil { return }' },
     { line: 12, code: '    if head.Val == val { head = head.Next; return }' },

@@ -1,4 +1,4 @@
-import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets } from '@/engine/types'
+import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets, DSOperationConfig, StackQueueState } from '@/engine/types'
 
 export const meta: AlgorithmMeta = {
   slug: 'queue',
@@ -8,6 +8,12 @@ export const meta: AlgorithmMeta = {
   complexity: {
     time: { best: 'O(1)', avg: 'O(1)', worst: 'O(1)' },
     space: 'O(n)',
+    operations: [
+      { name: 'enqueue', best: 'O(1)', avg: 'O(1)', worst: 'O(1)' },
+      { name: 'dequeue', best: 'O(1)', avg: 'O(1)', worst: 'O(1)' },
+      { name: 'peek',    best: 'O(1)', avg: 'O(1)', worst: 'O(1)' },
+      { name: 'search',  best: 'O(1)', avg: 'O(n)', worst: 'O(n)' },
+    ],
   },
   tags: ['FIFO', 'sequential', 'scheduling'],
   defaultInput: null,
@@ -18,21 +24,13 @@ export const meta: AlgorithmMeta = {
   ],
 }
 
-type QueueState = {
-  items: number[]
-  highlighted?: number
-  operation?: 'enqueue' | 'dequeue' | 'peek'
-}
+// ── Top-level demo generator (kept from original) ────────────────────────────
 
 export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   const items: number[] = []
 
-  function snapshot(op?: QueueState['operation'], highlighted?: number): QueueState {
-    return {
-      items: [...items],
-      highlighted,
-      operation: op,
-    }
+  function snapshot(op?: StackQueueState['operation'], highlighted?: number): StackQueueState {
+    return { items: [...items], highlighted, operation: op }
   }
 
   // enqueue(10)
@@ -128,6 +126,8 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   }
 }
 
+// ── Top-level codeSnippets (kept from original) ──────────────────────────────
+
 export const codeSnippets: CodeSnippets = {
   ts: [
     { line: 1, code: 'class Queue<T> {' },
@@ -191,3 +191,293 @@ export const codeSnippets: CodeSnippets = {
     { line: 11, code: 'q.Dequeue()  // 10' },
   ],
 }
+
+// ── Per-operation generators ──────────────────────────────────────────────────
+
+function* enqueueGenerator(value?: number): Generator<AlgorithmFrame> {
+  const val = value ?? 42
+  const items: number[] = [10, 20, 30]
+
+  // Frame 1: show current queue
+  yield {
+    state: { items: [...items], operation: 'enqueue' } as StackQueueState,
+    highlights: [],
+    message: 'ds.queue.enqueue.step1',
+    codeLine: 1,
+    auxState: { val },
+  }
+
+  // Frame 2: push value, highlight rear with label
+  items.push(val)
+  yield {
+    state: { items: [...items], highlighted: items.length - 1, operation: 'enqueue' } as StackQueueState,
+    highlights: [{ index: items.length - 1, role: 'current', label: 'rear' }],
+    message: 'ds.queue.enqueue.step2',
+    codeLine: 2,
+    auxState: { val },
+  }
+}
+
+function* dequeueGenerator(_value?: number): Generator<AlgorithmFrame> {
+  const items: number[] = [10, 20, 30]
+
+  // Frame 1: show queue
+  yield {
+    state: { items: [...items], operation: 'dequeue' } as StackQueueState,
+    highlights: [],
+    message: 'ds.queue.dequeue.step1',
+    codeLine: 1,
+  }
+
+  // Frame 2: highlight front
+  yield {
+    state: { items: [...items], highlighted: 0, operation: 'dequeue' } as StackQueueState,
+    highlights: [{ index: 0, role: 'selected', label: 'front' }],
+    message: 'ds.queue.dequeue.step2',
+    codeLine: 2,
+    auxState: { v: items[0] },
+  }
+
+  // Frame 3: remove front, show updated queue
+  const dequeued = items[0]
+  items.shift()
+  yield {
+    state: { items: [...items], operation: 'dequeue' } as StackQueueState,
+    highlights: [],
+    message: 'ds.queue.dequeue.step3',
+    codeLine: 3,
+    auxState: { v: dequeued },
+  }
+}
+
+function* peekGenerator(_value?: number): Generator<AlgorithmFrame> {
+  const items: number[] = [10, 20, 30]
+
+  // Frame 1: show queue
+  yield {
+    state: { items: [...items] } as StackQueueState,
+    highlights: [],
+    message: 'ds.queue.peek.step1',
+    codeLine: 1,
+  }
+
+  // Frame 2: highlight front with label
+  yield {
+    state: { items: [...items], highlighted: 0, operation: 'peek' } as StackQueueState,
+    highlights: [{ index: 0, role: 'selected', label: 'front' }],
+    message: 'ds.queue.peek.step2',
+    codeLine: 2,
+    auxState: { v: items[0] },
+  }
+}
+
+function* searchGenerator(value?: number): Generator<AlgorithmFrame> {
+  const val = value ?? 20
+  const items: number[] = [10, 20, 30]
+
+  // Frame 1: show queue
+  yield {
+    state: { items: [...items] } as StackQueueState,
+    highlights: [],
+    message: 'ds.queue.search.step1',
+    codeLine: 1,
+    auxState: { val },
+  }
+
+  // Iterate from front
+  for (let i = 0; i < items.length; i++) {
+    // Frame: checking index i
+    yield {
+      state: { items: [...items], highlighted: i } as StackQueueState,
+      highlights: [{ index: i, role: 'current', label: 'i' }],
+      message: 'ds.queue.search.step2',
+      codeLine: 3,
+      auxState: { val, i },
+    }
+
+    if (items[i] === val) {
+      // Frame: found
+      yield {
+        state: { items: [...items], highlighted: i } as StackQueueState,
+        highlights: [{ index: i, role: 'found', label: 'found' }],
+        message: 'ds.queue.search.found',
+        codeLine: 4,
+        auxState: { val, i },
+      }
+      return
+    }
+  }
+
+  // Frame: not found
+  yield {
+    state: { items: [...items] } as StackQueueState,
+    highlights: [],
+    message: 'ds.queue.search.notFound',
+    codeLine: 5,
+    auxState: { val },
+  }
+}
+
+// ── Per-operation codeSnippets ────────────────────────────────────────────────
+
+const enqueueSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'enqueue(val: T): void {' },
+    { line: 2, code: '  this.items.push(val)' },
+    { line: 3, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def enqueue(self, val):' },
+    { line: 2, code: '    self.items.append(val)' },
+  ],
+  c: [
+    { line: 1, code: 'void enqueue(int val) {' },
+    { line: 2, code: '  queue[rear++] = val;' },
+    { line: 3, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'void enqueue(int val) {' },
+    { line: 2, code: '  items.add(val);' },
+    { line: 3, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func (q *Queue) Enqueue(val int) {' },
+    { line: 2, code: '  q.items = append(q.items, val)' },
+    { line: 3, code: '}' },
+  ],
+}
+
+const dequeueSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'dequeue(): T | undefined {' },
+    { line: 2, code: '  if (this.isEmpty()) return undefined' },
+    { line: 3, code: '  return this.items.shift()' },
+    { line: 4, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def dequeue(self):' },
+    { line: 2, code: '  if not self.items: return None' },
+    { line: 3, code: '  return self.items.popleft()' },
+  ],
+  c: [
+    { line: 1, code: 'int dequeue() {' },
+    { line: 2, code: '  if (front == rear) return -1;' },
+    { line: 3, code: '  return queue[front++];' },
+    { line: 4, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'Integer dequeue() {' },
+    { line: 2, code: '  if (items.isEmpty()) return null;' },
+    { line: 3, code: '  return items.remove(0);' },
+    { line: 4, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func (q *Queue) Dequeue() (int, bool) {' },
+    { line: 2, code: '  if len(q.items) == 0 { return 0, false }' },
+    { line: 3, code: '  v := q.items[0]; q.items = q.items[1:]' },
+    { line: 4, code: '  return v, true' },
+    { line: 5, code: '}' },
+  ],
+}
+
+const peekSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'peek(): T | undefined {' },
+    { line: 2, code: '  return this.items[0]' },
+    { line: 3, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def peek(self):' },
+    { line: 2, code: '  return self.items[0] if self.items else None' },
+  ],
+  c: [
+    { line: 1, code: 'int peek() {' },
+    { line: 2, code: '  return queue[front];' },
+    { line: 3, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'Integer peek() {' },
+    { line: 2, code: '  return items.isEmpty() ? null : items.get(0);' },
+    { line: 3, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func (q *Queue) Peek() (int, bool) {' },
+    { line: 2, code: '  if len(q.items) == 0 { return 0, false }' },
+    { line: 3, code: '  return q.items[0], true' },
+    { line: 4, code: '}' },
+  ],
+}
+
+const searchQueueSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'search(val: T): number {' },
+    { line: 2, code: '  for (let i = 0; i < this.items.length; i++) {' },
+    { line: 3, code: '    if (this.items[i] === val) return i' },
+    { line: 4, code: '  }' },
+    { line: 5, code: '  return -1' },
+    { line: 6, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def search(self, val):' },
+    { line: 2, code: '  for i, item in enumerate(self.items):' },
+    { line: 3, code: '    if item == val: return i' },
+    { line: 4, code: '  return -1' },
+  ],
+  c: [
+    { line: 1, code: 'int search(int val) {' },
+    { line: 2, code: '  for (int i = front; i < rear; i++) {' },
+    { line: 3, code: '    if (queue[i] == val) return i - front;' },
+    { line: 4, code: '  }' },
+    { line: 5, code: '  return -1;' },
+    { line: 6, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'int search(int val) {' },
+    { line: 2, code: '  for (int i = 0; i < items.size(); i++) {' },
+    { line: 3, code: '    if (items.get(i) == val) return i;' },
+    { line: 4, code: '  }' },
+    { line: 5, code: '  return -1;' },
+    { line: 6, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func (q *Queue) Search(val int) int {' },
+    { line: 2, code: '  for i, v := range q.items {' },
+    { line: 3, code: '    if v == val { return i }' },
+    { line: 4, code: '  }' },
+    { line: 5, code: '  return -1' },
+    { line: 6, code: '}' },
+  ],
+}
+
+// ── dsOperations export ───────────────────────────────────────────────────────
+
+export const dsOperations: DSOperationConfig[] = [
+  {
+    type: 'insert',
+    label: 'Enqueue',
+    takesValue: true,
+    generator: enqueueGenerator,
+    codeSnippets: enqueueSnippets,
+  },
+  {
+    type: 'remove',
+    label: 'Dequeue',
+    takesValue: false,
+    generator: dequeueGenerator,
+    codeSnippets: dequeueSnippets,
+  },
+  {
+    type: 'traverse',
+    label: 'Peek',
+    takesValue: false,
+    generator: peekGenerator,
+    codeSnippets: peekSnippets,
+  },
+  {
+    type: 'search',
+    label: 'Search',
+    takesValue: true,
+    generator: searchGenerator,
+    codeSnippets: searchQueueSnippets,
+  },
+]

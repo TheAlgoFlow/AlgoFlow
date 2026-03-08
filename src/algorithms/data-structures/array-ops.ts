@@ -1,4 +1,4 @@
-import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets } from '@/engine/types'
+import type { AlgorithmMeta, AlgorithmFrame, CodeSnippets, DSOperationConfig } from '@/engine/types'
 
 export const meta: AlgorithmMeta = {
   slug: 'array-ops',
@@ -8,6 +8,12 @@ export const meta: AlgorithmMeta = {
   complexity: {
     time: { best: 'O(1)', avg: 'O(n)', worst: 'O(n)' },
     space: 'O(1)',
+    operations: [
+      { name: 'access',        best: 'O(1)', avg: 'O(1)', worst: 'O(1)' },
+      { name: 'insert middle', best: 'O(n)', avg: 'O(n)', worst: 'O(n)' },
+      { name: 'remove middle', best: 'O(n)', avg: 'O(n)', worst: 'O(n)' },
+      { name: 'search',        best: 'O(1)', avg: 'O(n)', worst: 'O(n)' },
+    ],
   },
   tags: ['fundamental', 'random-access'],
   defaultInput: null,
@@ -17,6 +23,396 @@ export const meta: AlgorithmMeta = {
     { platform: 'beecrowd',   url: 'https://www.beecrowd.com.br/judge/en/problems/view/1001',   title: '#1001 Extremely Basic',         difficulty: 'Easy' },
   ],
 }
+
+// ─── dsOperations ───────────────────────────────────────────────────────────
+
+function* insertGenerator(value: number = 42): Generator<AlgorithmFrame> {
+  const arr = [10, 20, 30, 40, 50]
+  const insertIdx = 2
+  const val = value
+
+  // Step 1: show initial array
+  yield {
+    state: { array: [...arr] },
+    highlights: [],
+    message: 'ds.arrayOps.insert.init',
+    codeLine: 1,
+  }
+
+  // Make room
+  arr.push(0)
+
+  // Step 2: shift elements right from end down to insertIdx
+  for (let i = arr.length - 1; i > insertIdx; i--) {
+    arr[i] = arr[i - 1]
+    yield {
+      state: { array: [...arr] },
+      highlights: [
+        { index: i,     role: 'swap',    label: 'i' },
+        { index: i - 1, role: 'compare', label: 'i-1' },
+      ],
+      message: 'ds.arrayOps.insert.shift',
+      codeLine: 3,
+    }
+  }
+
+  // Step 3: place new value
+  arr[insertIdx] = val
+  yield {
+    state: { array: [...arr] },
+    highlights: [{ index: insertIdx, role: 'found', label: 'new' }],
+    message: 'ds.arrayOps.insert.place',
+    codeLine: 4,
+  }
+
+  // Step 4: done
+  yield {
+    state: { array: [...arr] },
+    highlights: [],
+    message: 'ds.arrayOps.insert.done',
+    codeLine: 5,
+  }
+}
+
+function* removeGenerator(value: number = 30): Generator<AlgorithmFrame> {
+  const arr = [10, 20, 30, 40, 50]
+  const val = value
+
+  // Step 1: show initial array
+  yield {
+    state: { array: [...arr] },
+    highlights: [],
+    message: 'ds.arrayOps.remove.init',
+    codeLine: 1,
+  }
+
+  // Step 2: linear search for value
+  let foundIdx = -1
+  for (let i = 0; i < arr.length; i++) {
+    yield {
+      state: { array: [...arr] },
+      highlights: [{ index: i, role: 'current', label: 'i' }],
+      message: 'ds.arrayOps.remove.search',
+      codeLine: 3,
+    }
+    if (arr[i] === val) {
+      foundIdx = i
+      break
+    }
+  }
+
+  if (foundIdx === -1) {
+    yield {
+      state: { array: [...arr] },
+      highlights: [],
+      message: 'ds.arrayOps.remove.notFound',
+      codeLine: 4,
+    }
+    return
+  }
+
+  // Step 3: mark found element for deletion
+  yield {
+    state: { array: [...arr] },
+    highlights: [{ index: foundIdx, role: 'swap', label: 'del' }],
+    message: 'ds.arrayOps.remove.found',
+    codeLine: 4,
+  }
+
+  // Step 4: shift elements left
+  for (let i = foundIdx; i < arr.length - 1; i++) {
+    arr[i] = arr[i + 1]
+    yield {
+      state: { array: [...arr] },
+      highlights: [{ index: i, role: 'active', label: 'i' }],
+      message: 'ds.arrayOps.remove.shift',
+      codeLine: 5,
+    }
+  }
+
+  arr.length--
+
+  // Step 5: done
+  yield {
+    state: { array: [...arr] },
+    highlights: [],
+    message: 'ds.arrayOps.remove.done',
+    codeLine: 6,
+  }
+}
+
+function* searchGenerator(value: number = 30): Generator<AlgorithmFrame> {
+  const arr = [10, 20, 30, 40, 50]
+  const val = value
+
+  // Step 1: show initial array
+  yield {
+    state: { array: [...arr] },
+    highlights: [],
+    message: 'ds.arrayOps.search.init',
+    codeLine: 1,
+  }
+
+  // Step 2: iterate
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === val) {
+      // Step 3: found
+      yield {
+        state: { array: [...arr] },
+        highlights: [{ index: i, role: 'found', label: 'found' }],
+        message: 'ds.arrayOps.search.found',
+        codeLine: 4,
+      }
+      break
+    } else {
+      yield {
+        state: { array: [...arr] },
+        highlights: [{ index: i, role: 'current', label: 'i' }],
+        message: 'ds.arrayOps.search.checking',
+        codeLine: 3,
+      }
+    }
+  }
+
+  // Step 4: done
+  yield {
+    state: { array: [...arr] },
+    highlights: [],
+    message: 'ds.arrayOps.search.done',
+    codeLine: 5,
+  }
+}
+
+function* accessGenerator(value: number = 2): Generator<AlgorithmFrame> {
+  const arr = [10, 20, 30, 40, 50]
+  const idx = value
+
+  // Step 1: show initial array
+  yield {
+    state: { array: [...arr] },
+    highlights: [],
+    message: 'ds.arrayOps.access.init',
+    codeLine: 1,
+  }
+
+  // Step 2: highlight the accessed index
+  yield {
+    state: { array: [...arr] },
+    highlights: [{ index: idx, role: 'found', label: 'idx' }],
+    message: 'ds.arrayOps.access.done',
+    codeLine: 2,
+  }
+}
+
+const insertCodeSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'function insertAt(arr: number[], idx: number, val: number): void {' },
+    { line: 2, code: '  arr.length++' },
+    { line: 3, code: '  for (let i = arr.length - 1; i > idx; i--) {' },
+    { line: 4, code: '    arr[i] = arr[i - 1]' },
+    { line: 5, code: '  }' },
+    { line: 6, code: '  arr[idx] = val' },
+    { line: 7, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def insert_at(arr: list, idx: int, val: int) -> None:' },
+    { line: 2, code: '    arr.append(0)  # extend length' },
+    { line: 3, code: '    for i in range(len(arr) - 1, idx, -1):' },
+    { line: 4, code: '        arr[i] = arr[i - 1]' },
+    { line: 5, code: '    # end for' },
+    { line: 6, code: '    arr[idx] = val' },
+    { line: 7, code: '' },
+  ],
+  c: [
+    { line: 1, code: 'void insertAt(int arr[], int *n, int idx, int val) {' },
+    { line: 2, code: '    (*n)++;' },
+    { line: 3, code: '    for (int i = *n - 1; i > idx; i--) {' },
+    { line: 4, code: '        arr[i] = arr[i - 1];' },
+    { line: 5, code: '    }' },
+    { line: 6, code: '    arr[idx] = val;' },
+    { line: 7, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'void insertAt(int[] arr, int[] n, int idx, int val) {' },
+    { line: 2, code: '    n[0]++;' },
+    { line: 3, code: '    for (int i = n[0] - 1; i > idx; i--) {' },
+    { line: 4, code: '        arr[i] = arr[i - 1];' },
+    { line: 5, code: '    }' },
+    { line: 6, code: '    arr[idx] = val;' },
+    { line: 7, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func insertAt(arr []int, idx, val int) []int {' },
+    { line: 2, code: '    arr = append(arr, 0)' },
+    { line: 3, code: '    for i := len(arr) - 1; i > idx; i-- {' },
+    { line: 4, code: '        arr[i] = arr[i-1]' },
+    { line: 5, code: '    }' },
+    { line: 6, code: '    arr[idx] = val' },
+    { line: 7, code: '    return arr' },
+  ],
+}
+
+const removeCodeSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'function removeVal(arr: number[], val: number): void {' },
+    { line: 2, code: '  let idx = -1' },
+    { line: 3, code: '  for (let i = 0; i < arr.length; i++) {' },
+    { line: 4, code: '    if (arr[i] === val) { idx = i; break }' },
+    { line: 5, code: '  }' },
+    { line: 6, code: '  if (idx === -1) return' },
+    { line: 7, code: '  for (let i = idx; i < arr.length - 1; i++) arr[i] = arr[i + 1]' },
+    { line: 8, code: '  arr.length--' },
+    { line: 9, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def remove_val(arr: list, val: int) -> None:' },
+    { line: 2, code: '    idx = -1' },
+    { line: 3, code: '    for i in range(len(arr)):' },
+    { line: 4, code: '        if arr[i] == val: idx = i; break' },
+    { line: 5, code: '    if idx == -1: return' },
+    { line: 6, code: '    for i in range(idx, len(arr) - 1):' },
+    { line: 7, code: '        arr[i] = arr[i + 1]' },
+    { line: 8, code: '    arr.pop()' },
+    { line: 9, code: '' },
+  ],
+  c: [
+    { line: 1, code: 'void removeVal(int arr[], int *n, int val) {' },
+    { line: 2, code: '    int idx = -1;' },
+    { line: 3, code: '    for (int i = 0; i < *n; i++) {' },
+    { line: 4, code: '        if (arr[i] == val) { idx = i; break; }' },
+    { line: 5, code: '    }' },
+    { line: 6, code: '    if (idx == -1) return;' },
+    { line: 7, code: '    for (int i = idx; i < *n - 1; i++) arr[i] = arr[i + 1];' },
+    { line: 8, code: '    (*n)--;' },
+    { line: 9, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'int removeVal(int[] arr, int n, int val) {' },
+    { line: 2, code: '    int idx = -1;' },
+    { line: 3, code: '    for (int i = 0; i < n; i++) {' },
+    { line: 4, code: '        if (arr[i] == val) { idx = i; break; }' },
+    { line: 5, code: '    }' },
+    { line: 6, code: '    if (idx == -1) return n;' },
+    { line: 7, code: '    for (int i = idx; i < n - 1; i++) arr[i] = arr[i + 1];' },
+    { line: 8, code: '    return n - 1;' },
+    { line: 9, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func removeVal(arr []int, val int) []int {' },
+    { line: 2, code: '    idx := -1' },
+    { line: 3, code: '    for i, v := range arr {' },
+    { line: 4, code: '        if v == val { idx = i; break }' },
+    { line: 5, code: '    }' },
+    { line: 6, code: '    if idx == -1 { return arr }' },
+    { line: 7, code: '    return append(arr[:idx], arr[idx+1:]...)' },
+    { line: 8, code: '' },
+    { line: 9, code: '}' },
+  ],
+}
+
+const searchCodeSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'function search(arr: number[], val: number): number {' },
+    { line: 2, code: '  for (let i = 0; i < arr.length; i++) {' },
+    { line: 3, code: '    if (arr[i] === val) return i' },
+    { line: 4, code: '  }' },
+    { line: 5, code: '  return -1' },
+    { line: 6, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def search(arr: list, val: int) -> int:' },
+    { line: 2, code: '    for i, v in enumerate(arr):' },
+    { line: 3, code: '        if v == val: return i' },
+    { line: 4, code: '    # not found' },
+    { line: 5, code: '    return -1' },
+    { line: 6, code: '' },
+  ],
+  c: [
+    { line: 1, code: 'int search(int arr[], int n, int val) {' },
+    { line: 2, code: '    for (int i = 0; i < n; i++) {' },
+    { line: 3, code: '        if (arr[i] == val) return i;' },
+    { line: 4, code: '    }' },
+    { line: 5, code: '    return -1;' },
+    { line: 6, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'int search(int[] arr, int val) {' },
+    { line: 2, code: '    for (int i = 0; i < arr.length; i++) {' },
+    { line: 3, code: '        if (arr[i] == val) return i;' },
+    { line: 4, code: '    }' },
+    { line: 5, code: '    return -1;' },
+    { line: 6, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func search(arr []int, val int) int {' },
+    { line: 2, code: '    for i, v := range arr {' },
+    { line: 3, code: '        if v == val { return i }' },
+    { line: 4, code: '    }' },
+    { line: 5, code: '    return -1' },
+    { line: 6, code: '}' },
+  ],
+}
+
+const accessCodeSnippets: CodeSnippets = {
+  ts: [
+    { line: 1, code: 'function access(arr: number[], idx: number): number {' },
+    { line: 2, code: '  return arr[idx]' },
+    { line: 3, code: '}' },
+  ],
+  python: [
+    { line: 1, code: 'def access(arr: list, idx: int) -> int:' },
+    { line: 2, code: '    return arr[idx]' },
+    { line: 3, code: '' },
+  ],
+  c: [
+    { line: 1, code: 'int access(int arr[], int idx) {' },
+    { line: 2, code: '    return arr[idx];' },
+    { line: 3, code: '}' },
+  ],
+  java: [
+    { line: 1, code: 'int access(int[] arr, int idx) {' },
+    { line: 2, code: '    return arr[idx];' },
+    { line: 3, code: '}' },
+  ],
+  go: [
+    { line: 1, code: 'func access(arr []int, idx int) int {' },
+    { line: 2, code: '    return arr[idx]' },
+    { line: 3, code: '}' },
+  ],
+}
+
+export const dsOperations: DSOperationConfig[] = [
+  {
+    type: 'insert',
+    label: 'Insert',
+    takesValue: true,
+    generator: (value?: number) => insertGenerator(value),
+    codeSnippets: insertCodeSnippets,
+  },
+  {
+    type: 'remove',
+    label: 'Remove',
+    takesValue: true,
+    generator: (value?: number) => removeGenerator(value),
+    codeSnippets: removeCodeSnippets,
+  },
+  {
+    type: 'search',
+    label: 'Search',
+    takesValue: true,
+    generator: (value?: number) => searchGenerator(value),
+    codeSnippets: searchCodeSnippets,
+  },
+  {
+    type: 'search',
+    label: 'Access',
+    takesValue: true,
+    generator: (value?: number) => accessGenerator(value),
+    codeSnippets: accessCodeSnippets,
+  },
+]
+
+// ─── Top-level generator (demo: access → insert → delete → search) ──────────
 
 export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   // Step 1: Start with array [10, 20, 30, 40, 50]
@@ -39,11 +435,9 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   }
 
   // Step 3: Insert 25 at index 2 — shift elements right first
-  // arr = [10, 20, 30, 40, 50] → insert 25 at index 2
-  // shift: index 4←3←2, place 25 at 2 → [10, 20, 25, 30, 40, 50]
   const insertIndex = 2
   const insertValue = 25
-  arr.push(0) // make room
+  arr.push(0)
 
   for (let k = arr.length - 1; k > insertIndex; k--) {
     arr[k] = arr[k - 1]
@@ -68,7 +462,6 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   }
 
   // Step 4: Delete element at index 1 (value 20)
-  // arr = [10, 20, 25, 30, 40, 50] → delete index 1 → [10, 25, 30, 40, 50]
   const deleteIndex = 1
   yield {
     state: { array: [...arr], operation: 'delete' },

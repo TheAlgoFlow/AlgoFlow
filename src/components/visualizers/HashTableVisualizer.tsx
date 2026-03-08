@@ -1,6 +1,13 @@
 'use client'
 
-import type { AlgorithmFrame } from '@/engine/types'
+import type { AlgorithmFrame, HighlightRole } from '@/engine/types'
+
+const ROLE_COLORS: Partial<Record<HighlightRole, string>> = {
+  current: '#f59e0b',
+  active: '#6366f1',
+  found: '#10b981',
+  selected: '#8b5cf6',
+}
 
 type KVPair = { key: string; value: string }
 type HTState = { buckets: KVPair[][]; currentBucket: number | null; operation: string }
@@ -43,6 +50,10 @@ export function HashTableVisualizer({ frame }: HashTableVisualizerProps) {
     >
       {buckets.map((bucket, i) => {
         const isActive = i === currentBucket
+        const hl = frame.highlights.find(h => h.index === i)
+        const hlColor = hl ? (ROLE_COLORS[hl.role] ?? '#6366f1') : null
+        const rowColor = hlColor ?? (isActive ? '#6366f1' : null)
+
         return (
           <div
             key={i}
@@ -62,10 +73,10 @@ export function HashTableVisualizer({ frame }: HashTableVisualizerProps) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: '4px',
-                background: isActive ? 'rgba(99,102,241,0.2)' : 'rgba(30,41,59,0.5)',
+                background: rowColor ? `${rowColor}20` : 'rgba(30,41,59,0.5)',
                 border: '1px solid',
-                borderColor: isActive ? '#6366f1' : 'rgba(99,102,241,0.2)',
-                color: isActive ? '#a5b4fc' : '#64748b',
+                borderColor: rowColor ?? 'rgba(99,102,241,0.2)',
+                color: rowColor ?? '#64748b',
                 fontSize: '0.75rem',
                 fontWeight: 600,
                 flexShrink: 0,
@@ -101,10 +112,10 @@ export function HashTableVisualizer({ frame }: HashTableVisualizerProps) {
                       alignItems: 'center',
                       gap: '0',
                       border: '1px solid',
-                      borderColor: isActive ? '#6366f1' : 'rgba(99,102,241,0.3)',
+                      borderColor: rowColor ?? 'rgba(99,102,241,0.3)',
                       borderRadius: '4px',
                       overflow: 'hidden',
-                      background: isActive ? 'rgba(99,102,241,0.1)' : 'rgba(30,41,59,0.8)',
+                      background: rowColor ? `${rowColor}10` : 'rgba(30,41,59,0.8)',
                       transition: 'all 0.2s ease',
                     }}
                   >
@@ -132,6 +143,14 @@ export function HashTableVisualizer({ frame }: HashTableVisualizerProps) {
                 ))
               )}
             </div>
+
+            {/* Label arrow */}
+            {hl?.label && (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px' }}>
+                <span style={{ fontSize: '9px', color: hlColor ?? '#6366f1', lineHeight: 1 }}>◄</span>
+                <span style={{ fontSize: '11px', fontFamily: 'monospace', color: hlColor ?? '#6366f1', fontWeight: 700, whiteSpace: 'nowrap' }}>{hl.label}</span>
+              </div>
+            )}
           </div>
         )
       })}

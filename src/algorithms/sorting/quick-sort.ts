@@ -89,7 +89,6 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     yield {
       state: { array: [...arr] },
       highlights: [
-        { index: pivotIdx, role: 'sorted' },
         ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
       ],
       message: 'algorithms.quickSort.steps.place',

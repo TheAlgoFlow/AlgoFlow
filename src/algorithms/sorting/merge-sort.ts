@@ -81,12 +81,26 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
 
       while (i < left.length) {
         arr[k] = left[i]
+        yield {
+          state: { array: [...arr] },
+          highlights: [{ index: k, role: 'current' as const }],
+          message: 'algorithms.mergeSort.steps.pick',
+          codeLine: 9,
+          auxState: { placed: left[i], pos: k },
+        }
         i++
         k++
       }
 
       while (j < right.length) {
         arr[k] = right[j]
+        yield {
+          state: { array: [...arr] },
+          highlights: [{ index: k, role: 'current' as const }],
+          message: 'algorithms.mergeSort.steps.pick',
+          codeLine: 9,
+          auxState: { placed: right[j], pos: k },
+        }
         j++
         k++
       }

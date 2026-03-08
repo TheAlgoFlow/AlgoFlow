@@ -45,12 +45,12 @@ export function LinkedListVisualizer({ frame }: LinkedListVisualizerProps) {
   const orderedNodes: LLNode[] = []
   const nodeMap = new Map(nodes.map(n => [n.id, n]))
   let cur = head
-  const visited = new Set<string>()
-  while (cur && !visited.has(cur)) {
+  const visitedSet = new Set<string>()
+  while (cur && !visitedSet.has(cur)) {
     const node = nodeMap.get(cur)
     if (!node) break
     orderedNodes.push(node)
-    visited.add(cur)
+    visitedSet.add(cur)
     cur = node.next
   }
 
@@ -95,59 +95,71 @@ export function LinkedListVisualizer({ frame }: LinkedListVisualizerProps) {
               <div style={{ color: '#06b6d4', fontSize: '1rem' }}>→</div>
             </div>
 
-            {orderedNodes.map((node, i) => {
+            {orderedNodes.map((node) => {
               const color = getNodeColor(node.id)
               const isLast = node.next === null
+              const hl = frame.highlights.find(h => h.index === node.id)
 
               return (
                 <div
                   key={node.id}
                   style={{ display: 'flex', alignItems: 'center' }}
                 >
-                  {/* Node box */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      border: '2px solid',
-                      borderColor: color,
-                      borderRadius: '6px',
-                      overflow: 'hidden',
-                      background: `${color}15`,
-                      transition: 'all 0.2s ease',
-                      boxShadow: color === '#f59e0b' ? `0 0 12px ${color}50` : 'none',
-                    }}
-                  >
-                    {/* Value section */}
+                  {/* Node + label wrapper */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    {/* Node box */}
                     <div
                       style={{
-                        width: '44px',
-                        height: '44px',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        color,
-                        fontWeight: 700,
-                        fontSize: '1rem',
-                        borderRight: `1px solid ${color}50`,
+                        border: '2px solid',
+                        borderColor: color,
+                        borderRadius: '6px',
+                        overflow: 'hidden',
+                        background: `${color}15`,
+                        transition: 'all 0.2s ease',
+                        boxShadow: color === '#f59e0b' ? `0 0 12px ${color}50` : 'none',
                       }}
                     >
-                      {node.value}
+                      {/* Value section */}
+                      <div
+                        style={{
+                          width: '44px',
+                          height: '44px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color,
+                          fontWeight: 700,
+                          fontSize: '1rem',
+                          borderRight: `1px solid ${color}50`,
+                        }}
+                      >
+                        {node.value}
+                      </div>
+                      {/* Next pointer section */}
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '44px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: isLast ? '#475569' : color,
+                          fontSize: '0.75rem',
+                        }}
+                      >
+                        {isLast ? '∅' : '→'}
+                      </div>
                     </div>
-                    {/* Next pointer section */}
-                    <div
-                      style={{
-                        width: '32px',
-                        height: '44px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: isLast ? '#475569' : color,
-                        fontSize: '0.75rem',
-                      }}
-                    >
-                      {isLast ? '∅' : '→'}
-                    </div>
+
+                    {/* Label arrow */}
+                    {hl?.label && (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1px', marginTop: '4px' }}>
+                        <span style={{ fontSize: '9px', color: ROLE_COLORS[hl.role] ?? color, lineHeight: 1 }}>▲</span>
+                        <span style={{ fontSize: '11px', fontFamily: 'monospace', color: ROLE_COLORS[hl.role] ?? color, fontWeight: 700, whiteSpace: 'nowrap' }}>{hl.label}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Arrow between nodes */}

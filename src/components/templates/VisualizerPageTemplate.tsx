@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { LayoutGrid, BarChart2 } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { getCategoryTheme } from '@/components/constants/categoryTheme'
 import { CodePanel } from '@/components/molecules/CodePanel'
 import { VisualizerTopBar } from '@/components/organisms/VisualizerTopBar'
 import { VisualizerControlsDock } from '@/components/organisms/VisualizerControlsDock'
+import { DSOperationsPanel } from '@/components/organisms/DSOperationsPanel'
 import { InfoPanel } from '@/components/organisms/InfoPanel'
 import { PracticeSection } from '@/components/molecules/PracticeSection'
 import { ArrayBarsVisualizer } from '@/components/visualizers/ArrayBarsVisualizer'
@@ -18,7 +19,8 @@ import { GridVisualizer } from '@/components/visualizers/GridVisualizer'
 import { LinkedListVisualizer } from '@/components/visualizers/LinkedListVisualizer'
 import { StackQueueVisualizer } from '@/components/visualizers/StackQueueVisualizer'
 import { HashTableVisualizer } from '@/components/visualizers/HashTableVisualizer'
-import type { AlgorithmModule, AlgorithmFrame } from '@/engine/types'
+import { useAlgorithmPlayer } from '@/hooks/useAlgorithmPlayer'
+import type { AlgorithmModule, AlgorithmFrame, DSOperationConfig, CodeSnippets } from '@/engine/types'
 import type { PlayerState } from '@/hooks/useAlgorithmPlayer'
 
 // ── Slug classifiers ─────────────────────────────────────────────────────────
@@ -67,6 +69,8 @@ type Props = {
  * The full layout shell for any algorithm visualizer page.
  * Receives all data from the page; manages only visual layout state
  * (drag width, viz mode) internally.
+ * For DS pages with dsOperations, manages operation selection internally
+ * and drives a separate player.
  */
 export function VisualizerPageTemplate({
   algo,
@@ -84,6 +88,24 @@ export function VisualizerPageTemplate({
   const [isDragging, setIsDragging] = useState(false)
   const canvasRef = useRef<HTMLDivElement>(null)
 
+  // DS operations state
+  const [dsOpKey, setDsOpKey] = useState(0)  // bump to re-initialize player
+  const [activeDsOp, setActiveDsOp] = useState<DSOperationConfig | null>(
+    algo.dsOperations?.[0] ?? null
+  )
+  const [activeSnippets, setActiveSnippets] = useState<CodeSnippets | null>(
+    algo.dsOperations?.[0]?.codeSnippets ?? null
+  )
+
+  const dsGenerator = useMemo(() => {
+    if (!activeDsOp) return null
+    // dsOpKey is captured so bumping it creates a new fn reference → player re-initializes
+    return () => activeDsOp.generator(undefined)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeDsOp, dsOpKey])
+
+  const dsPlayer = useAlgorithmPlayer(algo.dsOperations ? dsGenerator : null)
+
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       if (!isDragging || !canvasRef.current) return
@@ -100,7 +122,11 @@ export function VisualizerPageTemplate({
     }
   }, [isDragging])
 
-  const frame = player.currentFrame
+  // Choose which player to display
+  const isDsPage = !!(algo.dsOperations && algo.dsOperations.length > 0)
+  const activePlayer = isDsPage ? dsPlayer : player
+
+  const frame = activePlayer.currentFrame
 
   // Resolve step message
   let stepMessage = ''
@@ -115,8 +141,22 @@ export function VisualizerPageTemplate({
   const isGraphAlgo   = ['bfs', 'dfs'].includes(slug)
   const isTreeOrDS    = ['binary-tree', 'bst', 'linked-list', 'stack', 'queue', 'hash-table', 'min-heap', 'array-ops'].includes(slug)
   const isSortingAlgo = SORTING_SLUGS.includes(slug)
-  const showArrayInput = !isGraphAlgo && !isTreeOrDS
+  const showArrayInput = !isGraphAlgo && !isTreeOrDS && !isDsPage
   const isArrayAlgo   = isSortingAlgo || isSearchAlgo || slug === 'array-ops'
+
+  const handleDsRun = useCallback((op: DSOperationConfig, value?: number) => {
+    // Create a new generator that captures the value
+    const opWithValue: DSOperationConfig = {
+      ...op,
+      generator: () => op.generator(value),
+    }
+    setActiveDsOp(opWithValue)
+    setActiveSnippets(op.codeSnippets)
+    setDsOpKey(k => k + 1)
+  }, [])
+
+  // Snippets to show in code panel
+  const displaySnippets = isDsPage && activeSnippets ? activeSnippets : algo.codeSnippets
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg)' }}>
@@ -234,21 +274,40 @@ export function VisualizerPageTemplate({
             transition: 'flex-basis 0.3s ease',
           }}
         >
-          <CodePanel snippets={algo.codeSnippets} activeLine={frame?.codeLine ?? 0} />
+          <CodePanel snippets={displaySnippets} activeLine={frame?.codeLine ?? 0} />
         </div>
       </div>
 
-      {/* ── Controls dock + input row ── */}
-      <VisualizerControlsDock
-        player={player}
-        message={stepMessage}
-        showArrayInput={showArrayInput}
-        isSearchAlgo={isSearchAlgo}
-        isSortingAlgo={isSortingAlgo}
-        color={color}
-        textColor={textColor}
-        onInputChange={onInputChange}
-      />
+      {/* ── Controls dock / DS operations ── */}
+      {isDsPage && algo.dsOperations ? (
+        <>
+          <DSOperationsPanel
+            operations={algo.dsOperations}
+            onRun={handleDsRun}
+          />
+          <VisualizerControlsDock
+            player={dsPlayer}
+            message={stepMessage}
+            showArrayInput={false}
+            isSearchAlgo={false}
+            isSortingAlgo={false}
+            color={color}
+            textColor={textColor}
+            onInputChange={onInputChange}
+          />
+        </>
+      ) : (
+        <VisualizerControlsDock
+          player={player}
+          message={stepMessage}
+          showArrayInput={showArrayInput}
+          isSearchAlgo={isSearchAlgo}
+          isSortingAlgo={isSortingAlgo}
+          color={color}
+          textColor={textColor}
+          onInputChange={onInputChange}
+        />
+      )}
 
       {/* ── Practice exercises ── */}
       <PracticeSection exercises={algo.meta.exercises} />
