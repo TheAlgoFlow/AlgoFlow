@@ -8,6 +8,10 @@ export const meta: AlgorithmMeta = {
   complexity: { time: { best: 'O(n)', avg: 'O(n²)', worst: 'O(n²)' }, space: 'O(1)' },
   tags: ['comparison', 'in-place', 'stable', 'adaptive'],
   defaultInput: [12, 11, 13, 5, 6],
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/insertion-sort-list/', title: '#147 Insertion Sort List', difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/insertionsort1/problem', title: 'Insertion Sort - Part 1',  difficulty: 'Easy' },
+  ],
 }
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {

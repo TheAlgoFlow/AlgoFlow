@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['fundamental', 'random-access'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/running-sum-of-1d-array/',    title: '#1480 Running Sum of 1d Array', difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/arrays-ds/problem',    title: 'Arrays - DS',                  difficulty: 'Easy' },
+    { platform: 'beecrowd',   url: 'https://www.beecrowd.com.br/judge/en/problems/view/1001',   title: '#1001 Extremely Basic',         difficulty: 'Easy' },
+  ],
 }
 
 export function* generator(_input: unknown): Generator<AlgorithmFrame> {

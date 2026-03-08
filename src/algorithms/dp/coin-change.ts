@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['optimization', 'minimum-coins', 'unbounded'],
   defaultInput: { coins: [1, 5, 6, 9], amount: 11 },
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/coin-change/',                             title: '#322 Coin Change',   difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/coin-change/problem',              title: 'The Coin Change Problem', difficulty: 'Easy' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/coin-change',                               title: 'Coin Change',        difficulty: 'Medium' },
+  ],
 }
 
 type CoinChangeInput = { coins: number[]; amount: number }

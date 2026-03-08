@@ -26,7 +26,7 @@ export function CategoryPageTemplate({ category, algorithms }: Props) {
   return (
     <div
       style={{
-        minHeight: 'calc(100vh - 64px)',
+        minHeight: '100vh',
         background: 'var(--bg)',
         animation: 'pageIn 0.2s ease',
       }}

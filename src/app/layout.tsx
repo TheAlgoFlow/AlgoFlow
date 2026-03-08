@@ -4,6 +4,7 @@ import { Fraunces, Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { I18nProvider } from '@/i18n/context'
 import { ThemeProvider } from '@/i18n/theme-context'
+import { SidebarProvider } from '@/i18n/sidebar-context'
 import { Nav } from '@/components/organisms/Nav'
 
 const fraunces = Fraunces({
@@ -52,8 +53,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <I18nProvider>
-            <Nav />
-            <main>{children}</main>
+            <SidebarProvider>
+              <Nav />
+              <main>
+                {children}
+              </main>
+            </SidebarProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>

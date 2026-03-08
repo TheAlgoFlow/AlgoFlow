@@ -1,70 +1,99 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Github, Search, Moon, Sun } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import {
+  Github, Moon, Sun,
+  BookOpen, TrendingUp, GitCompare, Home,
+  ChevronLeft, ChevronRight, Menu,
+} from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { useTheme } from '@/i18n/theme-context'
-import type { Locale } from '@/i18n/context'
-import { NavLink } from '@/components/atoms/NavLink'
-import { Kbd } from '@/components/atoms/Kbd'
-import { SearchOverlay } from '@/components/organisms/SearchOverlay'
+import { useSidebar } from '@/i18n/sidebar-context'
+
+const NAV_LINKS = [
+  { href: '/',          icon: Home,       labelKey: 'nav.home',      exact: true  },
+  { href: '/reference', icon: BookOpen,   labelKey: 'nav.reference', exact: false },
+  { href: '/big-o',     icon: TrendingUp, labelKey: 'nav.bigO',      exact: false },
+  { href: '/compare',   icon: GitCompare, labelKey: 'nav.compare',   exact: false },
+]
 
 export function Nav() {
   const { locale, setLocale, t } = useI18n()
   const { theme, toggleTheme } = useTheme()
-  const [scrolled, setScrolled] = useState(false)
-  const [searchOpen, setSearchOpen] = useState(false)
+  const { isExpanded, toggle } = useSidebar()
+  const pathname = usePathname()
   const isDark = theme === 'dark'
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        setSearchOpen(true)
-      }
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  function isActive(href: string, exact: boolean) {
+    if (exact) return pathname === href
+    return pathname.startsWith(href)
+  }
 
   return (
     <>
-      <nav
+      {/* Mobile hamburger (shown on small screens when sidebar is closed) */}
+      <button
+        onClick={toggle}
+        aria-label="Open menu"
         style={{
+          position: 'fixed',
+          top: '12px',
+          left: '12px',
+          zIndex: 51,
+          display: 'none',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '36px',
+          height: '36px',
+          borderRadius: '8px',
+          border: '1.5px solid var(--border)',
           background: 'var(--bg-card)',
-          borderBottom: `1px solid var(--border)`,
-          position: 'sticky',
+          color: 'var(--text-muted)',
+          cursor: 'pointer',
+        }}
+        className="mobile-menu-btn"
+      >
+        <Menu size={18} strokeWidth={2} />
+      </button>
+
+      {/* Sidebar */}
+      <aside
+        style={{
+          position: 'fixed',
           top: 0,
+          left: 0,
+          height: '100vh',
+          width: 'var(--sidebar-width)',
+          background: 'var(--bg-card)',
+          borderRight: '1px solid var(--border)',
+          display: 'flex',
+          flexDirection: 'column',
           zIndex: 50,
-          boxShadow: scrolled ? `0 1px 12px var(--shadow-sm)` : 'none',
+          transition: 'width 0.25s ease, transform 0.25s ease',
+          overflow: 'hidden',
         }}
       >
+        {/* Logo + toggle button row */}
         <div
           style={{
-            maxWidth: '1280px',
-            margin: '0 auto',
-            padding: '0 24px',
-            height: '64px',
             display: 'flex',
             alignItems: 'center',
-            gap: '24px',
+            justifyContent: isExpanded ? 'space-between' : 'center',
+            padding: isExpanded ? '0 8px 0 16px' : '0',
+            height: '56px',
+            flexShrink: 0,
+            borderBottom: '1px solid var(--border)',
           }}
         >
           {/* Logo */}
           <Link
             href="/"
             style={{
-              display: 'flex',
+              display: isExpanded ? 'flex' : 'none',
               alignItems: 'center',
               textDecoration: 'none',
-              fontSize: '20px',
+              fontSize: '18px',
               fontWeight: 900,
               letterSpacing: '-0.03em',
               lineHeight: 1,
@@ -79,117 +108,168 @@ export function Nav() {
             <span style={{ color: '#5200FF' }}>w</span>
           </Link>
 
-          {/* Nav links */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <NavLink href="/reference">{t('nav.reference')}</NavLink>
-            <NavLink href="/big-o">{t('nav.bigO')}</NavLink>
-            <NavLink href="/compare">{t('nav.compare')}</NavLink>
-          </div>
-
-          {/* Spacer */}
-          <div style={{ flex: 1 }} />
-
-          {/* Search pill */}
+          {/* Toggle button */}
           <button
-            onClick={() => setSearchOpen(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '7px 14px',
-              background: 'var(--bg-surface)',
-              border: `1px solid var(--border)`,
-              borderRadius: '999px',
-              color: 'var(--text-muted)',
-              fontSize: '12px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              boxShadow: `0 1px 3px var(--shadow-sm)`,
-              fontFamily: 'var(--font-body)',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = 'var(--border-hover)'
-              e.currentTarget.style.boxShadow = `0 2px 8px var(--shadow-md)`
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = 'var(--border)'
-              e.currentTarget.style.boxShadow = `0 1px 3px var(--shadow-sm)`
-            }}
-          >
-            <Search size={13} strokeWidth={2} />
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              {t('nav.searchPlaceholder')}
-              <Kbd>⌘K</Kbd>
-            </span>
-          </button>
-
-          {/* GitHub */}
-          <a
-            href="https://github.com/leo-stuart/AlgoFlow"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              color: 'var(--text-muted)',
-              textDecoration: 'none',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'var(--text)' }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)' }}
-          >
-            <Github size={18} strokeWidth={1.75} />
-          </a>
-
-          {/* Dark mode toggle */}
-          <button
-            onClick={toggleTheme}
-            title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            onClick={toggle}
+            aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
             style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: '34px',
-              height: '34px',
-              borderRadius: '8px',
-              border: `1.5px solid var(--border)`,
-              background: isDark ? 'rgba(82,0,255,0.12)' : 'transparent',
-              color: isDark ? '#5200FF' : 'var(--text-muted)',
+              width: '28px',
+              height: '28px',
+              borderRadius: '6px',
+              border: '1.5px solid var(--border)',
+              background: 'transparent',
+              color: 'var(--text-muted)',
               cursor: 'pointer',
               flexShrink: 0,
             }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'var(--bg-muted)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+          >
+            {isExpanded
+              ? <ChevronLeft size={14} strokeWidth={2.5} />
+              : <ChevronRight size={14} strokeWidth={2.5} />
+            }
+          </button>
+        </div>
+
+        {/* Nav links */}
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '8px', flexShrink: 0 }}>
+          {NAV_LINKS.map(({ href, icon: Icon, labelKey, exact }) => {
+            const active = isActive(href, exact)
+            return (
+              <Link
+                key={href}
+                href={href}
+                title={!isExpanded ? t(labelKey) : undefined}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: isExpanded ? '8px 10px' : '8px',
+                  justifyContent: isExpanded ? 'flex-start' : 'center',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  fontSize: '13px',
+                  fontWeight: active ? 600 : 500,
+                  color: active ? '#5200FF' : 'var(--text-muted)',
+                  background: active ? 'rgba(82,0,255,0.07)' : 'transparent',
+                  borderLeft: active ? '3px solid #5200FF' : '3px solid transparent',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+                onMouseEnter={e => {
+                  if (!active) {
+                    e.currentTarget.style.background = 'var(--bg-muted)'
+                    e.currentTarget.style.color = 'var(--text)'
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!active) {
+                    e.currentTarget.style.background = 'transparent'
+                    e.currentTarget.style.color = 'var(--text-muted)'
+                  }
+                }}
+              >
+                <Icon size={16} strokeWidth={active ? 2.5 : 2} style={{ flexShrink: 0 }} />
+                {isExpanded && (
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>{t(labelKey)}</span>
+                )}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Spacer */}
+        <div style={{ flex: 1 }} />
+
+        {/* Bottom section */}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            padding: '8px',
+            borderTop: '1px solid var(--border)',
+            flexShrink: 0,
+          }}
+        >
+          {/* Theme toggle — label reflects current state */}
+          <button
+            onClick={toggleTheme}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              justifyContent: isExpanded ? 'flex-start' : 'center',
+              padding: isExpanded ? '8px 10px' : '8px',
+              borderRadius: '8px',
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--text-muted)',
+              fontSize: '12px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              fontFamily: 'var(--font-body)',
+              width: '100%',
+            }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = 'var(--border-hover)'
-              e.currentTarget.style.background = isDark ? 'rgba(82,0,255,0.18)' : 'var(--bg-muted)'
+              e.currentTarget.style.background = 'var(--bg-muted)'
+              e.currentTarget.style.color = 'var(--text)'
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.borderColor = 'var(--border)'
-              e.currentTarget.style.background = isDark ? 'rgba(82,0,255,0.12)' : 'transparent'
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = 'var(--text-muted)'
             }}
           >
             {isDark
-              ? <Sun size={15} strokeWidth={2} />
-              : <Moon size={15} strokeWidth={2} />
+              ? <Moon size={15} strokeWidth={2} style={{ flexShrink: 0 }} />
+              : <Sun size={15} strokeWidth={2} style={{ flexShrink: 0 }} />
             }
+            {isExpanded && <span>{isDark ? 'Dark mode' : 'Light mode'}</span>}
           </button>
 
-          {/* Divider */}
-          <div style={{ width: '1px', height: '20px', background: 'var(--border)' }} />
-
-          {/* Language toggle */}
-          <div style={{ display: 'flex', gap: '4px' }}>
-            {(['en', 'pt'] as Locale[]).map(lang => (
+          {/* Language — segmented pill when expanded, compact badge when collapsed */}
+          {isExpanded ? (
+            <div style={{ display: 'flex', gap: '4px', padding: '2px 10px' }}>
+              {(['en', 'pt'] as const).map(lang => (
+                <button
+                  key={lang}
+                  onClick={() => setLocale(lang)}
+                  style={{
+                    flex: 1,
+                    padding: '6px 0',
+                    borderRadius: '7px',
+                    border: locale === lang ? '1.5px solid #5200FF' : '1.5px solid var(--border)',
+                    background: locale === lang ? 'rgba(82,0,255,0.08)' : 'transparent',
+                    color: locale === lang ? '#5200FF' : 'var(--text-muted)',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    fontFamily: 'var(--font-mono)',
+                    transition: 'background 0.15s, color 0.15s, border-color 0.15s',
+                  }}
+                >
+                  {lang.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '2px 0' }}>
               <button
-                key={lang}
-                onClick={() => setLocale(lang)}
+                onClick={() => setLocale(locale === 'en' ? 'pt' : 'en')}
+                title={locale === 'en' ? 'Português' : 'English'}
                 style={{
-                  padding: '5px 11px',
-                  borderRadius: '8px',
-                  border: '1.5px solid',
-                  borderColor: locale === lang ? '#5200FF' : 'transparent',
-                  background: locale === lang ? 'rgba(82,0,255,0.06)' : 'transparent',
-                  color: locale === lang ? '#5200FF' : 'var(--text-muted)',
-                  fontSize: '11px',
+                  padding: '5px 8px',
+                  borderRadius: '6px',
+                  border: '1.5px solid #5200FF',
+                  background: 'rgba(82,0,255,0.06)',
+                  color: '#5200FF',
+                  fontSize: '10px',
                   fontWeight: 700,
                   cursor: 'pointer',
                   textTransform: 'uppercase',
@@ -197,14 +277,51 @@ export function Nav() {
                   fontFamily: 'var(--font-mono)',
                 }}
               >
-                {lang === 'en' ? 'EN' : 'PT'}
+                {locale.toUpperCase()}
               </button>
-            ))}
-          </div>
-        </div>
-      </nav>
+            </div>
+          )}
 
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+          {/* GitHub */}
+          <a
+            href="https://github.com/leo-stuart/AlgoFlow"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="GitHub"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              justifyContent: isExpanded ? 'flex-start' : 'center',
+              padding: isExpanded ? '8px 10px' : '8px',
+              borderRadius: '8px',
+              color: 'var(--text-muted)',
+              textDecoration: 'none',
+              fontSize: '12px',
+              fontWeight: 500,
+              fontFamily: 'var(--font-body)',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.color = 'var(--text)'
+              e.currentTarget.style.background = 'var(--bg-muted)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.color = 'var(--text-muted)'
+              e.currentTarget.style.background = 'transparent'
+            }}
+          >
+            <Github size={15} strokeWidth={1.75} style={{ flexShrink: 0 }} />
+            {isExpanded && <span>GitHub</span>}
+          </a>
+        </div>
+      </aside>
+
+      {/* Mobile-only: show hamburger button */}
+      <style>{`
+        @media (max-width: 768px) {
+          .mobile-menu-btn { display: flex !important; }
+        }
+      `}</style>
     </>
   )
 }

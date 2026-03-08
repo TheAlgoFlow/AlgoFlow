@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['tree', 'hierarchical', 'traversal'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/binary-tree-inorder-traversal/',            title: '#94 Binary Tree Inorder Traversal', difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/tree-inorder-traversal/problem',    title: 'Tree: Inorder Traversal',           difficulty: 'Easy' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/binary-tree-inorder-traversal',              title: 'Binary Tree Inorder Traversal',     difficulty: 'Easy' },
+  ],
 }
 
 type BinaryTreeNode = {

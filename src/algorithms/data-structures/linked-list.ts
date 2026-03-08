@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['dynamic', 'sequential', 'pointer'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/reverse-linked-list/',                              title: '#206 Reverse Linked List',        difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/print-the-elements-of-a-linked-list/problem', title: 'Print Elements of a Linked List', difficulty: 'Easy' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/reverse-a-linked-list',                              title: 'Reverse a Linked List',           difficulty: 'Easy' },
+  ],
 }
 
 function cloneState(state: LinkedListState): LinkedListState {

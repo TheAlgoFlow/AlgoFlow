@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['FIFO', 'sequential', 'scheduling'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/implement-queue-using-stacks/',              title: '#232 Implement Queue Using Stacks', difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/queue-using-two-stacks/problem',     title: 'Queue Using Two Stacks',            difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/implement-queue-using-stacks',                title: 'Implement Queue Using Stacks',      difficulty: 'Easy' },
+  ],
 }
 
 type QueueState = {

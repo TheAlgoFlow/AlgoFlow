@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['LIFO', 'sequential', 'recursive'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/valid-parentheses/',                    title: '#20 Valid Parentheses',    difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/maximum-element/problem',       title: 'Maximum Element',          difficulty: 'Easy' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/validate-parentheses',                   title: 'Valid Parentheses',        difficulty: 'Easy' },
+  ],
 }
 
 export function* generator(_input: unknown): Generator<AlgorithmFrame> {

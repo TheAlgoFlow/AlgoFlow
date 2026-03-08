@@ -8,6 +8,10 @@ export const meta: AlgorithmMeta = {
   complexity: { time: { best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n log n)' }, space: 'O(1)' },
   tags: ['comparison', 'in-place', 'unstable'],
   defaultInput: [12, 11, 13, 5, 6, 7],
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/kth-largest-element-in-an-array/',          title: '#215 Kth Largest Element', difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/find-the-running-median/problem',   title: 'Find the Running Median',  difficulty: 'Hard' },
+  ],
 }
 
 function* heapify(

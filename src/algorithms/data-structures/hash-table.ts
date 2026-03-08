@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['hash', 'key-value', 'O(1)-lookup'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/two-sum/',                                   title: '#1 Two Sum',          difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/sherlock-and-anagrams/problem',      title: 'Sherlock and Anagrams', difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/two-integer-sum',                             title: 'Two Sum',             difficulty: 'Easy' },
+  ],
 }
 
 type HashEntry = { key: string; value: string }

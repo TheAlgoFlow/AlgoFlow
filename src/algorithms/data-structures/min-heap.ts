@@ -11,6 +11,10 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['heap', 'priority-queue', 'complete-tree'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/kth-largest-element-in-an-array/',          title: '#215 Kth Largest Element',  difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/jesse-and-cookies/problem',         title: 'Jesse and Cookies',         difficulty: 'Easy' },
+  ],
 }
 
 type MinHeapState = {

@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['subsequence', 'patience-sort', 'ordering'],
   defaultInput: [10, 9, 2, 5, 3, 7, 101, 18],
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/longest-increasing-subsequence/',                   title: '#300 Longest Increasing Subsequence',  difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/longest-increasing-subsequent/problem',     title: 'Longest Increasing Subsequence',       difficulty: 'Hard' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/longest-increasing-subsequence',                     title: 'Longest Increasing Subsequence',       difficulty: 'Medium' },
+  ],
 }
 
 type LISState = { array: number[]; dp: number[] }

@@ -30,6 +30,28 @@
   --font-mono:    var(--font-jetbrains), 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
+/* ── Sidebar layout ── */
+:root {
+  --sidebar-width: 220px;
+  --sidebar-collapsed-width: 56px;
+}
+:root[data-sidebar="collapsed"] { --sidebar-width: 56px; }
+@media (max-width: 768px) {
+  :root { --sidebar-width: 0px; }
+  :root[data-sidebar="open"] { --sidebar-width: 220px; }
+}
+
+/* ── Main content margin (mirrors sidebar width) ── */
+main {
+  margin-left: 220px;
+  transition: margin-left 0.25s ease;
+}
+:root[data-sidebar="collapsed"] main { margin-left: 56px; }
+@media (max-width: 768px) {
+  main { margin-left: 0px; }
+  :root[data-sidebar="open"] main { margin-left: 220px; }
+}
+
 /* ── Light mode (default) ── */
 :root {
   --bg:           #F5F1EB;

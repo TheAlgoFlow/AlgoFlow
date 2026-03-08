@@ -208,7 +208,7 @@ export default function BigOPage() {
   }))
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 64px)' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto', padding: 'clamp(40px,6vw,80px) 24px' }}>
 
         {/* ── Header ── */}

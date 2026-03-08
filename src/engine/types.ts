@@ -55,6 +55,15 @@ export type CodeLine = {
   code: string
 }
 
+export type ExercisePlatform = 'leetcode' | 'beecrowd' | 'hackerrank' | 'neetcode'
+
+export type ExerciseLink = {
+  platform: ExercisePlatform
+  url: string
+  title: string
+  difficulty: 'Easy' | 'Medium' | 'Hard'
+}
+
 export type AlgorithmMeta = {
   slug: string
   category: AlgorithmCategory
@@ -63,6 +72,7 @@ export type AlgorithmMeta = {
   complexity: Complexity
   tags: string[]
   defaultInput?: unknown
+  exercises?: ExerciseLink[]
 }
 
 export type AlgorithmModule = {

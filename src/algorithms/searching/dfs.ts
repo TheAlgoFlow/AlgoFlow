@@ -61,6 +61,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['graph', 'recursive', 'backtracking'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/number-of-islands/',                      title: '#200 Number of Islands',               difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/dfs-connected-cell-in-a-grid/problem', title: 'DFS: Connected Cell in a Grid',   difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/number-of-islands',                        title: 'Number of Islands',                    difficulty: 'Medium' },
+  ],
 };
 
 // ---------------------------------------------------------------------------

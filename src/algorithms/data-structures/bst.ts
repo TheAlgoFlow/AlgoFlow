@@ -11,6 +11,11 @@ export const meta: AlgorithmMeta = {
   },
   tags: ['tree', 'hierarchical', 'ordered', 'search'],
   defaultInput: null,
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/search-in-a-binary-search-tree/',              title: '#700 Search in a BST',              difficulty: 'Easy' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/is-binary-search-tree/problem',        title: 'Is This a Binary Search Tree?',     difficulty: 'Medium' },
+    { platform: 'neetcode',   url: 'https://neetcode.io/problems/search-in-a-binary-search-tree',                title: 'Search in a Binary Search Tree',    difficulty: 'Easy' },
+  ],
 }
 
 type BSTNode = {

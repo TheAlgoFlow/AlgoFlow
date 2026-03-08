@@ -8,6 +8,10 @@ export const meta: AlgorithmMeta = {
   complexity: { time: { best: 'O(n log n)', avg: 'O(n log n)', worst: 'O(n log n)' }, space: 'O(n)' },
   tags: ['divide-and-conquer', 'stable', 'not-in-place'],
   defaultInput: [38, 27, 43, 3, 9, 82, 10],
+  exercises: [
+    { platform: 'leetcode',   url: 'https://leetcode.com/problems/sort-list/',                       title: '#148 Sort List',  difficulty: 'Medium' },
+    { platform: 'hackerrank', url: 'https://www.hackerrank.com/challenges/ctci-merge-sort/problem',  title: 'Merge Sort: Counting Inversions', difficulty: 'Hard' },
+  ],
 }
 
 export function* generator(input: unknown): Generator<AlgorithmFrame> {

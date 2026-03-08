@@ -157,7 +157,7 @@ function ComparePageInner() {
   ] : []
 
   return (
-    <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 64px)' }}>
+    <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: 'clamp(32px,5vw,60px) 24px' }}>
 
         {/* ── Header ── */}
@@ -554,7 +554,7 @@ export default function ComparePage() {
   const { t } = useI18n()
   return (
     <Suspense fallback={
-      <div style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 64px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '13px' }}>
+      <div style={{ background: 'var(--bg)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', fontSize: '13px' }}>
         {t('compare.loading')}
       </div>
     }>

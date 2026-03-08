@@ -8,6 +8,7 @@ import { CodePanel } from '@/components/molecules/CodePanel'
 import { VisualizerTopBar } from '@/components/organisms/VisualizerTopBar'
 import { VisualizerControlsDock } from '@/components/organisms/VisualizerControlsDock'
 import { InfoPanel } from '@/components/organisms/InfoPanel'
+import { PracticeSection } from '@/components/molecules/PracticeSection'
 import { ArrayBarsVisualizer } from '@/components/visualizers/ArrayBarsVisualizer'
 import { ArraySearchVisualizer } from '@/components/visualizers/ArraySearchVisualizer'
 import { ArrayBoxesVisualizer } from '@/components/visualizers/ArrayBoxesVisualizer'
@@ -118,7 +119,7 @@ export function VisualizerPageTemplate({
   const isArrayAlgo   = isSortingAlgo || isSearchAlgo || slug === 'array-ops'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)', background: 'var(--bg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* ── Top bar ── */}
       <VisualizerTopBar
@@ -248,6 +249,9 @@ export function VisualizerPageTemplate({
         textColor={textColor}
         onInputChange={onInputChange}
       />
+
+      {/* ── Practice exercises ── */}
+      <PracticeSection exercises={algo.meta.exercises} />
 
       {/* ── Info panel ── */}
       <InfoPanel
