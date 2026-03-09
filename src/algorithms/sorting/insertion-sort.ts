@@ -17,6 +17,8 @@ export const meta: AlgorithmMeta = {
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
+  let comparisons = 0
+  let swaps = 0
 
   for (let i = 1; i < n; i++) {
     const key = arr[i]
@@ -24,32 +26,34 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     // Yield: pick the element to insert
     yield {
       state: { array: [...arr] },
-      highlights: [{ index: i, role: 'selected' }],
+      highlights: [{ index: i, role: 'selected', label: 'key' }],
       message: 'algorithms.insertionSort.steps.pick',
       codeLine: 2,
-      auxState: { key, i },
+      auxState: { key, i, comparisons, swaps },
     }
 
     let j = i - 1
 
     while (j >= 0 && arr[j] > key) {
+      comparisons++
       // Yield: comparing arr[j] with key
       yield {
         state: { array: [...arr] },
-        highlights: [{ index: j, role: 'compare' }, { index: j + 1, role: 'selected' }],
+        highlights: [{ index: j, role: 'compare', label: 'j' }, { index: j + 1, role: 'selected', label: 'key' }],
         message: 'algorithms.insertionSort.steps.compare',
         codeLine: 4,
-        auxState: { key, compared: arr[j], j },
+        auxState: { key, compared: arr[j], j, comparisons, swaps },
       }
 
       // Shift arr[j] right
+      swaps++
       arr[j + 1] = arr[j]
       yield {
         state: { array: [...arr] },
-        highlights: [{ index: j, role: 'compare' }, { index: j + 1, role: 'swap' }],
+        highlights: [{ index: j, role: 'compare', label: 'j' }, { index: j + 1, role: 'swap', label: 'key' }],
         message: 'algorithms.insertionSort.steps.compare',
         codeLine: 5,
-        auxState: { key, shifted: arr[j + 1], j },
+        auxState: { key, shifted: arr[j + 1], j, comparisons, swaps },
       }
 
       j--
@@ -62,7 +66,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: [{ index: j + 1, role: 'selected' }],
       message: 'algorithms.insertionSort.steps.insert',
       codeLine: 7,
-      auxState: { key, pos: j + 1 },
+      auxState: { key, pos: j + 1, comparisons, swaps },
     }
   }
 
@@ -71,6 +75,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.insertionSort.steps.done',
     codeLine: 8,
+    auxState: { comparisons, swaps },
   }
 }
 

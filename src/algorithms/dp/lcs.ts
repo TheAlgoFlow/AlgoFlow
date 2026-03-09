@@ -40,14 +40,18 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'algorithms.lcs.steps.init',
     codeLine: 1,
-    auxState: { m, n },
+    auxState: { m, n, fills: 0, matches: 0 },
   }
 
+  let fills = 0
+  let matches = 0
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
       if (s1[i - 1] === s2[j - 1]) {
         // Characters match: extend LCS from diagonal
         dp[i][j] = dp[i - 1][j - 1] + 1
+        fills++
+        matches++
         yield {
           state: { dp: dp.map(row => [...row]), s1, s2, current: [i, j] } as LCSState,
           highlights: [
@@ -56,11 +60,12 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           ],
           message: 'algorithms.lcs.steps.match',
           codeLine: 5,
-          auxState: { c: s1[i - 1], i, j, v: dp[i][j] },
+          auxState: { c: s1[i - 1], i, j, v: dp[i][j], fills, matches, formula: `dp[${i}][${j}]=dp[${i-1}][${j-1}]+1` },
         }
       } else {
         // Characters differ: take max of top or left
         dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1])
+        fills++
         yield {
           state: { dp: dp.map(row => [...row]), s1, s2, current: [i, j] } as LCSState,
           highlights: [
@@ -70,7 +75,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           ],
           message: 'algorithms.lcs.steps.noMatch',
           codeLine: 8,
-          auxState: { i, j, a: dp[i - 1][j], b: dp[i][j - 1], v: dp[i][j] },
+          auxState: { i, j, a: dp[i - 1][j], b: dp[i][j - 1], v: dp[i][j], fills, matches, formula: `dp[${i}][${j}]=max(${dp[i-1][j]},${dp[i][j-1]})` },
         }
       }
     }
@@ -81,7 +86,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [{ index: `${m},${n}`, role: 'dp-fill' }],
     message: 'algorithms.lcs.steps.done',
     codeLine: 10,
-    auxState: { v: dp[m][n] },
+    auxState: { v: dp[m][n], fills, matches },
   }
 }
 

@@ -18,6 +18,8 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
   const sortedIndices = new Set<number>()
+  let comparisons = 0
+  let swaps = 0
 
   // AEDS2: iterative quick sort with middle pivot + Hoare-like two-pointer partition
   const stack: Array<[number, number]> = [[0, n - 1]]
@@ -37,12 +39,14 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     yield {
       state: { array: [...arr] },
       highlights: [
-        { index: midIdx, role: 'pivot' },
+        { index: midIdx, role: 'pivot', label: 'pivot' },
+        { index: lo, role: 'pointer', label: 'lo' },
+        { index: hi, role: 'pointer', label: 'hi' },
         ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
       ],
       message: 'algorithms.quickSort.steps.pivot',
       codeLine: 3,
-      auxState: { pivotVal, lo, hi },
+      auxState: { pivotVal, lo, hi, comparisons, swaps },
     }
 
     // Hoare-like partition: two pointers scanning inward
@@ -54,31 +58,33 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       while (arr[j] > pivotVal) j--
 
       if (i <= j) {
+        comparisons++
         yield {
           state: { array: [...arr] },
           highlights: [
-            { index: i, role: 'compare' },
-            { index: j, role: 'compare' },
+            { index: i, role: 'compare', label: 'i' },
+            { index: j, role: 'compare', label: 'j' },
             ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
           ],
           message: 'algorithms.quickSort.steps.compare',
           codeLine: 7,
-          auxState: { i, j, a: arr[i], b: arr[j], pivotVal },
+          auxState: { i, j, a: arr[i], b: arr[j], pivotVal, comparisons, swaps },
         }
 
         ;[arr[i], arr[j]] = [arr[j], arr[i]]
 
         if (i !== j) {
+          swaps++
           yield {
             state: { array: [...arr] },
             highlights: [
-              { index: i, role: 'swap' },
-              { index: j, role: 'swap' },
+              { index: i, role: 'swap', label: 'i' },
+              { index: j, role: 'swap', label: 'j' },
               ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
             ],
             message: 'algorithms.quickSort.steps.swap',
             codeLine: 8,
-            auxState: { i, j, a: arr[i], b: arr[j] },
+            auxState: { i, j, a: arr[i], b: arr[j], comparisons, swaps },
           }
         }
 
@@ -98,7 +104,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.quickSort.steps.place',
       codeLine: 12,
-      auxState: { lo, hi, leftEnd: j, rightStart: i },
+      auxState: { lo, hi, leftEnd: j, rightStart: i, comparisons, swaps },
     }
 
     if (lo < j) stack.push([lo, j])
@@ -113,6 +119,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.quickSort.steps.done',
     codeLine: 14,
+    auxState: { comparisons, swaps },
   }
 }
 

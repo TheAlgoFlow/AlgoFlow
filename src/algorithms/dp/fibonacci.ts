@@ -27,29 +27,33 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const dp: (number | null)[] = Array(n + 1).fill(null)
 
   // Base cases
+  let fills = 0
   dp[0] = 0
+  fills++
   yield {
     state: { dp: [...dp], n } as FibState,
     highlights: [{ index: 0, role: 'dp-current' }],
     message: 'algorithms.fibonacci.steps.fill',
     codeLine: 2,
-    auxState: { n: 0, v: 0 },
+    auxState: { n: 0, v: 0, fills, formula: 'dp[0] = 0' },
   }
 
   if (n >= 1) {
     dp[1] = 1
+    fills++
     yield {
       state: { dp: [...dp], n } as FibState,
       highlights: [{ index: 1, role: 'dp-current' }],
       message: 'algorithms.fibonacci.steps.fill',
       codeLine: 3,
-      auxState: { n: 1, v: 1 },
+      auxState: { n: 1, v: 1, fills, formula: 'dp[1] = 1' },
     }
   }
 
   // Fill dp[i] = dp[i-1] + dp[i-2]
   for (let i = 2; i <= n; i++) {
     dp[i] = (dp[i - 1] as number) + (dp[i - 2] as number)
+    fills++
     yield {
       state: { dp: [...dp], n } as FibState,
       highlights: [
@@ -59,7 +63,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.fibonacci.steps.fill',
       codeLine: 5,
-      auxState: { n: i, a: i - 1, b: i - 2, v: dp[i] },
+      auxState: { n: i, a: i - 1, b: i - 2, v: dp[i], fills, formula: `dp[${i}] = dp[${i-1}] + dp[${i-2}]` },
     }
   }
 
@@ -68,7 +72,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: Array.from({ length: n + 1 }, (_, idx) => ({ index: idx, role: 'dp-fill' as const })),
     message: 'algorithms.fibonacci.steps.done',
     codeLine: 7,
-    auxState: { n: input === null ? n : (input as FibInput).n, v: dp[n] },
+    auxState: { n: input === null ? n : (input as FibInput).n, v: dp[n], fills },
   }
 }
 

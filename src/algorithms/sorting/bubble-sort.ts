@@ -19,33 +19,37 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
   const sorted: number[] = []
+  let comparisons = 0
+  let swaps = 0
 
   // AEDS2: outer i < n, inner j < n-1 (naive, no early-exit optimisation)
   for (let i = 0; i < n; i++) {
     for (let j = 0; j < n - 1; j++) {
+      comparisons++
       yield {
         state: { array: [...arr] },
-        highlights: [{ index: j, role: 'compare' }, { index: j + 1, role: 'compare' }],
+        highlights: [{ index: j, role: 'compare', label: 'j' }, { index: j + 1, role: 'compare', label: 'j+1' }],
         message: 'algorithms.bubbleSort.steps.comparing',
         codeLine: 4,
-        auxState: { a: arr[j], b: arr[j + 1] },
+        auxState: { a: arr[j], b: arr[j + 1], comparisons, swaps },
       }
       if (arr[j] > arr[j + 1]) {
+        swaps++
         ;[arr[j], arr[j + 1]] = [arr[j + 1], arr[j]]
         yield {
           state: { array: [...arr] },
-          highlights: [{ index: j, role: 'swap' }, { index: j + 1, role: 'swap' }],
+          highlights: [{ index: j, role: 'swap', label: 'j' }, { index: j + 1, role: 'swap', label: 'j+1' }],
           message: 'algorithms.bubbleSort.steps.swap',
           codeLine: 7,
-          auxState: { a: arr[j], b: arr[j + 1] },
+          auxState: { a: arr[j], b: arr[j + 1], comparisons, swaps },
         }
       } else {
         yield {
           state: { array: [...arr] },
-          highlights: [{ index: j, role: 'compare' }, { index: j + 1, role: 'compare' }],
+          highlights: [{ index: j, role: 'compare', label: 'j' }, { index: j + 1, role: 'compare', label: 'j+1' }],
           message: 'algorithms.bubbleSort.steps.noSwap',
           codeLine: 5,
-          auxState: { a: arr[j], b: arr[j + 1] },
+          auxState: { a: arr[j], b: arr[j + 1], comparisons, swaps },
         }
       }
     }
@@ -56,7 +60,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         highlights: sorted.map(s => ({ index: s, role: 'sorted' as const })),
         message: 'algorithms.bubbleSort.steps.sorted',
         codeLine: 10,
-        auxState: { v: arr[n - 1 - i] },
+        auxState: { v: arr[n - 1 - i], comparisons, swaps },
       }
     }
   }
@@ -65,6 +69,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.bubbleSort.steps.done',
     codeLine: 11,
+    auxState: { comparisons, swaps },
   }
 }
 

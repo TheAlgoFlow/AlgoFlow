@@ -62,11 +62,13 @@ function buildList(insertValues: number[]): { state: LinkedListState; nodeIds: s
 // dsOperations generators
 // ---------------------------------------------------------------------------
 
-function* insertHeadGenerator(value?: number): Generator<AlgorithmFrame> {
+function* insertHeadGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 42
-  const state: LinkedListState = { nodes: [], head: null }
+  const state: LinkedListState = initialState
+    ? { nodes: (initialState as LinkedListState).nodes.map(n => ({ ...n })), head: (initialState as LinkedListState).head }
+    : { nodes: [], head: null }
 
-  // Step 1: Show empty list
+  // Step 1: Show current list
   yield {
     state: cloneState(state),
     highlights: [],
@@ -75,7 +77,9 @@ function* insertHeadGenerator(value?: number): Generator<AlgorithmFrame> {
   }
 
   // Step 2: Create node and set as head
-  const newId = 'n0'
+  const existingIds = state.nodes.map(n => parseInt(n.id.replace('n', ''), 10)).filter(n => !isNaN(n))
+  const nextCounter = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 0
+  const newId = `n${nextCounter}`
   state.nodes.unshift({ value: val, id: newId, next: null })
   state.head = newId
 
@@ -87,13 +91,20 @@ function* insertHeadGenerator(value?: number): Generator<AlgorithmFrame> {
   }
 }
 
-function* insertTailGenerator(value?: number): Generator<AlgorithmFrame> {
+function* insertTailGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 42
 
-  // Build initial list [10, 20, 30] inserted at head => 30->20->10
-  const { state, nodeIds } = buildList([10, 20, 30])
-  // nodeIds[0]='n0'(10), nodeIds[1]='n1'(20), nodeIds[2]='n2'(30)
-  // head = 'n2' (value 30)
+  // Build initial list or use persistent state
+  let state: LinkedListState
+  if (initialState) {
+    state = { nodes: (initialState as LinkedListState).nodes.map(n => ({ ...n })), head: (initialState as LinkedListState).head }
+  } else {
+    const built = buildList([10, 20, 30])
+    state = built.state
+  }
+  // Derive next node ID counter from existing nodes
+  const existingIds = state.nodes.map(n => parseInt(n.id.replace('n', ''), 10)).filter(n => !isNaN(n))
+  const nextCounter = existingIds.length > 0 ? Math.max(...existingIds) + 1 : 0
 
   // Step 1: show initial list
   yield {
@@ -120,28 +131,35 @@ function* insertTailGenerator(value?: number): Generator<AlgorithmFrame> {
   }
 
   // Step 3: insert new node at tail
-  const newId = `n${nodeIds.length}`
+  const newId = `n${nextCounter}`
   state.nodes.push({ value: val, id: newId, next: null })
-  // Update tail's next pointer
-  const tailNode = state.nodes.find(n => n.id === tailId)!
-  tailNode.next = newId
+  if (tailId !== null) {
+    // Update tail's next pointer
+    const tailNode = state.nodes.find(n => n.id === tailId)!
+    tailNode.next = newId
+  } else {
+    // List was empty — new node is also head
+    state.head = newId
+  }
 
   yield {
     state: cloneState(state),
     highlights: [
-      { index: tailId!, role: 'tail', label: 'curr' },
-      { index: newId,   role: 'head', label: 'new' },
+      ...(tailId !== null ? [{ index: tailId, role: 'tail' as const, label: 'curr' }] : []),
+      { index: newId, role: 'head' as const, label: 'new' },
     ],
     message: 'ds.linkedList.insertTail.done',
     codeLine: 4,
   }
 }
 
-function* searchGenerator(value?: number): Generator<AlgorithmFrame> {
+function* searchGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const target = value ?? 20
 
-  // Build list [10, 20, 30] inserted at head => 30->20->10
-  const { state } = buildList([10, 20, 30])
+  // Build list [10, 20, 30] or use persistent state
+  const { state } = initialState
+    ? { state: { nodes: (initialState as LinkedListState).nodes.map(n => ({ ...n })), head: (initialState as LinkedListState).head } as LinkedListState }
+    : buildList([10, 20, 30])
 
   // Step 1: init
   yield {
@@ -154,24 +172,29 @@ function* searchGenerator(value?: number): Generator<AlgorithmFrame> {
   // Step 2: traverse searching for target
   let currId: string | null = state.head
   let found = false
+  let steps = 0
   while (currId !== null) {
     const node = state.nodes.find(n => n.id === currId)!
     if (node.value === target) {
       // Step 3: found
+      steps++
       yield {
         state: cloneState(state),
         highlights: [{ index: currId, role: 'found', label: 'found' }],
         message: 'ds.linkedList.search.found',
         codeLine: 4,
+        auxState: { steps },
       }
       found = true
       break
     } else {
+      steps++
       yield {
         state: cloneState(state),
         highlights: [{ index: currId, role: 'current', label: 'curr' }],
         message: 'ds.linkedList.search.checking',
         codeLine: 3,
+        auxState: { steps },
       }
     }
     currId = node.next
@@ -184,13 +207,16 @@ function* searchGenerator(value?: number): Generator<AlgorithmFrame> {
       highlights: [],
       message: 'ds.linkedList.search.notFound',
       codeLine: 5,
+      auxState: { steps },
     }
   }
 }
 
-function* traverseGenerator(_value?: number): Generator<AlgorithmFrame> {
-  // Build list [10, 20, 30] inserted at head => 30->20->10
-  const { state } = buildList([10, 20, 30])
+function* traverseGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  // Build list [10, 20, 30] or use persistent state
+  const { state } = initialState
+    ? { state: { nodes: (initialState as LinkedListState).nodes.map(n => ({ ...n })), head: (initialState as LinkedListState).head } as LinkedListState }
+    : buildList([10, 20, 30])
 
   // Step 1: show full list
   yield {
@@ -202,13 +228,16 @@ function* traverseGenerator(_value?: number): Generator<AlgorithmFrame> {
 
   // Step 2: traverse each node
   let currId: string | null = state.head
+  let steps = 0
   while (currId !== null) {
     const node = state.nodes.find(n => n.id === currId)!
+    steps++
     yield {
       state: cloneState(state),
       highlights: [{ index: currId, role: 'current', label: 'curr' }],
       message: 'ds.linkedList.traverse.visiting',
       codeLine: 3,
+      auxState: { steps },
     }
     currId = node.next
   }
@@ -399,28 +428,28 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'insert',
     label: 'Insert Head',
     takesValue: true,
-    generator: insertHeadGenerator,
+    generator: (value?: number, initialState?: unknown) => insertHeadGenerator(value, initialState),
     codeSnippets: insertHeadSnippets,
   },
   {
     type: 'insert',
     label: 'Insert Tail',
     takesValue: true,
-    generator: insertTailGenerator,
+    generator: (value?: number, initialState?: unknown) => insertTailGenerator(value, initialState),
     codeSnippets: insertTailSnippets,
   },
   {
     type: 'search',
     label: 'Search',
     takesValue: true,
-    generator: searchGenerator,
+    generator: (value?: number, initialState?: unknown) => searchGenerator(value, initialState),
     codeSnippets: searchSnippets,
   },
   {
     type: 'traverse',
     label: 'Traverse',
     takesValue: false,
-    generator: traverseGenerator,
+    generator: (value?: number, initialState?: unknown) => traverseGenerator(value, initialState),
     codeSnippets: traverseSnippets,
   },
 ]

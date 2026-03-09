@@ -47,6 +47,8 @@ export function GridVisualizer({ frame }: GridVisualizerProps) {
     n?: number
   }
 
+  const formula = (frame.auxState as { formula?: string } | undefined)?.formula
+
   // 2D DP table
   if (state.dp && Array.isArray(state.dp[0])) {
     const table = state.dp as (number | null)[][]
@@ -162,6 +164,16 @@ export function GridVisualizer({ frame }: GridVisualizerProps) {
             </tbody>
           </table>
         </div>
+        {formula && (
+          <div style={{
+            textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px',
+            color: 'var(--text-muted)', background: 'var(--bg-surface)',
+            border: '1px solid var(--border)', borderRadius: '6px',
+            padding: '4px 12px', flexShrink: 0,
+          }}>
+            {formula}
+          </div>
+        )}
       </div>
     )
   }
@@ -274,6 +286,18 @@ export function GridVisualizer({ frame }: GridVisualizerProps) {
           </div>
         ))}
       </div>
+
+      {/* Formula strip */}
+      {formula && (
+        <div style={{
+          textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '11px',
+          color: 'var(--text-muted)', background: 'var(--bg-surface)',
+          border: '1px solid var(--border)', borderRadius: '6px',
+          padding: '4px 12px', flexShrink: 0,
+        }}>
+          {formula}
+        </div>
+      )}
     </div>
   )
 }

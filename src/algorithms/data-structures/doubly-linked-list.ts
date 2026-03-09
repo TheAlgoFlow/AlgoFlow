@@ -82,10 +82,17 @@ let nodeCounter = 0
 function nextId() { return `n${nodeCounter++}` }
 
 /** inserirInicio — inserts at front (after sentinel head in AEDS2 terms) */
-function* inserirInicioGenerator(value?: number): Generator<AlgorithmFrame> {
-  nodeCounter = 0
+function* inserirInicioGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 42
-  const { state } = buildDLL([10, 20, 30])
+  let state: DLLState
+  if (initialState) {
+    state = cloneState(initialState as DLLState)
+    const ids = state.nodes.map(n => parseInt(n.id.replace('n', ''), 10)).filter(n => !isNaN(n))
+    nodeCounter = ids.length > 0 ? Math.max(...ids) + 1 : 0
+  } else {
+    nodeCounter = 0
+    ;({ state } = buildDLL([10, 20, 30]))
+  }
 
   yield {
     state: cloneState(state) as unknown,
@@ -112,10 +119,17 @@ function* inserirInicioGenerator(value?: number): Generator<AlgorithmFrame> {
 }
 
 /** inserirFim — inserts at back (ultimo.prox in AEDS2) */
-function* inserirFimGenerator(value?: number): Generator<AlgorithmFrame> {
-  nodeCounter = 0
+function* inserirFimGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 99
-  const { state } = buildDLL([10, 20, 30])
+  let state: DLLState
+  if (initialState) {
+    state = cloneState(initialState as DLLState)
+    const ids = state.nodes.map(n => parseInt(n.id.replace('n', ''), 10)).filter(n => !isNaN(n))
+    nodeCounter = ids.length > 0 ? Math.max(...ids) + 1 : 0
+  } else {
+    nodeCounter = 0
+    ;({ state } = buildDLL([10, 20, 30]))
+  }
 
   yield {
     state: cloneState(state) as unknown,
@@ -150,9 +164,14 @@ function* inserirFimGenerator(value?: number): Generator<AlgorithmFrame> {
 }
 
 /** removerInicio — removes first node */
-function* removerInicioGenerator(_value?: number): Generator<AlgorithmFrame> {
-  nodeCounter = 0
-  const { state } = buildDLL([10, 20, 30])
+function* removerInicioGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  let state: DLLState
+  if (initialState) {
+    state = cloneState(initialState as DLLState)
+  } else {
+    nodeCounter = 0
+    ;({ state } = buildDLL([10, 20, 30]))
+  }
 
   yield {
     state: cloneState(state) as unknown,
@@ -180,9 +199,14 @@ function* removerInicioGenerator(_value?: number): Generator<AlgorithmFrame> {
 }
 
 /** removerFim — removes last node */
-function* removerFimGenerator(_value?: number): Generator<AlgorithmFrame> {
-  nodeCounter = 0
-  const { state } = buildDLL([10, 20, 30])
+function* removerFimGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  let state: DLLState
+  if (initialState) {
+    state = cloneState(initialState as DLLState)
+  } else {
+    nodeCounter = 0
+    ;({ state } = buildDLL([10, 20, 30]))
+  }
 
   yield {
     state: cloneState(state) as unknown,
@@ -213,10 +237,15 @@ function* removerFimGenerator(_value?: number): Generator<AlgorithmFrame> {
 }
 
 /** pesquisar — linear search forward */
-function* pesquisarGenerator(value?: number): Generator<AlgorithmFrame> {
-  nodeCounter = 0
+function* pesquisarGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const target = value ?? 20
-  const { state } = buildDLL([10, 20, 30])
+  let state: DLLState
+  if (initialState) {
+    state = cloneState(initialState as DLLState)
+  } else {
+    nodeCounter = 0
+    ;({ state } = buildDLL([10, 20, 30]))
+  }
 
   yield {
     state: cloneState(state) as unknown,
@@ -228,25 +257,28 @@ function* pesquisarGenerator(value?: number): Generator<AlgorithmFrame> {
 
   let currId: string | null = state.head
   let found = false
+  let steps = 0
   while (currId !== null) {
     const node = state.nodes.find(n => n.id === currId)!
     if (node.value === target) {
+      steps++
       yield {
         state: cloneState(state) as unknown,
         highlights: [{ index: currId, role: 'found', label: 'found' }],
         message: 'ds.doublyLinkedList.pesquisar.found',
         codeLine: 4,
-        auxState: { target, val: node.value },
+        auxState: { target, val: node.value, steps },
       }
       found = true
       break
     }
+    steps++
     yield {
       state: cloneState(state) as unknown,
       highlights: [{ index: currId, role: 'current', label: 'curr' }],
       message: 'ds.doublyLinkedList.pesquisar.checking',
       codeLine: 3,
-      auxState: { target, val: node.value },
+      auxState: { target, val: node.value, steps },
     }
     currId = node.next
   }
@@ -257,15 +289,20 @@ function* pesquisarGenerator(value?: number): Generator<AlgorithmFrame> {
       highlights: [],
       message: 'ds.doublyLinkedList.pesquisar.notFound',
       codeLine: 5,
-      auxState: { target },
+      auxState: { target, steps },
     }
   }
 }
 
 /** mostrarInverso — traverse in reverse (tail → head) */
-function* mostrarInversoGenerator(_value?: number): Generator<AlgorithmFrame> {
-  nodeCounter = 0
-  const { state } = buildDLL([10, 20, 30])
+function* mostrarInversoGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  let state: DLLState
+  if (initialState) {
+    state = cloneState(initialState as DLLState)
+  } else {
+    nodeCounter = 0
+    ;({ state } = buildDLL([10, 20, 30]))
+  }
 
   yield {
     state: cloneState(state) as unknown,
@@ -276,13 +313,15 @@ function* mostrarInversoGenerator(_value?: number): Generator<AlgorithmFrame> {
 
   // Walk backwards using prevMap
   let currId: string | null = state.tail
+  let steps = 0
   while (currId !== null) {
+    steps++
     yield {
       state: cloneState(state) as unknown,
       highlights: [{ index: currId, role: 'current', label: 'curr' }],
       message: 'ds.doublyLinkedList.mostrarInverso.visiting',
       codeLine: 3,
-      auxState: { val: state.nodes.find(n => n.id === currId)!.value },
+      auxState: { val: state.nodes.find(n => n.id === currId)!.value, steps },
     }
     currId = state.prevMap[currId] ?? null
   }
@@ -601,42 +640,42 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'insert',
     label: 'Insert Front',
     takesValue: true,
-    generator: inserirInicioGenerator,
+    generator: (value?: number, initialState?: unknown) => inserirInicioGenerator(value, initialState),
     codeSnippets: inserirInicioSnippets,
   },
   {
     type: 'insert',
     label: 'Insert Back',
     takesValue: true,
-    generator: inserirFimGenerator,
+    generator: (value?: number, initialState?: unknown) => inserirFimGenerator(value, initialState),
     codeSnippets: inserirFimSnippets,
   },
   {
     type: 'remove',
     label: 'Remove Front',
     takesValue: false,
-    generator: removerInicioGenerator,
+    generator: (value?: number, initialState?: unknown) => removerInicioGenerator(value, initialState),
     codeSnippets: removerInicioSnippets,
   },
   {
     type: 'remove',
     label: 'Remove Back',
     takesValue: false,
-    generator: removerFimGenerator,
+    generator: (value?: number, initialState?: unknown) => removerFimGenerator(value, initialState),
     codeSnippets: removerFimSnippets,
   },
   {
     type: 'search',
     label: 'Search',
     takesValue: true,
-    generator: pesquisarGenerator,
+    generator: (value?: number, initialState?: unknown) => pesquisarGenerator(value, initialState),
     codeSnippets: pesquisarSnippets,
   },
   {
     type: 'traverse',
     label: 'Traverse Reverse',
     takesValue: false,
-    generator: mostrarInversoGenerator,
+    generator: (value?: number, initialState?: unknown) => mostrarInversoGenerator(value, initialState),
     codeSnippets: mostrarInversoSnippets,
   },
 ]

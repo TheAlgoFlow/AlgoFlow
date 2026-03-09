@@ -36,7 +36,11 @@ export function StackQueueVisualizer({ frame, mode }: StackQueueVisualizerProps)
   }
 
   const state = frame.state as SQState
-  const { items, highlighted } = state
+  const { items, highlighted, operation } = state
+
+  const opColor = operation === 'push' || operation === 'enqueue' ? '#10b981'
+    : operation === 'pop' || operation === 'dequeue' ? '#ef4444'
+    : '#f59e0b'
 
   if (mode === 'stack') {
     // Stack: vertical, top at top
@@ -44,6 +48,7 @@ export function StackQueueVisualizer({ frame, mode }: StackQueueVisualizerProps)
     return (
       <div
         style={{
+          position: 'relative',
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
@@ -53,6 +58,17 @@ export function StackQueueVisualizer({ frame, mode }: StackQueueVisualizerProps)
           gap: '0.5rem',
         }}
       >
+        {operation && (
+          <div style={{
+            position: 'absolute', top: '12px', left: '12px',
+            padding: '4px 10px', borderRadius: '12px',
+            background: `${opColor}20`, border: `1px solid ${opColor}60`,
+            color: opColor, fontSize: '11px', fontWeight: 700,
+            fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em',
+          }}>
+            {operation}
+          </div>
+        )}
         <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600, marginBottom: '0.25rem' }}>
           ← TOP
         </div>
@@ -123,6 +139,7 @@ export function StackQueueVisualizer({ frame, mode }: StackQueueVisualizerProps)
   return (
     <div
       style={{
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
@@ -132,6 +149,17 @@ export function StackQueueVisualizer({ frame, mode }: StackQueueVisualizerProps)
         gap: '0.75rem',
       }}
     >
+      {operation && (
+        <div style={{
+          position: 'absolute', top: '12px', left: '12px',
+          padding: '4px 10px', borderRadius: '12px',
+          background: `${opColor}20`, border: `1px solid ${opColor}60`,
+          color: opColor, fontSize: '11px', fontWeight: 700,
+          fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em',
+        }}>
+          {operation}
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
         <div style={{ color: '#06b6d4', fontSize: '0.75rem', fontWeight: 600 }}>FRONT →</div>
         <div

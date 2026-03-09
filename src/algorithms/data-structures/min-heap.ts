@@ -31,9 +31,11 @@ function heapRight(i: number): number  { return 2 * i + 2 }
 
 // ─── dsOperations generators ─────────────────────────────────────────────────
 
-function* insertHeapGenerator(value: number = 5): Generator<AlgorithmFrame> {
-  const heap = [1, 3, 8, 5, 9, 10]
+function* insertHeapGenerator(value: number = 5, initialState?: unknown): Generator<AlgorithmFrame> {
+  const heap = initialState ? [...(initialState as { array: number[] }).array] : [1, 3, 8, 5, 9, 10]
   const val = value
+
+  let swaps = 0
 
   // Step 1: show initial heap
   yield {
@@ -41,6 +43,7 @@ function* insertHeapGenerator(value: number = 5): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.minHeap.insert.init',
     codeLine: 1,
+    auxState: { swaps },
   }
 
   // Add at end
@@ -51,6 +54,7 @@ function* insertHeapGenerator(value: number = 5): Generator<AlgorithmFrame> {
     highlights: [{ index: n, role: 'active', label: 'new' }],
     message: 'ds.minHeap.insert.push',
     codeLine: 2,
+    auxState: { swaps },
   }
 
   // Bubble up
@@ -65,8 +69,10 @@ function* insertHeapGenerator(value: number = 5): Generator<AlgorithmFrame> {
       ],
       message: 'ds.minHeap.insert.bubbleUp',
       codeLine: 4,
+      auxState: { swaps },
     }
     ;[heap[i], heap[p]] = [heap[p], heap[i]]
+    swaps++
     i = p
   }
 
@@ -76,11 +82,13 @@ function* insertHeapGenerator(value: number = 5): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.minHeap.insert.done',
     codeLine: 5,
+    auxState: { swaps },
   }
 }
 
-function* extractMinGenerator(_value?: number): Generator<AlgorithmFrame> {
-  const heap = [1, 3, 8, 5, 9, 10]
+function* extractMinGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  const heap = initialState ? [...(initialState as { array: number[] }).array] : [1, 3, 8, 5, 9, 10]
+  let swaps = 0
 
   // Step 1: show heap, highlight min
   yield {
@@ -88,6 +96,7 @@ function* extractMinGenerator(_value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: 0, role: 'selected', label: 'min' }],
     message: 'ds.minHeap.extractMin.init',
     codeLine: 1,
+    auxState: { swaps },
   }
 
   const last = heap.length - 1
@@ -101,8 +110,10 @@ function* extractMinGenerator(_value?: number): Generator<AlgorithmFrame> {
     ],
     message: 'ds.minHeap.extractMin.swap',
     codeLine: 3,
+    auxState: { swaps },
   }
   ;[heap[0], heap[last]] = [heap[last], heap[0]]
+  swaps++
 
   // Remove last
   heap.pop()
@@ -127,8 +138,10 @@ function* extractMinGenerator(_value?: number): Generator<AlgorithmFrame> {
       ],
       message: 'ds.minHeap.extractMin.siftDown',
       codeLine: 5,
+      auxState: { swaps },
     }
     ;[heap[i], heap[smallest]] = [heap[smallest], heap[i]]
+    swaps++
     i = smallest
   }
 
@@ -138,11 +151,12 @@ function* extractMinGenerator(_value?: number): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.minHeap.extractMin.done',
     codeLine: 7,
+    auxState: { swaps },
   }
 }
 
-function* getMinGenerator(_value?: number): Generator<AlgorithmFrame> {
-  const heap = [1, 3, 8, 5, 9, 10]
+function* getMinGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  const heap = initialState ? [...(initialState as { array: number[] }).array] : [1, 3, 8, 5, 9, 10]
 
   // Step 1: show heap
   yield {
@@ -161,8 +175,8 @@ function* getMinGenerator(_value?: number): Generator<AlgorithmFrame> {
   }
 }
 
-function* heapifyGenerator(_value?: number): Generator<AlgorithmFrame> {
-  const arr = [9, 3, 8, 1, 5, 10]
+function* heapifyGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  const arr = initialState ? [...(initialState as { array: number[] }).array] : [9, 3, 8, 1, 5, 10]
   const heap = [...arr]
 
   // Step 1: show unsorted array
@@ -436,28 +450,28 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'insert',
     label: 'Insert',
     takesValue: true,
-    generator: (value?: number) => insertHeapGenerator(value),
+    generator: (value?: number, initialState?: unknown) => insertHeapGenerator(value, initialState),
     codeSnippets: insertOpSnippets,
   },
   {
     type: 'remove',
     label: 'Extract Min',
     takesValue: false,
-    generator: (value?: number) => extractMinGenerator(value),
+    generator: (value?: number, initialState?: unknown) => extractMinGenerator(value, initialState),
     codeSnippets: extractMinOpSnippets,
   },
   {
     type: 'search',
     label: 'Get Min',
     takesValue: false,
-    generator: (value?: number) => getMinGenerator(value),
+    generator: (value?: number, initialState?: unknown) => getMinGenerator(value, initialState),
     codeSnippets: getMinOpSnippets,
   },
   {
     type: 'traverse',
     label: 'Heapify',
     takesValue: false,
-    generator: (value?: number) => heapifyGenerator(value),
+    generator: (value?: number, initialState?: unknown) => heapifyGenerator(value, initialState),
     codeSnippets: heapifyOpSnippets,
   },
 ]

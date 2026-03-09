@@ -35,6 +35,7 @@ export function useAlgorithmPlayer(
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeedState] = useState(1)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const isFirstRun = useRef(true)
 
   // Eagerly collect all frames when generator changes
   useEffect(() => {
@@ -54,7 +55,12 @@ export function useAlgorithmPlayer(
     }
     setFrames(collected)
     setFrameIndex(0)
-    setIsPlaying(false)
+    if (isFirstRun.current) {
+      isFirstRun.current = false
+      setIsPlaying(false)
+    } else {
+      setIsPlaying(collected.length > 0)
+    }
   }, [generator])
 
   // Auto-play interval

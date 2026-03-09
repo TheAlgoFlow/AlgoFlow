@@ -20,22 +20,24 @@ function* heapify(
   root: number,
   sortedIndices: Set<number>,
   phase: string,
+  counters: { comparisons: number; swaps: number },
 ): Generator<AlgorithmFrame> {
   let largest = root
   const left = 2 * root + 1
   const right = 2 * root + 2
 
+  counters.comparisons += 2
   yield {
     state: { array: [...arr] },
     highlights: [
-      { index: root, role: 'current' },
-      ...(left < n ? [{ index: left, role: 'compare' as const }] : []),
-      ...(right < n ? [{ index: right, role: 'compare' as const }] : []),
+      { index: root, role: 'current', label: 'root' },
+      ...(left < n ? [{ index: left, role: 'compare' as const, label: 'L' }] : []),
+      ...(right < n ? [{ index: right, role: 'compare' as const, label: 'R' }] : []),
       ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
     ],
     message: 'algorithms.heapSort.steps.heapify',
     codeLine: 4,
-    auxState: { root, left: left < n ? arr[left] : null, right: right < n ? arr[right] : null, phase },
+    auxState: { root, left: left < n ? arr[left] : null, right: right < n ? arr[right] : null, phase, comparisons: counters.comparisons, swaps: counters.swaps },
   }
 
   if (left < n && arr[left] > arr[largest]) largest = left
@@ -43,20 +45,21 @@ function* heapify(
 
   if (largest !== root) {
     ;[arr[root], arr[largest]] = [arr[largest], arr[root]]
+    counters.swaps++
 
     yield {
       state: { array: [...arr] },
       highlights: [
-        { index: root, role: 'swap' },
-        { index: largest, role: 'swap' },
+        { index: root, role: 'swap', label: 'root' },
+        { index: largest, role: 'swap', label: largest === left ? 'L' : 'R' },
         ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
       ],
       message: 'algorithms.heapSort.steps.heapify',
       codeLine: 6,
-      auxState: { root, largest, phase },
+      auxState: { root, largest, phase, comparisons: counters.comparisons, swaps: counters.swaps },
     }
 
-    yield* heapify(arr, n, largest, sortedIndices, phase)
+    yield* heapify(arr, n, largest, sortedIndices, phase, counters)
   }
 }
 
@@ -64,6 +67,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
   const sortedIndices = new Set<number>()
+  const counters = { comparisons: 0, swaps: 0 }
 
   // Phase 1: Build max heap
   yield {
@@ -71,17 +75,18 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'algorithms.heapSort.steps.buildHeap',
     codeLine: 1,
-    auxState: { phase: 'build' },
+    auxState: { phase: 'build', comparisons: counters.comparisons, swaps: counters.swaps },
   }
 
   for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
-    yield* heapify(arr, n, i, sortedIndices, 'build')
+    yield* heapify(arr, n, i, sortedIndices, 'build', counters)
   }
 
   // Phase 2: Extract elements from heap one by one
   for (let i = n - 1; i > 0; i--) {
     // Move current root (maximum) to end
     ;[arr[0], arr[i]] = [arr[i], arr[0]]
+    counters.swaps++
     sortedIndices.add(i)
 
     yield {
@@ -93,11 +98,11 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.heapSort.steps.extract',
       codeLine: 9,
-      auxState: { extracted: arr[i], pos: i },
+      auxState: { extracted: arr[i], pos: i, comparisons: counters.comparisons, swaps: counters.swaps },
     }
 
     // Heapify the reduced heap
-    yield* heapify(arr, i, 0, sortedIndices, 'extract')
+    yield* heapify(arr, i, 0, sortedIndices, 'extract', counters)
   }
 
   sortedIndices.add(0)
@@ -106,6 +111,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.heapSort.steps.done',
     codeLine: 11,
+    auxState: { comparisons: counters.comparisons, swaps: counters.swaps },
   }
 }
 

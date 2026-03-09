@@ -17,6 +17,8 @@ export const meta: AlgorithmMeta = {
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
+  let comparisons = 0
+  let swaps = 0
 
   // AEDS2 gap sequence: h = h*3+1 until h >= n, then shrink h /= 3
   let h = 1
@@ -29,7 +31,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: [],
       message: 'algorithms.shellSort.steps.gap',
       codeLine: 4,
-      auxState: { h },
+      auxState: { h, comparisons, swaps },
     }
 
     // For each "color" (offset 0..h-1), run insertion sort with stride h
@@ -44,32 +46,34 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           highlights: [{ index: i, role: 'selected', label: 'key' }],
           message: 'algorithms.shellSort.steps.pick',
           codeLine: 7,
-          auxState: { tmp, i, h, cor },
+          auxState: { tmp, i, h, cor, comparisons, swaps },
         }
 
         while (j >= cor && arr[j] > tmp) {
+          comparisons++
           yield {
             state: { array: [...arr] },
             highlights: [
-              { index: j,   role: 'compare' },
+              { index: j,   role: 'compare', label: 'j' },
               { index: j + h, role: 'selected' },
             ],
             message: 'algorithms.shellSort.steps.compare',
             codeLine: 9,
-            auxState: { val: arr[j], tmp, j, h },
+            auxState: { val: arr[j], tmp, j, h, comparisons, swaps },
           }
 
           arr[j + h] = arr[j]
+          swaps++
 
           yield {
             state: { array: [...arr] },
             highlights: [
-              { index: j,     role: 'compare' },
+              { index: j,     role: 'compare', label: 'j' },
               { index: j + h, role: 'swap' },
             ],
             message: 'algorithms.shellSort.steps.shift',
             codeLine: 10,
-            auxState: { val: arr[j], pos: j + h, h },
+            auxState: { val: arr[j], pos: j + h, h, comparisons, swaps },
           }
 
           j -= h
@@ -82,7 +86,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           highlights: [{ index: j + h, role: 'active', label: 'placed' }],
           message: 'algorithms.shellSort.steps.insert',
           codeLine: 11,
-          auxState: { tmp, pos: j + h },
+          auxState: { tmp, pos: j + h, comparisons, swaps },
         }
       }
     }
@@ -95,6 +99,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.shellSort.steps.done',
     codeLine: 14,
+    auxState: { comparisons, swaps },
   }
 }
 

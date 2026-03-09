@@ -32,12 +32,15 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'algorithms.lis.steps.init',
     codeLine: 1,
-    auxState: { n },
+    auxState: { n, comparisons: 0, updates: 0 },
   }
 
+  let comparisons = 0
+  let updates = 0
   for (let i = 1; i < n; i++) {
     for (let j = 0; j < i; j++) {
       // Show comparison between j and i
+      comparisons++
       yield {
         state: { array: [...array], dp: [...dp] } as LISState,
         highlights: [
@@ -46,11 +49,12 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         ],
         message: 'algorithms.lis.steps.check',
         codeLine: 4,
-        auxState: { i, j, arrI: array[i], arrJ: array[j] },
+        auxState: { i, j, arrI: array[i], arrJ: array[j], comparisons, updates },
       }
 
       if (array[j] < array[i] && dp[j] + 1 > dp[i]) {
         dp[i] = dp[j] + 1
+        updates++
         yield {
           state: { array: [...array], dp: [...dp] } as LISState,
           highlights: [
@@ -59,7 +63,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           ],
           message: 'algorithms.lis.steps.update',
           codeLine: 5,
-          auxState: { i, v: dp[i], x: array[i] },
+          auxState: { i, v: dp[i], x: array[i], comparisons, updates, formula: `dp[${i}]=max(dp[${i}],dp[${j}]+1)` },
         }
       }
     }
@@ -75,7 +79,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     })),
     message: 'algorithms.lis.steps.done',
     codeLine: 8,
-    auxState: { v: maxLen },
+    auxState: { v: maxLen, comparisons, updates },
   }
 }
 

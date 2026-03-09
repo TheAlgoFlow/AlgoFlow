@@ -18,6 +18,8 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
   const sortedIndices: number[] = []
+  let comparisons = 0
+  let swaps = 0
 
   for (let i = 0; i < n - 1; i++) {
     let minIdx = i
@@ -26,26 +28,27 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     yield {
       state: { array: [...arr] },
       highlights: [
-        { index: minIdx, role: 'current' },
+        { index: minIdx, role: 'current', label: 'i' },
         ...sortedIndices.map(s => ({ index: s, role: 'sorted' as const })),
       ],
       message: 'algorithms.selectionSort.steps.findMin',
       codeLine: 3,
-      auxState: { i, minIdx, minVal: arr[minIdx] },
+      auxState: { i, minIdx, minVal: arr[minIdx], comparisons, swaps },
     }
 
     for (let j = i + 1; j < n; j++) {
+      comparisons++
       // Yield compare frame
       yield {
         state: { array: [...arr] },
         highlights: [
-          { index: minIdx, role: 'current' },
-          { index: j, role: 'compare' },
+          { index: minIdx, role: 'current', label: 'min' },
+          { index: j, role: 'compare', label: 'j' },
           ...sortedIndices.map(s => ({ index: s, role: 'sorted' as const })),
         ],
         message: 'algorithms.selectionSort.steps.findMin',
         codeLine: 5,
-        auxState: { i, j, minIdx, minVal: arr[minIdx], curVal: arr[j] },
+        auxState: { i, j, minIdx, minVal: arr[minIdx], curVal: arr[j], comparisons, swaps },
       }
 
       if (arr[j] < arr[minIdx]) {
@@ -53,28 +56,29 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         yield {
           state: { array: [...arr] },
           highlights: [
-            { index: minIdx, role: 'current' },
+            { index: minIdx, role: 'current', label: 'min' },
             ...sortedIndices.map(s => ({ index: s, role: 'sorted' as const })),
           ],
           message: 'algorithms.selectionSort.steps.newMin',
           codeLine: 6,
-          auxState: { i, minIdx, minVal: arr[minIdx] },
+          auxState: { i, minIdx, minVal: arr[minIdx], comparisons, swaps },
         }
       }
     }
 
     if (minIdx !== i) {
+      swaps++
       ;[arr[i], arr[minIdx]] = [arr[minIdx], arr[i]]
       yield {
         state: { array: [...arr] },
         highlights: [
-          { index: i, role: 'swap' },
-          { index: minIdx, role: 'swap' },
+          { index: i, role: 'swap', label: 'i' },
+          { index: minIdx, role: 'swap', label: 'min' },
           ...sortedIndices.map(s => ({ index: s, role: 'sorted' as const })),
         ],
         message: 'algorithms.selectionSort.steps.swap',
         codeLine: 8,
-        auxState: { i, minIdx, val: arr[i] },
+        auxState: { i, minIdx, val: arr[i], comparisons, swaps },
       }
     }
 
@@ -84,7 +88,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: sortedIndices.map(s => ({ index: s, role: 'sorted' as const })),
       message: 'algorithms.selectionSort.steps.sorted',
       codeLine: 9,
-      auxState: { i, val: arr[i] },
+      auxState: { i, val: arr[i], comparisons, swaps },
     }
   }
 
@@ -94,6 +98,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.selectionSort.steps.done',
     codeLine: 10,
+    auxState: { comparisons, swaps },
   }
 }
 

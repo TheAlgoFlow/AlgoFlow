@@ -17,6 +17,7 @@ export const meta: AlgorithmMeta = {
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
+  let placements = 0
 
   const max = Math.max(...arr)
   const maxDigits = Math.floor(Math.log10(max)) + 1
@@ -30,7 +31,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: [],
       message: 'algorithms.radixSort.steps.pass',
       codeLine: 2,
-      auxState: { digit, place: exp, pass: digit + 1, totalPasses: maxDigits },
+      auxState: { digit, place: exp, pass: digit + 1, totalPasses: maxDigits, comparisons: 0, swaps: placements },
     }
 
     const buckets: number[][] = Array.from({ length: 10 }, () => [])
@@ -44,17 +45,18 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         highlights: [{ index: i, role: 'current' }],
         message: 'algorithms.radixSort.steps.bucket',
         codeLine: 4,
-        auxState: { val: arr[i], bucketIdx, digit, place: exp },
+        auxState: { val: arr[i], bucketIdx, digit, place: exp, comparisons: 0, swaps: placements },
       }
 
       buckets[bucketIdx].push(arr[i])
+      placements++
 
       yield {
         state: { array: [...arr], buckets: buckets.map(b => [...b]) },
         highlights: [{ index: i, role: 'active' }],
         message: 'algorithms.radixSort.steps.bucket',
         codeLine: 5,
-        auxState: { val: arr[i], bucketIdx, digit, place: exp },
+        auxState: { val: arr[i], bucketIdx, digit, place: exp, comparisons: 0, swaps: placements },
       }
     }
 
@@ -72,7 +74,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: arr.map((_, idx) => ({ index: idx, role: 'active' as const })),
       message: 'algorithms.radixSort.steps.collect',
       codeLine: 7,
-      auxState: { digit, place: exp },
+      auxState: { digit, place: exp, comparisons: 0, swaps: placements },
     }
   }
 
@@ -81,6 +83,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.radixSort.steps.done',
     codeLine: 9,
+    auxState: { comparisons: 0, swaps: placements },
   }
 }
 

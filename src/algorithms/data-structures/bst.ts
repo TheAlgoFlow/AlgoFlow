@@ -61,9 +61,11 @@ function cloneNodes(nodes: TreeNodeData[]): TreeNodeData[] {
 }
 
 // ─── dsOperation 1: Insert ───────────────────────────────────────────────────
-function* insertGenerator(value = 45): Generator<AlgorithmFrame> {
-  const nodes = makeBaseNodes()
-  let nextId = 5
+function* insertGenerator(value = 45, initialState?: unknown): Generator<AlgorithmFrame> {
+  const nodes = initialState ? [...(initialState as State).nodes] : makeBaseNodes()
+  const existingMaxId = nodes.length > 0 ? Math.max(...nodes.map(n => n.id)) : -1
+  let nextId = initialState ? existingMaxId + 1 : 5
+  let comparisons = 0
 
   function snap(current: number | null): State {
     return { nodes: cloneNodes(nodes), current }
@@ -74,7 +76,7 @@ function* insertGenerator(value = 45): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.bst.insert.start',
     codeLine: 1,
-    auxState: { v: value },
+    auxState: { v: value, comparisons },
   }
 
   let currId: number = nodes[0].id
@@ -82,12 +84,13 @@ function* insertGenerator(value = 45): Generator<AlgorithmFrame> {
   while (true) {
     const curr = nodes.find(n => n.id === currId)!
 
+    comparisons++
     yield {
       state: snap(currId),
       highlights: [{ index: currId, role: 'current', label: 'curr' }],
       message: 'ds.bst.insert.compare',
       codeLine: 5,
-      auxState: { v: value, nodeV: curr.value },
+      auxState: { v: value, nodeV: curr.value, comparisons },
     }
 
     if (value < curr.value) {
@@ -100,7 +103,7 @@ function* insertGenerator(value = 45): Generator<AlgorithmFrame> {
           highlights: [{ index: newId, role: 'found', label: 'curr' }],
           message: 'ds.bst.insert.placed',
           codeLine: 6,
-          auxState: { v: value },
+          auxState: { v: value, comparisons },
         }
         break
       }
@@ -115,7 +118,7 @@ function* insertGenerator(value = 45): Generator<AlgorithmFrame> {
           highlights: [{ index: newId, role: 'found', label: 'curr' }],
           message: 'ds.bst.insert.placed',
           codeLine: 9,
-          auxState: { v: value },
+          auxState: { v: value, comparisons },
         }
         break
       }
@@ -128,13 +131,14 @@ function* insertGenerator(value = 45): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.bst.insert.done',
     codeLine: 13,
-    auxState: { v: value },
+    auxState: { v: value, comparisons },
   }
 }
 
 // ─── dsOperation 2: Search ───────────────────────────────────────────────────
-function* searchGenerator(value = 30): Generator<AlgorithmFrame> {
-  const nodes = makeBaseNodes()
+function* searchGenerator(value = 30, initialState?: unknown): Generator<AlgorithmFrame> {
+  const nodes = initialState ? [...(initialState as State).nodes] : makeBaseNodes()
+  let comparisons = 0
 
   function snap(current: number | null): State {
     return { nodes: cloneNodes(nodes), current }
@@ -145,7 +149,7 @@ function* searchGenerator(value = 30): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.bst.search.start',
     codeLine: 1,
-    auxState: { target: value },
+    auxState: { target: value, comparisons },
   }
 
   let currId: number | null = nodes[0].id
@@ -153,12 +157,13 @@ function* searchGenerator(value = 30): Generator<AlgorithmFrame> {
   while (currId !== null) {
     const curr = nodes.find(n => n.id === currId)!
 
+    comparisons++
     yield {
       state: snap(currId),
       highlights: [{ index: currId, role: 'current', label: 'curr' }],
       message: 'ds.bst.search.visiting',
       codeLine: 3,
-      auxState: { target: value, nodeV: curr.value },
+      auxState: { target: value, nodeV: curr.value, comparisons },
     }
 
     if (curr.value === value) {
@@ -167,7 +172,7 @@ function* searchGenerator(value = 30): Generator<AlgorithmFrame> {
         highlights: [{ index: currId, role: 'found', label: 'found' }],
         message: 'ds.bst.search.found',
         codeLine: 4,
-        auxState: { v: curr.value },
+        auxState: { v: curr.value, comparisons },
       }
       return
     }
@@ -178,7 +183,7 @@ function* searchGenerator(value = 30): Generator<AlgorithmFrame> {
         highlights: [{ index: currId, role: 'current', label: 'curr' }],
         message: 'ds.bst.search.goLeft',
         codeLine: 5,
-        auxState: { target: value, nodeV: curr.value },
+        auxState: { target: value, nodeV: curr.value, comparisons },
       }
       currId = curr.left
     } else {
@@ -187,7 +192,7 @@ function* searchGenerator(value = 30): Generator<AlgorithmFrame> {
         highlights: [{ index: currId, role: 'current', label: 'curr' }],
         message: 'ds.bst.search.goRight',
         codeLine: 6,
-        auxState: { target: value, nodeV: curr.value },
+        auxState: { target: value, nodeV: curr.value, comparisons },
       }
       currId = curr.right
     }
@@ -198,13 +203,14 @@ function* searchGenerator(value = 30): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.bst.search.notFound',
     codeLine: 8,
-    auxState: { target: value },
+    auxState: { target: value, comparisons },
   }
 }
 
 // ─── dsOperation 3: Remove ───────────────────────────────────────────────────
-function* removeGenerator(value = 30): Generator<AlgorithmFrame> {
-  const nodes = makeBaseNodes()
+function* removeGenerator(value = 30, initialState?: unknown): Generator<AlgorithmFrame> {
+  const nodes = initialState ? [...(initialState as State).nodes] : makeBaseNodes()
+  let comparisons = 0
 
   function snap(current: number | null): State {
     return { nodes: cloneNodes(nodes), current }
@@ -220,7 +226,7 @@ function* removeGenerator(value = 30): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.bst.remove.start',
     codeLine: 1,
-    auxState: { v: value },
+    auxState: { v: value, comparisons },
   }
 
   // Phase 1: Find the node to remove
@@ -231,12 +237,13 @@ function* removeGenerator(value = 30): Generator<AlgorithmFrame> {
   while (currId !== null) {
     const curr = nodes.find(n => n.id === currId)!
 
+    comparisons++
     yield {
       state: snap(currId),
       highlights: [{ index: currId, role: 'current', label: 'curr' }],
       message: 'ds.bst.remove.searching',
       codeLine: 5,
-      auxState: { v: value, nodeV: curr.value },
+      auxState: { v: value, nodeV: curr.value, comparisons },
     }
 
     if (curr.value === value) {
@@ -257,7 +264,7 @@ function* removeGenerator(value = 30): Generator<AlgorithmFrame> {
       highlights: [],
       message: 'ds.bst.remove.notFound',
       codeLine: 5,
-      auxState: { v: value },
+      auxState: { v: value, comparisons },
     }
     return
   }
@@ -268,7 +275,7 @@ function* removeGenerator(value = 30): Generator<AlgorithmFrame> {
     highlights: [{ index: foundId, role: 'swap', label: 'del' }],
     message: 'ds.bst.remove.found',
     codeLine: 8,
-    auxState: { v: value },
+    auxState: { v: value, comparisons },
   }
 
   // Phase 3: Perform removal
@@ -329,7 +336,7 @@ function* removeGenerator(value = 30): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.bst.remove.done',
     codeLine: 16,
-    auxState: { v: value },
+    auxState: { v: value, comparisons },
   }
 }
 
@@ -339,7 +346,7 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'insert',
     label: 'Insert',
     takesValue: true,
-    generator: (value = 45) => insertGenerator(value),
+    generator: (value = 45, initialState?: unknown) => insertGenerator(value, initialState),
     codeSnippets: {
       ts: [
         { line: 1,  code: 'insert(val: number): void {' },
@@ -422,7 +429,7 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'search',
     label: 'Search',
     takesValue: true,
-    generator: (value = 30) => searchGenerator(value),
+    generator: (value = 30, initialState?: unknown) => searchGenerator(value, initialState),
     codeSnippets: {
       ts: [
         { line: 1, code: 'search(val: number): boolean {' },
@@ -483,7 +490,7 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'remove',
     label: 'Remove',
     takesValue: true,
-    generator: (value = 30) => removeGenerator(value),
+    generator: (value = 30, initialState?: unknown) => removeGenerator(value, initialState),
     codeSnippets: {
       ts: [
         { line: 1,  code: 'remove(val: number): void {' },

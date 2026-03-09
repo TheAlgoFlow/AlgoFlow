@@ -47,9 +47,10 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'algorithms.knapsack.steps.init',
     codeLine: 1,
-    auxState: { n, capacity },
+    auxState: { n, capacity, fills: 0 },
   }
 
+  let fills = 0
   for (let i = 1; i <= n; i++) {
     const item = items[i - 1]
     for (let w = 0; w <= capacity; w++) {
@@ -59,7 +60,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         highlights: [{ index: `${i},${w}`, role: 'dp-current' }],
         message: 'algorithms.knapsack.steps.fill',
         codeLine: 4,
-        auxState: { i, w, name: item.name, wt: item.weight, val: item.value },
+        auxState: { i, w, name: item.name, wt: item.weight, val: item.value, fills },
       }
 
       if (item.weight <= w) {
@@ -67,6 +68,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         const withItem = dp[i - 1][w - item.weight] + item.value
         const withoutItem = dp[i - 1][w]
 
+        fills++
         yield {
           state: { dp: dp.map(row => [...row]), items, capacity, current: [i, w] } as KnapsackState,
           highlights: [
@@ -76,7 +78,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           ],
           message: 'algorithms.knapsack.steps.include',
           codeLine: 6,
-          auxState: { i, w, name: item.name, wt: item.weight, val: item.value, withItem, withoutItem },
+          auxState: { i, w, name: item.name, wt: item.weight, val: item.value, withItem, withoutItem, fills, formula: `max(dp[${i-1}][${w}], dp[${i-1}][${w-item.weight}]+${item.value})` },
         }
 
         dp[i][w] = Math.max(withItem, withoutItem)
@@ -84,6 +86,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         // Cannot include this item, carry forward without-item value
         dp[i][w] = dp[i - 1][w]
 
+        fills++
         yield {
           state: { dp: dp.map(row => [...row]), items, capacity, current: [i, w] } as KnapsackState,
           highlights: [
@@ -92,7 +95,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           ],
           message: 'algorithms.knapsack.steps.exclude',
           codeLine: 8,
-          auxState: { i, w, name: item.name, wt: item.weight, val: item.value },
+          auxState: { i, w, name: item.name, wt: item.weight, val: item.value, fills, formula: `dp[${i}][${w}]=dp[${i-1}][${w}]` },
         }
       }
     }
@@ -103,7 +106,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [{ index: `${n},${capacity}`, role: 'dp-fill' }],
     message: 'algorithms.knapsack.steps.done',
     codeLine: 10,
-    auxState: { result: dp[n][capacity] },
+    auxState: { result: dp[n][capacity], fills },
   }
 }
 

@@ -17,6 +17,8 @@ export const meta: AlgorithmMeta = {
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
+  let comparisons = 0
+  let swaps = 0
 
   // Iterative bottom-up merge sort
   for (let width = 1; width < n; width *= 2) {
@@ -32,12 +34,21 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       for (let k = lo; k <= mid; k++) leftHighlights.push({ index: k, role: 'left' as const })
       for (let k = mid + 1; k <= hi; k++) rightHighlights.push({ index: k, role: 'right' as const })
 
+      const announcementHighlights = leftHighlights.map((h, idx) =>
+        idx === 0 ? { ...h, label: 'lo' }
+        : idx === leftHighlights.length - 1 ? { ...h, label: 'mid' }
+        : h
+      )
+      const rightAnnotated = rightHighlights.map((h, idx) =>
+        idx === rightHighlights.length - 1 ? { ...h, label: 'hi' } : h
+      )
+
       yield {
         state: { array: [...arr] },
-        highlights: [...leftHighlights, ...rightHighlights],
+        highlights: [...announcementHighlights, ...rightAnnotated],
         message: 'algorithms.mergeSort.steps.merge',
         codeLine: 5,
-        auxState: { lo, mid, hi, width },
+        auxState: { lo, mid, hi, width, comparisons, swaps },
       }
 
       // Merge the two halves
@@ -48,17 +59,18 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       let k = lo
 
       while (i < left.length && j < right.length) {
+        comparisons++
         // Yield: picking the smaller element
         yield {
           state: { array: [...arr] },
           highlights: [
-            { index: lo + i, role: 'left' },
-            { index: mid + 1 + j, role: 'right' },
+            { index: lo + i, role: 'left', label: 'L' },
+            { index: mid + 1 + j, role: 'right', label: 'R' },
             { index: k, role: 'current' },
           ],
           message: 'algorithms.mergeSort.steps.pick',
           codeLine: 7,
-          auxState: { leftVal: left[i], rightVal: right[j] },
+          auxState: { leftVal: left[i], rightVal: right[j], comparisons, swaps },
         }
 
         if (left[i] <= right[j]) {
@@ -69,24 +81,26 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           j++
         }
         k++
+        swaps++
 
         yield {
           state: { array: [...arr] },
           highlights: [{ index: k - 1, role: 'current' }],
           message: 'algorithms.mergeSort.steps.pick',
           codeLine: 8,
-          auxState: { placed: arr[k - 1], pos: k - 1 },
+          auxState: { placed: arr[k - 1], pos: k - 1, comparisons, swaps },
         }
       }
 
       while (i < left.length) {
         arr[k] = left[i]
+        swaps++
         yield {
           state: { array: [...arr] },
           highlights: [{ index: k, role: 'current' as const }],
           message: 'algorithms.mergeSort.steps.pick',
           codeLine: 9,
-          auxState: { placed: left[i], pos: k },
+          auxState: { placed: left[i], pos: k, comparisons, swaps },
         }
         i++
         k++
@@ -94,12 +108,13 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
 
       while (j < right.length) {
         arr[k] = right[j]
+        swaps++
         yield {
           state: { array: [...arr] },
           highlights: [{ index: k, role: 'current' as const }],
           message: 'algorithms.mergeSort.steps.pick',
           codeLine: 9,
-          auxState: { placed: right[j], pos: k },
+          auxState: { placed: right[j], pos: k, comparisons, swaps },
         }
         j++
         k++
@@ -114,7 +129,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         highlights: mergedHighlights,
         message: 'algorithms.mergeSort.steps.merge',
         codeLine: 10,
-        auxState: { lo, hi },
+        auxState: { lo, hi, comparisons, swaps },
       }
     }
   }
@@ -124,6 +139,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.mergeSort.steps.done',
     codeLine: 12,
+    auxState: { comparisons, swaps },
   }
 }
 

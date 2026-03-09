@@ -17,6 +17,7 @@ export const meta: AlgorithmMeta = {
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
+  let writes = 0
 
   const max = Math.max(...arr)
   const countArray = new Array(max + 1).fill(0)
@@ -31,7 +32,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: [{ index: i, role: 'current' }],
       message: 'algorithms.countingSort.steps.count',
       codeLine: 3,
-      auxState: { val: arr[i], count: countArray[arr[i]], i },
+      auxState: { val: arr[i], count: countArray[arr[i]], i, comparisons: 0, swaps: writes },
     }
   }
 
@@ -44,7 +45,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: [{ index: i, role: 'active' }],
       message: 'algorithms.countingSort.steps.accumulate',
       codeLine: 6,
-      auxState: { i, cumCount: countArray[i] },
+      auxState: { i, cumCount: countArray[i], comparisons: 0, swaps: writes },
     }
   }
 
@@ -54,6 +55,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     const pos = countArray[val] - 1
     output[pos] = val
     countArray[val]--
+    writes++
 
     yield {
       state: { array: [...output], countArray: [...countArray] },
@@ -63,7 +65,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.countingSort.steps.place',
       codeLine: 9,
-      auxState: { val, pos, i },
+      auxState: { val, pos, i, comparisons: 0, swaps: writes },
     }
   }
 
@@ -72,6 +74,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: output.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.countingSort.steps.done',
     codeLine: 11,
+    auxState: { comparisons: 0, swaps: writes },
   }
 }
 

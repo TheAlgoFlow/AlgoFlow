@@ -194,9 +194,9 @@ export const codeSnippets: CodeSnippets = {
 
 // ── Per-operation generators ──────────────────────────────────────────────────
 
-function* enqueueGenerator(value?: number): Generator<AlgorithmFrame> {
+function* enqueueGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 42
-  const items: number[] = [10, 20, 30]
+  const items: number[] = initialState ? [...(initialState as StackQueueState).items] : [10, 20, 30]
 
   // Frame 1: show current queue
   yield {
@@ -214,12 +214,12 @@ function* enqueueGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: items.length - 1, role: 'current', label: 'rear' }],
     message: 'ds.queue.enqueue.step2',
     codeLine: 2,
-    auxState: { val },
+    auxState: { val, operation: 'enqueue' },
   }
 }
 
-function* dequeueGenerator(_value?: number): Generator<AlgorithmFrame> {
-  const items: number[] = [10, 20, 30]
+function* dequeueGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  const items: number[] = initialState ? [...(initialState as StackQueueState).items] : [10, 20, 30]
 
   // Frame 1: show queue
   yield {
@@ -246,12 +246,12 @@ function* dequeueGenerator(_value?: number): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.queue.dequeue.step3',
     codeLine: 3,
-    auxState: { v: dequeued },
+    auxState: { v: dequeued, operation: 'dequeue' },
   }
 }
 
-function* peekGenerator(_value?: number): Generator<AlgorithmFrame> {
-  const items: number[] = [10, 20, 30]
+function* peekGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  const items: number[] = initialState ? [...(initialState as StackQueueState).items] : [10, 20, 30]
 
   // Frame 1: show queue
   yield {
@@ -267,13 +267,13 @@ function* peekGenerator(_value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: 0, role: 'selected', label: 'front' }],
     message: 'ds.queue.peek.step2',
     codeLine: 2,
-    auxState: { v: items[0] },
+    auxState: { v: items[0], operation: 'peek' },
   }
 }
 
-function* searchGenerator(value?: number): Generator<AlgorithmFrame> {
+function* searchGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 20
-  const items: number[] = [10, 20, 30]
+  const items: number[] = initialState ? [...(initialState as StackQueueState).items] : [10, 20, 30]
 
   // Frame 1: show queue
   yield {
@@ -302,7 +302,7 @@ function* searchGenerator(value?: number): Generator<AlgorithmFrame> {
         highlights: [{ index: i, role: 'found', label: 'found' }],
         message: 'ds.queue.search.found',
         codeLine: 4,
-        auxState: { val, i },
+        auxState: { val, i, operation: 'search' },
       }
       return
     }
@@ -314,7 +314,7 @@ function* searchGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.queue.search.notFound',
     codeLine: 5,
-    auxState: { val },
+    auxState: { val, operation: 'search' },
   }
 }
 
@@ -456,28 +456,28 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'insert',
     label: 'Enqueue',
     takesValue: true,
-    generator: enqueueGenerator,
+    generator: (value?: number, initialState?: unknown) => enqueueGenerator(value, initialState),
     codeSnippets: enqueueSnippets,
   },
   {
     type: 'remove',
     label: 'Dequeue',
     takesValue: false,
-    generator: dequeueGenerator,
+    generator: (value?: number, initialState?: unknown) => dequeueGenerator(value, initialState),
     codeSnippets: dequeueSnippets,
   },
   {
     type: 'traverse',
     label: 'Peek',
     takesValue: false,
-    generator: peekGenerator,
+    generator: (value?: number, initialState?: unknown) => peekGenerator(value, initialState),
     codeSnippets: peekSnippets,
   },
   {
     type: 'search',
     label: 'Search',
     takesValue: true,
-    generator: searchGenerator,
+    generator: (value?: number, initialState?: unknown) => searchGenerator(value, initialState),
     codeSnippets: searchQueueSnippets,
   },
 ]
