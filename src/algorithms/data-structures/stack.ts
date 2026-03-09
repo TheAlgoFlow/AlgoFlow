@@ -47,9 +47,9 @@ function snapshot(items: number[], op?: StackQueueState['operation'], highlighte
 // dsOperations generators
 // ---------------------------------------------------------------------------
 
-function* pushGenerator(value?: number): Generator<AlgorithmFrame> {
+function* pushGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 42
-  const items: number[] = [10, 20, 30]
+  const items: number[] = initialState ? [...(initialState as StackQueueState).items] : [10, 20, 30]
 
   // Step 1: show current stack
   yield {
@@ -66,11 +66,12 @@ function* pushGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: items.length - 1, role: 'current', label: 'top' }],
     message: 'ds.stack.push.done',
     codeLine: 2,
+    auxState: { operation: 'push' },
   }
 }
 
-function* popGenerator(_value?: number): Generator<AlgorithmFrame> {
-  const items: number[] = [10, 20, 30]
+function* popGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  const items: number[] = initialState ? [...(initialState as StackQueueState).items] : [10, 20, 30]
 
   // Step 1: show stack
   yield {
@@ -96,11 +97,12 @@ function* popGenerator(_value?: number): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.stack.pop.done',
     codeLine: 3,
+    auxState: { operation: 'pop' },
   }
 }
 
-function* peekGenerator(_value?: number): Generator<AlgorithmFrame> {
-  const items: number[] = [10, 20, 30]
+function* peekGenerator(_value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
+  const items: number[] = initialState ? [...(initialState as StackQueueState).items] : [10, 20, 30]
 
   // Step 1: show stack
   yield {
@@ -117,12 +119,13 @@ function* peekGenerator(_value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: top, role: 'selected', label: 'top' }],
     message: 'ds.stack.peek.done',
     codeLine: 2,
+    auxState: { operation: 'peek' },
   }
 }
 
-function* searchStackGenerator(value?: number): Generator<AlgorithmFrame> {
+function* searchStackGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const target = value ?? 20
-  const items: number[] = [10, 20, 30]
+  const items: number[] = initialState ? [...(initialState as StackQueueState).items] : [10, 20, 30]
 
   // Step 1: show stack
   yield {
@@ -141,6 +144,7 @@ function* searchStackGenerator(value?: number): Generator<AlgorithmFrame> {
         highlights: [{ index: i, role: 'found', label: 'found' }],
         message: 'ds.stack.search.found',
         codeLine: 4,
+        auxState: { operation: 'search' },
       }
       found = true
       break
@@ -160,6 +164,7 @@ function* searchStackGenerator(value?: number): Generator<AlgorithmFrame> {
       highlights: [],
       message: 'ds.stack.search.notFound',
       codeLine: 5,
+      auxState: { operation: 'search' },
     }
   }
 }
@@ -309,28 +314,28 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'insert',
     label: 'Push',
     takesValue: true,
-    generator: pushGenerator,
+    generator: (value?: number, initialState?: unknown) => pushGenerator(value, initialState),
     codeSnippets: pushSnippets,
   },
   {
     type: 'remove',
     label: 'Pop',
     takesValue: false,
-    generator: popGenerator,
+    generator: (value?: number, initialState?: unknown) => popGenerator(value, initialState),
     codeSnippets: popSnippets,
   },
   {
     type: 'search',
     label: 'Peek',
     takesValue: false,
-    generator: peekGenerator,
+    generator: (value?: number, initialState?: unknown) => peekGenerator(value, initialState),
     codeSnippets: peekSnippets,
   },
   {
     type: 'search',
     label: 'Search',
     takesValue: true,
-    generator: searchStackGenerator,
+    generator: (value?: number, initialState?: unknown) => searchStackGenerator(value, initialState),
     codeSnippets: searchSnippets,
   },
 ]

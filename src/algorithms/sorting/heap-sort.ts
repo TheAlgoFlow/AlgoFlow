@@ -20,22 +20,24 @@ function* heapify(
   root: number,
   sortedIndices: Set<number>,
   phase: string,
+  counters: { comparisons: number; swaps: number },
 ): Generator<AlgorithmFrame> {
   let largest = root
   const left = 2 * root + 1
   const right = 2 * root + 2
 
+  counters.comparisons += 2
   yield {
     state: { array: [...arr] },
     highlights: [
-      { index: root, role: 'current' },
-      ...(left < n ? [{ index: left, role: 'compare' as const }] : []),
-      ...(right < n ? [{ index: right, role: 'compare' as const }] : []),
+      { index: root, role: 'current', label: 'root' },
+      ...(left < n ? [{ index: left, role: 'compare' as const, label: 'L' }] : []),
+      ...(right < n ? [{ index: right, role: 'compare' as const, label: 'R' }] : []),
       ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
     ],
     message: 'algorithms.heapSort.steps.heapify',
     codeLine: 4,
-    auxState: { root, left: left < n ? arr[left] : null, right: right < n ? arr[right] : null, phase },
+    auxState: { root, left: left < n ? arr[left] : null, right: right < n ? arr[right] : null, phase, comparisons: counters.comparisons, swaps: counters.swaps },
   }
 
   if (left < n && arr[left] > arr[largest]) largest = left
@@ -43,20 +45,21 @@ function* heapify(
 
   if (largest !== root) {
     ;[arr[root], arr[largest]] = [arr[largest], arr[root]]
+    counters.swaps++
 
     yield {
       state: { array: [...arr] },
       highlights: [
-        { index: root, role: 'swap' },
-        { index: largest, role: 'swap' },
+        { index: root, role: 'swap', label: 'root' },
+        { index: largest, role: 'swap', label: largest === left ? 'L' : 'R' },
         ...Array.from(sortedIndices).map(s => ({ index: s, role: 'sorted' as const })),
       ],
       message: 'algorithms.heapSort.steps.heapify',
       codeLine: 6,
-      auxState: { root, largest, phase },
+      auxState: { root, largest, phase, comparisons: counters.comparisons, swaps: counters.swaps },
     }
 
-    yield* heapify(arr, n, largest, sortedIndices, phase)
+    yield* heapify(arr, n, largest, sortedIndices, phase, counters)
   }
 }
 
@@ -64,6 +67,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
   const sortedIndices = new Set<number>()
+  const counters = { comparisons: 0, swaps: 0 }
 
   // Phase 1: Build max heap
   yield {
@@ -71,17 +75,18 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'algorithms.heapSort.steps.buildHeap',
     codeLine: 1,
-    auxState: { phase: 'build' },
+    auxState: { phase: 'build', comparisons: counters.comparisons, swaps: counters.swaps },
   }
 
   for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
-    yield* heapify(arr, n, i, sortedIndices, 'build')
+    yield* heapify(arr, n, i, sortedIndices, 'build', counters)
   }
 
   // Phase 2: Extract elements from heap one by one
   for (let i = n - 1; i > 0; i--) {
     // Move current root (maximum) to end
     ;[arr[0], arr[i]] = [arr[i], arr[0]]
+    counters.swaps++
     sortedIndices.add(i)
 
     yield {
@@ -93,11 +98,11 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.heapSort.steps.extract',
       codeLine: 9,
-      auxState: { extracted: arr[i], pos: i },
+      auxState: { extracted: arr[i], pos: i, comparisons: counters.comparisons, swaps: counters.swaps },
     }
 
     // Heapify the reduced heap
-    yield* heapify(arr, i, 0, sortedIndices, 'extract')
+    yield* heapify(arr, i, 0, sortedIndices, 'extract', counters)
   }
 
   sortedIndices.add(0)
@@ -106,6 +111,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.heapSort.steps.done',
     codeLine: 11,
+    auxState: { comparisons: counters.comparisons, swaps: counters.swaps },
   }
 }
 
@@ -150,41 +156,40 @@ export const codeSnippets: CodeSnippets = {
     { line: 15, code: '        heapify(arr, n, largest)' },
   ],
   c: [
-    { line: 1, code: 'void heapify(int arr[], int n, int i) {' },
-    { line: 2, code: '    int largest=i, l=2*i+1, r=2*i+2;' },
-    { line: 3, code: '    if(l<n && arr[l]>arr[largest]) largest=l;' },
-    { line: 4, code: '    if(r<n && arr[r]>arr[largest]) largest=r;' },
-    { line: 5, code: '    if(largest!=i){' },
-    { line: 6, code: '        int tmp=arr[i]; arr[i]=arr[largest]; arr[largest]=tmp;' },
-    { line: 7, code: '        heapify(arr,n,largest);' },
-    { line: 8, code: '    }' },
-    { line: 9, code: '}' },
-    { line: 10, code: 'void heapSort(int arr[], int n) {' },
-    { line: 11, code: '    for(int i=n/2-1;i>=0;i--) heapify(arr,n,i);' },
+    { line: 1,  code: 'void heapify(int* A, int n, int i) {' },
+    { line: 2,  code: '    int maior=i, esq=2*i+1, dir=2*i+2, tmp;' },
+    { line: 3,  code: '    if(esq<n && A[esq]>A[maior]) maior=esq;' },
+    { line: 4,  code: '    if(dir<n && A[dir]>A[maior]) maior=dir;' },
+    { line: 5,  code: '    if(maior!=i){' },
+    { line: 6,  code: '        tmp=A[i]; A[i]=A[maior]; A[maior]=tmp;' },
+    { line: 7,  code: '        heapify(A,n,maior);' },
+    { line: 8,  code: '    }' },
+    { line: 9,  code: '}' },
+    { line: 10, code: 'void heapSort(int* A, int n) {' },
+    { line: 11, code: '    for(int i=n/2-1;i>=0;i--) heapify(A,n,i);' },
     { line: 12, code: '    for(int i=n-1;i>0;i--){' },
-    { line: 13, code: '        int tmp=arr[0]; arr[0]=arr[i]; arr[i]=tmp;' },
-    { line: 14, code: '        heapify(arr,i,0);' },
+    { line: 13, code: '        int tmp=A[0]; A[0]=A[i]; A[i]=tmp;' },
+    { line: 14, code: '        heapify(A,i,0);' },
     { line: 15, code: '    }' },
     { line: 16, code: '}' },
   ],
   java: [
-    { line: 1, code: 'void heapSort(int[] arr) {' },
-    { line: 2, code: '    int n = arr.length;' },
-    { line: 3, code: '    for (int i=n/2-1;i>=0;i--) heapify(arr,n,i);' },
-    { line: 4, code: '    for (int i=n-1;i>0;i--) {' },
-    { line: 5, code: '        int tmp=arr[0]; arr[0]=arr[i]; arr[i]=tmp;' },
-    { line: 6, code: '        heapify(arr,i,0);' },
-    { line: 7, code: '    }' },
-    { line: 8, code: '}' },
-    { line: 9, code: 'void heapify(int[] arr, int n, int i) {' },
-    { line: 10, code: '    int largest=i, l=2*i+1, r=2*i+2;' },
-    { line: 11, code: '    if(l<n && arr[l]>arr[largest]) largest=l;' },
-    { line: 12, code: '    if(r<n && arr[r]>arr[largest]) largest=r;' },
-    { line: 13, code: '    if(largest!=i){' },
-    { line: 14, code: '        int tmp=arr[i]; arr[i]=arr[largest]; arr[largest]=tmp;' },
-    { line: 15, code: '        heapify(arr,n,largest);' },
-    { line: 16, code: '    }' },
-    { line: 17, code: '}' },
+    { line: 1,  code: 'void heapSort(int[] A, int n) {' },
+    { line: 2,  code: '    for (int i=n/2-1;i>=0;i--) heapify(A,n,i);' },
+    { line: 3,  code: '    for (int i=n-1;i>0;i--) {' },
+    { line: 4,  code: '        int tmp=A[0]; A[0]=A[i]; A[i]=tmp;' },
+    { line: 5,  code: '        heapify(A,i,0);' },
+    { line: 6,  code: '    }' },
+    { line: 7,  code: '}' },
+    { line: 8,  code: 'void heapify(int[] A, int n, int i) {' },
+    { line: 9,  code: '    int maior=i, esq=2*i+1, dir=2*i+2;' },
+    { line: 10, code: '    if(esq<n && A[esq]>A[maior]) maior=esq;' },
+    { line: 11, code: '    if(dir<n && A[dir]>A[maior]) maior=dir;' },
+    { line: 12, code: '    if(maior!=i){' },
+    { line: 13, code: '        int tmp=A[i]; A[i]=A[maior]; A[maior]=tmp;' },
+    { line: 14, code: '        heapify(A,n,maior);' },
+    { line: 15, code: '    }' },
+    { line: 16, code: '}' },
   ],
   go: [
     { line: 1, code: 'func heapSort(arr []int) {' },

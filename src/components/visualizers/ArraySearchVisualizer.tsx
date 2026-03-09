@@ -52,6 +52,7 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
   const state = frame.state as { array: number[]; target: number; low?: number; high?: number; mid?: number }
   const arr = state.array ?? []
   const target = state.target
+  const comparisons = (frame.auxState as { comparisons?: number } | undefined)?.comparisons
 
   return (
     <div
@@ -68,22 +69,29 @@ export function ArraySearchVisualizer({ frame }: ArraySearchVisualizerProps) {
       {/* Target display */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <span style={{ color: '#64748b', fontSize: '0.875rem' }}>Target:</span>
-        <div
-          style={{
-            width: '48px',
-            height: '48px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'rgba(16, 185, 129, 0.15)',
-            border: '2px solid #10b981',
-            borderRadius: '8px',
-            fontWeight: 700,
-            fontSize: '1.125rem',
-            color: '#10b981',
-          }}
-        >
-          {target}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+          <div
+            style={{
+              width: '48px',
+              height: '48px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'rgba(16, 185, 129, 0.15)',
+              border: '2px solid #10b981',
+              borderRadius: '8px',
+              fontWeight: 700,
+              fontSize: '1.125rem',
+              color: '#10b981',
+            }}
+          >
+            {target}
+          </div>
+          {comparisons !== undefined && (
+            <div style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: '#f59e0b', fontWeight: 700 }}>
+              ⟳ {comparisons}
+            </div>
+          )}
         </div>
       </div>
 

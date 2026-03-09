@@ -16,6 +16,7 @@ type GraphState = {
   stack?: string[];
   current?: string;
   path?: string[];
+  traversedEdges?: Array<{ from: string; to: string }>;
 };
 
 // ---------------------------------------------------------------------------
@@ -77,12 +78,16 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   const stack: string[] = [START];
   const path: string[] = [];
 
+  let nodesVisited = 0
+  const traversedEdges: Array<{ from: string; to: string }> = []
+
   const baseState = (): GraphState => ({
     nodes: NODES,
     edges: EDGES,
     visited: [...visited],
     stack: [...stack],
     path: [...path],
+    traversedEdges: [...traversedEdges],
   });
 
   // Initial frame – show the starting node on the stack
@@ -91,7 +96,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     highlights: [{ index: START, role: 'active' }],
     message: 'algorithms.dfs.steps.start',
     codeLine: 1,
-    auxState: { node: START },
+    auxState: { node: START, nodesVisited },
   };
 
   while (stack.length > 0) {
@@ -114,13 +119,14 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
         ],
         message: 'algorithms.dfs.steps.backtrack',
         codeLine: 4,
-        auxState: { node: current },
+        auxState: { node: current, nodesVisited },
       };
       continue;
     }
 
     visited.push(current);
     path.push(current);
+    nodesVisited++
 
     // Frame: visit the popped node
     yield {
@@ -138,7 +144,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.dfs.steps.visit',
       codeLine: 3,
-      auxState: { node: current },
+      auxState: { node: current, nodesVisited },
     };
 
     // Push unvisited neighbours onto the stack (reverse order so leftmost is
@@ -147,6 +153,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     for (const neighbour of neighbours) {
       if (!visited.includes(neighbour)) {
         stack.push(neighbour);
+        traversedEdges.push({ from: current, to: neighbour })
       }
     }
   }
@@ -157,7 +164,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     highlights: visited.map((n) => ({ index: n, role: 'visited' as const })),
     message: 'algorithms.dfs.steps.done',
     codeLine: 7,
-    auxState: { path },
+    auxState: { path, nodesVisited },
   };
 }
 

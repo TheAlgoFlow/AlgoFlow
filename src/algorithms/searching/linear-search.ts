@@ -25,14 +25,16 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const { array, target } = input as { array: number[]; target: number };
   const arr = [...array];
 
+  let comparisons = 0
   for (let i = 0; i < arr.length; i++) {
     // Highlight current element being inspected
+    comparisons++
     yield {
       state: { array: arr, target },
       highlights: [{ index: i, role: 'current' }],
       message: 'algorithms.linearSearch.steps.check',
       codeLine: 2,
-      auxState: { i, v: arr[i] },
+      auxState: { i, v: arr[i], comparisons },
     };
 
     if (arr[i] === target) {
@@ -42,7 +44,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         highlights: [{ index: i, role: 'found' }],
         message: 'algorithms.linearSearch.steps.found',
         codeLine: 3,
-        auxState: { i, target },
+        auxState: { i, target, comparisons },
       };
       return;
     } else {
@@ -52,7 +54,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         highlights: [{ index: i, role: 'compare' }],
         message: 'algorithms.linearSearch.steps.move',
         codeLine: 2,
-        auxState: { i, v: arr[i] },
+        auxState: { i, v: arr[i], comparisons },
       };
     }
   }
@@ -63,7 +65,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'algorithms.linearSearch.steps.notFound',
     codeLine: 5,
-    auxState: { target },
+    auxState: { target, comparisons },
   };
 }
 

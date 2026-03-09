@@ -265,11 +265,11 @@ export const codeSnippets: CodeSnippets = {
 
 // ── Per-operation generators ──────────────────────────────────────────────────
 
-function* htInsertGenerator(value?: number): Generator<AlgorithmFrame> {
+function* htInsertGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 42
   const key = String(val)
   const entryValue = `val_${val}`
-  const buckets = emptyBuckets()
+  const buckets = initialState ? cloneBuckets((initialState as HashTableState).buckets) : emptyBuckets()
   const hashIdx = hashKey(key)
 
   function makeState(currentBucket: number | null, operation: string): HashTableState {
@@ -282,7 +282,7 @@ function* htInsertGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.hashTable.insert.step1',
     codeLine: 1,
-    auxState: { key, value: entryValue },
+    auxState: { key, value: entryValue, operation: 'insert' },
   }
 
   // Frame 2: compute hash, highlight bucket
@@ -291,7 +291,7 @@ function* htInsertGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: hashIdx, role: 'active', label: 'hash' }],
     message: 'ds.hashTable.insert.step2',
     codeLine: 2,
-    auxState: { key, hashIdx },
+    auxState: { key, hashIdx, operation: 'insert' },
   }
 
   // Frame 3: insert into bucket
@@ -301,14 +301,14 @@ function* htInsertGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: hashIdx, role: 'found', label: 'bucket' }],
     message: 'ds.hashTable.insert.step3',
     codeLine: 3,
-    auxState: { key, value: entryValue, hashIdx },
+    auxState: { key, value: entryValue, hashIdx, operation: 'insert' },
   }
 }
 
-function* htSearchGenerator(value?: number): Generator<AlgorithmFrame> {
+function* htSearchGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 42
   const key = String(val)
-  const buckets = prepopulatedBuckets()
+  const buckets = initialState ? cloneBuckets((initialState as HashTableState).buckets) : prepopulatedBuckets()
   const hashIdx = hashKey(key)
 
   function makeState(currentBucket: number | null, operation: string): HashTableState {
@@ -321,7 +321,7 @@ function* htSearchGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.hashTable.search.step1',
     codeLine: 1,
-    auxState: { key },
+    auxState: { key, operation: 'search' },
   }
 
   // Frame 2: compute hash, highlight bucket
@@ -330,7 +330,7 @@ function* htSearchGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: hashIdx, role: 'active', label: 'hash' }],
     message: 'ds.hashTable.search.step2',
     codeLine: 2,
-    auxState: { key, hashIdx },
+    auxState: { key, hashIdx, operation: 'search' },
   }
 
   // Frame 3: check bucket contents
@@ -339,7 +339,7 @@ function* htSearchGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: hashIdx, role: 'current', label: 'i' }],
     message: 'ds.hashTable.search.step3',
     codeLine: 3,
-    auxState: { key, hashIdx },
+    auxState: { key, hashIdx, operation: 'search' },
   }
 
   // Frame 4: found or not found
@@ -350,7 +350,7 @@ function* htSearchGenerator(value?: number): Generator<AlgorithmFrame> {
       highlights: [{ index: hashIdx, role: 'found', label: 'found' }],
       message: 'ds.hashTable.search.found',
       codeLine: 4,
-      auxState: { key, value: match.value, hashIdx },
+      auxState: { key, value: match.value, hashIdx, operation: 'search' },
     }
   } else {
     yield {
@@ -358,15 +358,15 @@ function* htSearchGenerator(value?: number): Generator<AlgorithmFrame> {
       highlights: [{ index: hashIdx, role: 'inactive', label: 'miss' }],
       message: 'ds.hashTable.search.notFound',
       codeLine: 6,
-      auxState: { key, hashIdx },
+      auxState: { key, hashIdx, operation: 'search' },
     }
   }
 }
 
-function* htRemoveGenerator(value?: number): Generator<AlgorithmFrame> {
+function* htRemoveGenerator(value?: number, initialState?: unknown): Generator<AlgorithmFrame> {
   const val = value ?? 42
   const key = String(val)
-  const buckets = prepopulatedBuckets()
+  const buckets = initialState ? cloneBuckets((initialState as HashTableState).buckets) : prepopulatedBuckets()
   const hashIdx = hashKey(key)
 
   function makeState(currentBucket: number | null, operation: string): HashTableState {
@@ -379,7 +379,7 @@ function* htRemoveGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'ds.hashTable.remove.step1',
     codeLine: 1,
-    auxState: { key },
+    auxState: { key, operation: 'remove' },
   }
 
   // Frame 2: compute hash, highlight bucket
@@ -388,7 +388,7 @@ function* htRemoveGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: hashIdx, role: 'active', label: 'hash' }],
     message: 'ds.hashTable.remove.step2',
     codeLine: 2,
-    auxState: { key, hashIdx },
+    auxState: { key, hashIdx, operation: 'remove' },
   }
 
   // Frame 3: filter out key, show updated bucket
@@ -398,7 +398,7 @@ function* htRemoveGenerator(value?: number): Generator<AlgorithmFrame> {
     highlights: [{ index: hashIdx, role: 'swap', label: 'del' }],
     message: 'ds.hashTable.remove.step3',
     codeLine: 3,
-    auxState: { key, hashIdx },
+    auxState: { key, hashIdx, operation: 'remove' },
   }
 }
 
@@ -524,21 +524,21 @@ export const dsOperations: DSOperationConfig[] = [
     type: 'insert',
     label: 'Insert',
     takesValue: true,
-    generator: htInsertGenerator,
+    generator: (value?: number, initialState?: unknown) => htInsertGenerator(value, initialState),
     codeSnippets: insertSnippets,
   },
   {
     type: 'search',
     label: 'Search',
     takesValue: true,
-    generator: htSearchGenerator,
+    generator: (value?: number, initialState?: unknown) => htSearchGenerator(value, initialState),
     codeSnippets: htSearchSnippets,
   },
   {
     type: 'remove',
     label: 'Remove',
     takesValue: true,
-    generator: htRemoveGenerator,
+    generator: (value?: number, initialState?: unknown) => htRemoveGenerator(value, initialState),
     codeSnippets: removeSnippets,
   },
 ]

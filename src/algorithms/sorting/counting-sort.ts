@@ -17,6 +17,7 @@ export const meta: AlgorithmMeta = {
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
+  let writes = 0
 
   const max = Math.max(...arr)
   const countArray = new Array(max + 1).fill(0)
@@ -31,7 +32,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: [{ index: i, role: 'current' }],
       message: 'algorithms.countingSort.steps.count',
       codeLine: 3,
-      auxState: { val: arr[i], count: countArray[arr[i]], i },
+      auxState: { val: arr[i], count: countArray[arr[i]], i, comparisons: 0, swaps: writes },
     }
   }
 
@@ -44,7 +45,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: [{ index: i, role: 'active' }],
       message: 'algorithms.countingSort.steps.accumulate',
       codeLine: 6,
-      auxState: { i, cumCount: countArray[i] },
+      auxState: { i, cumCount: countArray[i], comparisons: 0, swaps: writes },
     }
   }
 
@@ -54,6 +55,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     const pos = countArray[val] - 1
     output[pos] = val
     countArray[val]--
+    writes++
 
     yield {
       state: { array: [...output], countArray: [...countArray] },
@@ -63,7 +65,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.countingSort.steps.place',
       codeLine: 9,
-      auxState: { val, pos, i },
+      auxState: { val, pos, i, comparisons: 0, swaps: writes },
     }
   }
 
@@ -72,6 +74,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: output.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.countingSort.steps.done',
     codeLine: 11,
+    auxState: { comparisons: 0, swaps: writes },
   }
 }
 
@@ -103,28 +106,30 @@ export const codeSnippets: CodeSnippets = {
     { line: 11, code: '    return output' },
   ],
   c: [
-    { line: 1, code: 'void countingSort(int arr[], int n) {' },
-    { line: 2, code: '    int max = arr[0];' },
-    { line: 3, code: '    for(int i=1;i<n;i++) if(arr[i]>max) max=arr[i];' },
-    { line: 4, code: '    int count[max+1]; memset(count,0,sizeof(count));' },
-    { line: 5, code: '    for(int i=0;i<n;i++) count[arr[i]]++;' },
-    { line: 6, code: '    for(int i=1;i<=max;i++) count[i]+=count[i-1];' },
-    { line: 7, code: '    int output[n];' },
-    { line: 8, code: '    for(int i=n-1;i>=0;i--) output[--count[arr[i]]]=arr[i];' },
-    { line: 9, code: '    for(int i=0;i<n;i++) arr[i]=output[i];' },
-    { line: 10, code: '}' },
+    { line: 1,  code: 'void countingSort(int* A, int n) {' },
+    { line: 2,  code: '    int i, max = A[0];' },
+    { line: 3,  code: '    for(i=1;i<n;i++) if(A[i]>max) max=A[i];' },
+    { line: 4,  code: '    int* count = (int*)calloc(max+1, sizeof(int));' },
+    { line: 5,  code: '    int* output = (int*)malloc(n*sizeof(int));' },
+    { line: 6,  code: '    for(i=0;i<n;i++) count[A[i]]++;' },
+    { line: 7,  code: '    for(i=1;i<=max;i++) count[i]+=count[i-1];' },
+    { line: 8,  code: '    for(i=n-1;i>=0;i--) output[--count[A[i]]]=A[i];' },
+    { line: 9,  code: '    for(i=0;i<n;i++) A[i]=output[i];' },
+    { line: 10, code: '    free(count); free(output);' },
+    { line: 11, code: '}' },
   ],
   java: [
-    { line: 1, code: 'int[] countingSort(int[] arr) {' },
-    { line: 2, code: '    int max = Arrays.stream(arr).max().getAsInt();' },
-    { line: 3, code: '    int[] count = new int[max + 1];' },
-    { line: 4, code: '    for (int v : arr) count[v]++;' },
-    { line: 5, code: '    for (int i=1;i<=max;i++) count[i]+=count[i-1];' },
-    { line: 6, code: '    int[] output = new int[arr.length];' },
-    { line: 7, code: '    for (int i=arr.length-1;i>=0;i--)' },
-    { line: 8, code: '        output[--count[arr[i]]] = arr[i];' },
-    { line: 9, code: '    return output;' },
-    { line: 10, code: '}' },
+    { line: 1,  code: 'void countingSort(int[] A, int n) {' },
+    { line: 2,  code: '    int max = A[0];' },
+    { line: 3,  code: '    for (int i=1;i<n;i++) if(A[i]>max) max=A[i];' },
+    { line: 4,  code: '    int[] count = new int[max+1];' },
+    { line: 5,  code: '    int[] output = new int[n];' },
+    { line: 6,  code: '    for (int i=0;i<n;i++) count[A[i]]++;' },
+    { line: 7,  code: '    for (int i=1;i<=max;i++) count[i]+=count[i-1];' },
+    { line: 8,  code: '    for (int i=n-1;i>=0;i--)' },
+    { line: 9,  code: '        output[--count[A[i]]] = A[i];' },
+    { line: 10, code: '    for (int i=0;i<n;i++) A[i]=output[i];' },
+    { line: 11, code: '}' },
   ],
   go: [
     { line: 1, code: 'func countingSort(arr []int) []int {' },

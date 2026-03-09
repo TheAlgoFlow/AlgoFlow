@@ -17,6 +17,8 @@ export const meta: AlgorithmMeta = {
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
+  let comparisons = 0
+  let swaps = 0
 
   for (let i = 1; i < n; i++) {
     const key = arr[i]
@@ -24,32 +26,34 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     // Yield: pick the element to insert
     yield {
       state: { array: [...arr] },
-      highlights: [{ index: i, role: 'selected' }],
+      highlights: [{ index: i, role: 'selected', label: 'key' }],
       message: 'algorithms.insertionSort.steps.pick',
       codeLine: 2,
-      auxState: { key, i },
+      auxState: { key, i, comparisons, swaps },
     }
 
     let j = i - 1
 
     while (j >= 0 && arr[j] > key) {
+      comparisons++
       // Yield: comparing arr[j] with key
       yield {
         state: { array: [...arr] },
-        highlights: [{ index: j, role: 'compare' }, { index: j + 1, role: 'selected' }],
+        highlights: [{ index: j, role: 'compare', label: 'j' }, { index: j + 1, role: 'selected', label: 'key' }],
         message: 'algorithms.insertionSort.steps.compare',
         codeLine: 4,
-        auxState: { key, compared: arr[j], j },
+        auxState: { key, compared: arr[j], j, comparisons, swaps },
       }
 
       // Shift arr[j] right
+      swaps++
       arr[j + 1] = arr[j]
       yield {
         state: { array: [...arr] },
-        highlights: [{ index: j, role: 'compare' }, { index: j + 1, role: 'swap' }],
+        highlights: [{ index: j, role: 'compare', label: 'j' }, { index: j + 1, role: 'swap', label: 'key' }],
         message: 'algorithms.insertionSort.steps.compare',
         codeLine: 5,
-        auxState: { key, shifted: arr[j + 1], j },
+        auxState: { key, shifted: arr[j + 1], j, comparisons, swaps },
       }
 
       j--
@@ -62,7 +66,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       highlights: [{ index: j + 1, role: 'selected' }],
       message: 'algorithms.insertionSort.steps.insert',
       codeLine: 7,
-      auxState: { key, pos: j + 1 },
+      auxState: { key, pos: j + 1, comparisons, swaps },
     }
   }
 
@@ -71,6 +75,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.insertionSort.steps.done',
     codeLine: 8,
+    auxState: { comparisons, swaps },
   }
 }
 
@@ -101,30 +106,26 @@ export const codeSnippets: CodeSnippets = {
     { line: 9, code: '    return arr' },
   ],
   c: [
-    { line: 1, code: 'void insertionSort(int arr[], int n) {' },
-    { line: 2, code: '    for (int i = 1; i < n; i++) {' },
-    { line: 3, code: '        int key = arr[i];' },
-    { line: 4, code: '        int j = i - 1;' },
-    { line: 5, code: '        while (j >= 0 && arr[j] > key) {' },
-    { line: 6, code: '            arr[j + 1] = arr[j];' },
-    { line: 7, code: '            j--;' },
-    { line: 8, code: '        }' },
-    { line: 9, code: '        arr[j + 1] = key;' },
-    { line: 10, code: '    }' },
-    { line: 11, code: '}' },
+    { line: 1,  code: 'void insertionSort(int* A, int n) {' },
+    { line: 2,  code: '    int i, j, tmp;' },
+    { line: 3,  code: '    for (i = 1; i < n; i++) {' },
+    { line: 4,  code: '        tmp = A[i];' },
+    { line: 5,  code: '        for (j = i-1; j >= 0 && A[j] > tmp; j--)' },
+    { line: 6,  code: '            A[j+1] = A[j];' },
+    { line: 7,  code: '        A[j+1] = tmp;' },
+    { line: 8,  code: '    }' },
+    { line: 9,  code: '}' },
   ],
   java: [
-    { line: 1, code: 'void insertionSort(int[] arr) {' },
-    { line: 2, code: '    for (int i = 1; i < arr.length; i++) {' },
-    { line: 3, code: '        int key = arr[i];' },
-    { line: 4, code: '        int j = i - 1;' },
-    { line: 5, code: '        while (j >= 0 && arr[j] > key) {' },
-    { line: 6, code: '            arr[j + 1] = arr[j];' },
-    { line: 7, code: '            j--;' },
-    { line: 8, code: '        }' },
-    { line: 9, code: '        arr[j + 1] = key;' },
-    { line: 10, code: '    }' },
-    { line: 11, code: '}' },
+    { line: 1,  code: 'void insertionSort(int[] A, int n) {' },
+    { line: 2,  code: '    for (int i = 1; i < n; i++) {' },
+    { line: 3,  code: '        int tmp = A[i];' },
+    { line: 4,  code: '        int j;' },
+    { line: 5,  code: '        for (j = i-1; j >= 0 && A[j] > tmp; j--)' },
+    { line: 6,  code: '            A[j+1] = A[j];' },
+    { line: 7,  code: '        A[j+1] = tmp;' },
+    { line: 8,  code: '    }' },
+    { line: 9,  code: '}' },
   ],
   go: [
     { line: 1, code: 'func insertionSort(arr []int) {' },

@@ -11,6 +11,7 @@ import { DSOperationsPanel } from '@/components/organisms/DSOperationsPanel'
 import { InfoPanel } from '@/components/organisms/InfoPanel'
 import { PracticeSection } from '@/components/molecules/PracticeSection'
 import { ArrayBarsVisualizer } from '@/components/visualizers/ArrayBarsVisualizer'
+import { AlgoStatsBar } from '@/components/molecules/AlgoStatsBar'
 import { ArraySearchVisualizer } from '@/components/visualizers/ArraySearchVisualizer'
 import { ArrayBoxesVisualizer } from '@/components/visualizers/ArrayBoxesVisualizer'
 import { GraphVisualizer } from '@/components/visualizers/GraphVisualizer'
@@ -28,7 +29,7 @@ import type { PlayerState } from '@/hooks/useAlgorithmPlayer'
 const SORTING_SLUGS = [
   'bubble-sort', 'selection-sort', 'insertion-sort',
   'merge-sort', 'quick-sort', 'heap-sort',
-  'counting-sort', 'radix-sort',
+  'counting-sort', 'radix-sort', 'shell-sort',
 ]
 
 function getVisualizerForSlug(slug: string, frame: AlgorithmFrame | null) {
@@ -39,6 +40,7 @@ function getVisualizerForSlug(slug: string, frame: AlgorithmFrame | null) {
   if (slug === 'stack') return <StackQueueVisualizer frame={frame} mode="stack" />
   if (slug === 'queue') return <StackQueueVisualizer frame={frame} mode="queue" />
   if (slug === 'linked-list') return <LinkedListVisualizer frame={frame} />
+  if (slug === 'doubly-linked-list') return <LinkedListVisualizer frame={frame} />
   if (slug === 'hash-table') return <HashTableVisualizer frame={frame} />
   if (slug === 'array-ops' || slug === 'min-heap') return <ArrayBarsVisualizer frame={frame} />
   return <GridVisualizer frame={frame} />
@@ -96,6 +98,10 @@ export function VisualizerPageTemplate({
   const [activeSnippets, setActiveSnippets] = useState<CodeSnippets | null>(
     algo.dsOperations?.[0]?.codeSnippets ?? null
   )
+  const [operationHistory, setOperationHistory] = useState<string[]>([])
+
+  // Persistent DS state — survives across operations
+  const persistentDSStateRef = useRef<unknown>(null)
 
   const dsGenerator = useMemo(() => {
     if (!activeDsOp) return null
@@ -105,6 +111,20 @@ export function VisualizerPageTemplate({
   }, [activeDsOp, dsOpKey])
 
   const dsPlayer = useAlgorithmPlayer(algo.dsOperations ? dsGenerator : null)
+
+  // Capture final frame state after each DS operation completes
+  useEffect(() => {
+    if (dsPlayer.frames.length > 0) {
+      persistentDSStateRef.current = dsPlayer.frames[dsPlayer.frames.length - 1].state
+    }
+  }, [dsPlayer.frames])
+
+  // Idle frame: show accumulated DS state when no animation is playing
+  const idleFrame: AlgorithmFrame | null = useMemo(() => {
+    if (!persistentDSStateRef.current) return null
+    return { state: persistentDSStateRef.current, highlights: [], message: '', codeLine: 0 }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dsPlayer.frames])
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
@@ -127,6 +147,8 @@ export function VisualizerPageTemplate({
   const activePlayer = isDsPage ? dsPlayer : player
 
   const frame = activePlayer.currentFrame
+  // For DS pages: show accumulated state when animation is idle
+  const displayFrame = isDsPage ? (frame ?? idleFrame) : frame
 
   // Resolve step message
   let stepMessage = ''
@@ -139,19 +161,26 @@ export function VisualizerPageTemplate({
 
   const isSearchAlgo  = ['linear-search', 'binary-search'].includes(slug)
   const isGraphAlgo   = ['bfs', 'dfs'].includes(slug)
-  const isTreeOrDS    = ['binary-tree', 'bst', 'linked-list', 'stack', 'queue', 'hash-table', 'min-heap', 'array-ops'].includes(slug)
+  const isTreeOrDS    = ['binary-tree', 'bst', 'linked-list', 'doubly-linked-list', 'stack', 'queue', 'hash-table', 'min-heap', 'array-ops'].includes(slug)
   const isSortingAlgo = SORTING_SLUGS.includes(slug)
   const showArrayInput = !isGraphAlgo && !isTreeOrDS && !isDsPage
   const isArrayAlgo   = isSortingAlgo || isSearchAlgo || slug === 'array-ops'
 
   const handleDsRun = useCallback((op: DSOperationConfig, value?: number) => {
-    // Create a new generator that captures the value
+    // Create a new generator that captures the value and persistent state
     const opWithValue: DSOperationConfig = {
       ...op,
-      generator: () => op.generator(value),
+      generator: () => op.generator(value, persistentDSStateRef.current),
     }
     setActiveDsOp(opWithValue)
     setActiveSnippets(op.codeSnippets)
+    setDsOpKey(k => k + 1)
+    setOperationHistory(prev => [...prev, value !== undefined ? `${op.label}(${value})` : op.label])
+  }, [])
+
+  const handleDsReset = useCallback(() => {
+    persistentDSStateRef.current = null
+    setOperationHistory([])
     setDsOpKey(k => k + 1)
   }, [])
 
@@ -195,8 +224,8 @@ export function VisualizerPageTemplate({
           }}
         >
           {isArrayAlgo && vizMode === 'array'
-            ? <ArrayBoxesVisualizer frame={frame} />
-            : getVisualizerForSlug(slug, frame)
+            ? <ArrayBoxesVisualizer frame={displayFrame} />
+            : getVisualizerForSlug(slug, displayFrame)
           }
 
           {/* Viz mode toggle — only for array algorithms */}
@@ -274,9 +303,76 @@ export function VisualizerPageTemplate({
             transition: 'flex-basis 0.3s ease',
           }}
         >
-          <CodePanel snippets={displaySnippets} activeLine={frame?.codeLine ?? 0} />
+          <CodePanel snippets={displaySnippets} activeLine={displayFrame?.codeLine ?? 0} />
         </div>
       </div>
+
+      {/* ── Stats bar (sorting algorithms only) ── */}
+      <AlgoStatsBar frame={frame} slug={slug} />
+
+      {/* ── DS Operation history strip ── */}
+      {isDsPage && operationHistory.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.75rem 1rem',
+            background: 'var(--surface)',
+            borderTop: '1px solid var(--border)',
+            borderBottom: '1px solid var(--border)',
+            overflowX: 'auto',
+            maxHeight: '44px',
+            flexShrink: 0,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flex: 1, minWidth: 0 }}>
+            {operationHistory.map((op, i) => (
+              <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
+                <span
+                  style={{
+                    background: 'rgba(249,0,255,0.1)',
+                    border: '1px solid rgba(249,0,255,0.3)',
+                    color: '#F900FF',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '11px',
+                    padding: '2px 8px',
+                    borderRadius: '999px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {op}
+                </span>
+                {i < operationHistory.length - 1 && (
+                  <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>→</span>
+                )}
+              </span>
+            ))}
+          </div>
+          <button
+            onClick={handleDsReset}
+            style={{
+              flexShrink: 0,
+              marginLeft: '0.5rem',
+              padding: '3px 10px',
+              borderRadius: '6px',
+              border: '1px solid rgba(239,68,68,0.3)',
+              background: 'rgba(239,68,68,0.08)',
+              color: '#ef4444',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '11px',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'background 0.15s',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.18)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)' }}
+          >
+            Reset DS
+          </button>
+        </div>
+      )}
 
       {/* ── Controls dock / DS operations ── */}
       {isDsPage && algo.dsOperations ? (

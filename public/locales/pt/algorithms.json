@@ -91,6 +91,19 @@
         "done": "Array ordenado!"
       }
     },
+    "shellSort": {
+      "name": "Shell Sort",
+      "description": "Generalização do insertion sort que ordena elementos distantes primeiro usando uma sequência de intervalos decrescentes, finalizando com uma passagem de insertion sort.",
+      "whenToUse": "Bom desempenho prático para arrays de tamanho médio. Mais rápido que o insertion sort na maioria dos casos. Usado em sistemas embarcados e como sub-rotina em algoritmos mais complexos.",
+      "steps": {
+        "gap": "Novo intervalo h = {{h}} — ordenando sub-sequências com passo {{h}}",
+        "pick": "Selecionando elemento {{tmp}} no índice {{i}} (intervalo {{h}})",
+        "compare": "Comparando {{val}} com chave {{tmp}} — deslocando para direita",
+        "shift": "Deslocando {{val}} para posição {{pos}}",
+        "insert": "Inserindo {{tmp}} na posição {{pos}}",
+        "done": "Array ordenado!"
+      }
+    },
     "linearSearch": {
       "name": "Busca Linear",
       "description": "Verifica cada elemento sequencialmente até encontrar o alvo ou atingir o fim. Funciona em arrays ordenados e não-ordenados.",
@@ -148,6 +161,15 @@
         "shift": "Deslocando elementos para abrir espaço",
         "delete": "Deletando elemento no índice {{i}}",
         "search": "Buscando {{v}}"
+      }
+    },
+    "doublyLinkedList": {
+      "name": "Lista Duplamente Encadeada",
+      "description": "Sequência de nós onde cada nó armazena um valor e ponteiros para o nó seguinte e anterior, permitindo travessia eficiente em ambas as direções.",
+      "whenToUse": "Quando é necessária travessia bidirecional ou remoção O(1) em ambas as extremidades. Usado em histórico do navegador, caches LRU e pilhas de desfazer/refazer.",
+      "steps": {
+        "init": "Lista inicial pronta",
+        "done": "Operação concluída"
       }
     },
     "linkedList": {
@@ -288,6 +310,214 @@
         "update": "dp[{{a}}] = min({{prev}}, dp[{{rem}}]+1) = {{v}}",
         "skip": "Moeda {{c}} > valor {{a}}, pulando",
         "done": "Mínimo de moedas para {{amount}}: {{v}}"
+      }
+    }
+  },
+  "ds": {
+    "stack": {
+      "push": {
+        "init": "Stack pronta — prestes a empilhar",
+        "done": "Elemento empilhado no topo"
+      },
+      "pop": {
+        "init": "Stack pronta — prestes a desempilhar",
+        "highlight": "Elemento do topo destacado",
+        "done": "Elemento do topo removido"
+      },
+      "peek": {
+        "init": "Observando o elemento do topo",
+        "done": "Observação completa"
+      },
+      "search": {
+        "init": "Buscando na stack",
+        "checking": "Verificando elemento",
+        "found": "Elemento encontrado na stack",
+        "notFound": "Elemento não encontrado na stack"
+      }
+    },
+    "queue": {
+      "enqueue": {
+        "step1": "Fila pronta — prestes a enfileirar",
+        "step2": "Elemento enfileirado no fim"
+      },
+      "dequeue": {
+        "step1": "Fila pronta — prestes a desenfileirar",
+        "step2": "Elemento do início removido",
+        "step3": "Desenfileiramento completo"
+      },
+      "peek": {
+        "step1": "Observando o elemento do início",
+        "step2": "Observação completa"
+      },
+      "search": {
+        "step1": "Buscando na fila",
+        "step2": "Verificando elemento",
+        "found": "Elemento encontrado na fila",
+        "notFound": "Elemento não encontrado na fila"
+      }
+    },
+    "linkedList": {
+      "insertHead": {
+        "init": "Inserindo na cabeça",
+        "done": "Inserido na cabeça"
+      },
+      "insertTail": {
+        "init": "Inserindo no fim",
+        "traversing": "Percorrendo até o fim",
+        "done": "Inserido no fim"
+      },
+      "search": {
+        "init": "Buscando na lista",
+        "checking": "Verificando nó",
+        "found": "Nó encontrado",
+        "notFound": "Nó não encontrado"
+      },
+      "traverse": {
+        "init": "Iniciando percurso",
+        "visiting": "Visitando nó"
+      }
+    },
+    "doublyLinkedList": {
+      "inserirInicio": {
+        "init": "Inserindo no início",
+        "done": "Inserido no início"
+      },
+      "inserirFim": {
+        "init": "Inserindo no fim",
+        "done": "Inserido no fim"
+      },
+      "removerInicio": {
+        "init": "Removendo o nó do início",
+        "done": "Nó do início removido"
+      },
+      "removerFim": {
+        "init": "Removendo o nó do fim",
+        "done": "Nó do fim removido"
+      },
+      "pesquisar": {
+        "init": "Buscando na lista",
+        "checking": "Verificando nó",
+        "found": "Nó encontrado",
+        "notFound": "Nó não encontrado"
+      },
+      "mostrarInverso": {
+        "init": "Iniciando percurso inverso",
+        "visiting": "Visitando nó",
+        "done": "Percurso inverso completo"
+      }
+    },
+    "hashTable": {
+      "insert": {
+        "step1": "Calculando hash da chave",
+        "step2": "Inserindo no bucket alvo",
+        "step3": "Inserção completa"
+      },
+      "search": {
+        "step1": "Calculando hash da chave",
+        "step2": "Verificando bucket alvo",
+        "step3": "Varrendo entradas do bucket",
+        "found": "Chave encontrada",
+        "notFound": "Chave não encontrada"
+      },
+      "remove": {
+        "step1": "Calculando hash da chave",
+        "step2": "Varrendo bucket alvo",
+        "step3": "Chave removida"
+      }
+    },
+    "minHeap": {
+      "insert": {
+        "init": "Inserindo no heap",
+        "push": "Adicionado ao final",
+        "bubbleUp": "Subindo para restaurar a propriedade do heap",
+        "done": "Inserção completa"
+      },
+      "extractMin": {
+        "init": "Extraindo o elemento mínimo",
+        "siftDown": "Descendo para restaurar a propriedade do heap",
+        "swap": "Trocando com o filho menor",
+        "done": "Extração completa"
+      },
+      "getMin": {
+        "init": "Observando o elemento mínimo",
+        "done": "Observação completa"
+      },
+      "heapify": {
+        "init": "Heapificando o array",
+        "siftDown": "Descendo no índice",
+        "done": "Propriedade do heap restaurada"
+      }
+    },
+    "bst": {
+      "insert": {
+        "start": "Inserindo {{v}} na BST",
+        "compare": "Comparando {{v}} com o nó {{nodeV}}",
+        "placed": "{{v}} inserido como nova folha",
+        "done": "Inserção completa"
+      },
+      "search": {
+        "start": "Buscando {{target}} na BST",
+        "visiting": "Visitando nó {{nodeV}}",
+        "goLeft": "{{target}} < {{nodeV}} — indo para a esquerda",
+        "goRight": "{{target}} > {{nodeV}} — indo para a direita",
+        "found": "{{v}} encontrado!",
+        "notFound": "{{target}} não encontrado na BST"
+      },
+      "remove": {
+        "start": "Removendo {{v}} da BST",
+        "searching": "Buscando nó {{v}}",
+        "found": "Nó a remover encontrado",
+        "notFound": "{{v}} não encontrado na BST",
+        "done": "Remoção completa"
+      }
+    },
+    "binaryTree": {
+      "insert": {
+        "start": "Inserindo na árvore",
+        "compare": "Comparando com o nó atual",
+        "placed": "Inserido como novo nó",
+        "done": "Inserção completa"
+      },
+      "search": {
+        "start": "Buscando na árvore",
+        "visiting": "Visitando nó",
+        "goLeft": "Indo para a esquerda",
+        "goRight": "Indo para a direita",
+        "found": "Nó encontrado!",
+        "notFound": "Nó não encontrado"
+      },
+      "traverse": {
+        "start": "Iniciando percurso",
+        "visit": "Visitando nó",
+        "goLeft": "Indo para a esquerda",
+        "goRight": "Indo para a direita",
+        "done": "Percurso completo"
+      }
+    },
+    "arrayOps": {
+      "access": {
+        "init": "Acessando elemento",
+        "done": "Acesso completo"
+      },
+      "insert": {
+        "init": "Inserindo elemento",
+        "shift": "Deslocando elementos para a direita",
+        "place": "Elemento inserido no índice alvo",
+        "done": "Inserção completa"
+      },
+      "remove": {
+        "init": "Removendo elemento",
+        "search": "Buscando elemento",
+        "found": "Elemento encontrado",
+        "shift": "Deslocando elementos para a esquerda",
+        "notFound": "Elemento não encontrado",
+        "done": "Remoção completa"
+      },
+      "search": {
+        "init": "Buscando elemento",
+        "checking": "Verificando índice",
+        "found": "Elemento encontrado",
+        "done": "Busca completa"
       }
     }
   }

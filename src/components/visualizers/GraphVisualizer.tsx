@@ -18,6 +18,7 @@ type GraphState = {
   queue?: string[]
   stack?: string[]
   current?: string
+  traversedEdges?: Array<{ from: string; to: string }>
 }
 
 type GraphVisualizerProps = {
@@ -43,7 +44,8 @@ export function GraphVisualizer({ frame }: GraphVisualizerProps) {
   }
 
   const state = frame.state as GraphState
-  const { nodes, edges, visited, queue, stack, current } = state
+  const { nodes, edges, visited, queue, stack, current, traversedEdges = [] } = state
+  const nodesVisited = (frame.auxState as { nodesVisited?: number } | undefined)?.nodesVisited ?? 0
 
   const getNodeColor = (nodeId: string) => {
     const hl = frame.highlights.find(h => h.index === nodeId)
@@ -69,11 +71,24 @@ export function GraphVisualizer({ frame }: GraphVisualizerProps) {
         viewBox="0 0 600 300"
         style={{ overflow: 'visible' }}
       >
+        {/* Visited counter */}
+        {nodesVisited > 0 && (
+          <text x="10" y="20" fontSize="11" fontFamily="var(--font-mono)" fill="#10b981" fontWeight="bold">
+            Visited: {nodesVisited}
+          </text>
+        )}
+
         {/* Edges */}
         {edges?.map((edge, i) => {
           const fromNode = nodes?.find(n => n.id === edge.from)
           const toNode = nodes?.find(n => n.id === edge.to)
           if (!fromNode || !toNode) return null
+          const isTraversed = traversedEdges.some(
+            te => (te.from === edge.from && te.to === edge.to) || (te.from === edge.to && te.to === edge.from)
+          )
+          const isActive = edge.from === current && !visited?.includes(edge.to)
+          const stroke = isActive ? '#f59e0b' : isTraversed ? '#10b981' : 'rgba(99,102,241,0.3)'
+          const strokeWidth = isActive ? '3' : isTraversed ? '2.5' : '1.5'
           return (
             <line
               key={i}
@@ -81,8 +96,9 @@ export function GraphVisualizer({ frame }: GraphVisualizerProps) {
               y1={fromNode.y}
               x2={toNode.x}
               y2={toNode.y}
-              stroke="rgba(99,102,241,0.3)"
-              strokeWidth="2"
+              stroke={stroke}
+              strokeWidth={strokeWidth}
+              style={{ transition: 'stroke 0.2s ease' }}
             />
           )
         })}

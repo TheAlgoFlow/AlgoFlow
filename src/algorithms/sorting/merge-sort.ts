@@ -17,6 +17,8 @@ export const meta: AlgorithmMeta = {
 export function* generator(input: unknown): Generator<AlgorithmFrame> {
   const arr = [...(input as number[])]
   const n = arr.length
+  let comparisons = 0
+  let swaps = 0
 
   // Iterative bottom-up merge sort
   for (let width = 1; width < n; width *= 2) {
@@ -32,12 +34,21 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       for (let k = lo; k <= mid; k++) leftHighlights.push({ index: k, role: 'left' as const })
       for (let k = mid + 1; k <= hi; k++) rightHighlights.push({ index: k, role: 'right' as const })
 
+      const announcementHighlights = leftHighlights.map((h, idx) =>
+        idx === 0 ? { ...h, label: 'lo' }
+        : idx === leftHighlights.length - 1 ? { ...h, label: 'mid' }
+        : h
+      )
+      const rightAnnotated = rightHighlights.map((h, idx) =>
+        idx === rightHighlights.length - 1 ? { ...h, label: 'hi' } : h
+      )
+
       yield {
         state: { array: [...arr] },
-        highlights: [...leftHighlights, ...rightHighlights],
+        highlights: [...announcementHighlights, ...rightAnnotated],
         message: 'algorithms.mergeSort.steps.merge',
         codeLine: 5,
-        auxState: { lo, mid, hi, width },
+        auxState: { lo, mid, hi, width, comparisons, swaps },
       }
 
       // Merge the two halves
@@ -48,17 +59,18 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       let k = lo
 
       while (i < left.length && j < right.length) {
+        comparisons++
         // Yield: picking the smaller element
         yield {
           state: { array: [...arr] },
           highlights: [
-            { index: lo + i, role: 'left' },
-            { index: mid + 1 + j, role: 'right' },
+            { index: lo + i, role: 'left', label: 'L' },
+            { index: mid + 1 + j, role: 'right', label: 'R' },
             { index: k, role: 'current' },
           ],
           message: 'algorithms.mergeSort.steps.pick',
           codeLine: 7,
-          auxState: { leftVal: left[i], rightVal: right[j] },
+          auxState: { leftVal: left[i], rightVal: right[j], comparisons, swaps },
         }
 
         if (left[i] <= right[j]) {
@@ -69,24 +81,26 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           j++
         }
         k++
+        swaps++
 
         yield {
           state: { array: [...arr] },
           highlights: [{ index: k - 1, role: 'current' }],
           message: 'algorithms.mergeSort.steps.pick',
           codeLine: 8,
-          auxState: { placed: arr[k - 1], pos: k - 1 },
+          auxState: { placed: arr[k - 1], pos: k - 1, comparisons, swaps },
         }
       }
 
       while (i < left.length) {
         arr[k] = left[i]
+        swaps++
         yield {
           state: { array: [...arr] },
           highlights: [{ index: k, role: 'current' as const }],
           message: 'algorithms.mergeSort.steps.pick',
           codeLine: 9,
-          auxState: { placed: left[i], pos: k },
+          auxState: { placed: left[i], pos: k, comparisons, swaps },
         }
         i++
         k++
@@ -94,12 +108,13 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
 
       while (j < right.length) {
         arr[k] = right[j]
+        swaps++
         yield {
           state: { array: [...arr] },
           highlights: [{ index: k, role: 'current' as const }],
           message: 'algorithms.mergeSort.steps.pick',
           codeLine: 9,
-          auxState: { placed: right[j], pos: k },
+          auxState: { placed: right[j], pos: k, comparisons, swaps },
         }
         j++
         k++
@@ -114,7 +129,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         highlights: mergedHighlights,
         message: 'algorithms.mergeSort.steps.merge',
         codeLine: 10,
-        auxState: { lo, hi },
+        auxState: { lo, hi, comparisons, swaps },
       }
     }
   }
@@ -124,6 +139,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: arr.map((_, idx) => ({ index: idx, role: 'sorted' as const })),
     message: 'algorithms.mergeSort.steps.done',
     codeLine: 12,
+    auxState: { comparisons, swaps },
   }
 }
 
@@ -162,43 +178,43 @@ export const codeSnippets: CodeSnippets = {
     { line: 15, code: '    return result + left[i:] + right[j:]' },
   ],
   c: [
-    { line: 1, code: 'void merge(int arr[], int l, int m, int r) {' },
-    { line: 2, code: '    int n1 = m-l+1, n2 = r-m;' },
-    { line: 3, code: '    int L[n1], R[n2];' },
-    { line: 4, code: '    for (int i=0;i<n1;i++) L[i]=arr[l+i];' },
-    { line: 5, code: '    for (int j=0;j<n2;j++) R[j]=arr[m+1+j];' },
-    { line: 6, code: '    int i=0,j=0,k=l;' },
-    { line: 7, code: '    while(i<n1&&j<n2)' },
-    { line: 8, code: '        arr[k++]=(L[i]<=R[j])?L[i++]:R[j++];' },
-    { line: 9, code: '    while(i<n1) arr[k++]=L[i++];' },
-    { line: 10, code: '    while(j<n2) arr[k++]=R[j++];' },
+    { line: 1,  code: 'void intercala(int* A, int esq, int meio, int dir) {' },
+    { line: 2,  code: '    int nEsq = meio-esq, nDir = dir-meio;' },
+    { line: 3,  code: '    int AEsq[nEsq], ADir[nDir];' },
+    { line: 4,  code: '    for (int i=0;i<nEsq;i++) AEsq[i]=A[esq+i];' },
+    { line: 5,  code: '    for (int j=0;j<nDir;j++) ADir[j]=A[meio+j];' },
+    { line: 6,  code: '    int i=0,j=0,k=esq;' },
+    { line: 7,  code: '    while(i<nEsq&&j<nDir)' },
+    { line: 8,  code: '        A[k++]=(AEsq[i]<=ADir[j])?AEsq[i++]:ADir[j++];' },
+    { line: 9,  code: '    while(i<nEsq) A[k++]=AEsq[i++];' },
+    { line: 10, code: '    while(j<nDir) A[k++]=ADir[j++];' },
     { line: 11, code: '}' },
-    { line: 12, code: 'void mergeSort(int arr[], int l, int r) {' },
-    { line: 13, code: '    if (l < r) {' },
-    { line: 14, code: '        int m = l+(r-l)/2;' },
-    { line: 15, code: '        mergeSort(arr,l,m);' },
-    { line: 16, code: '        mergeSort(arr,m+1,r);' },
-    { line: 17, code: '        merge(arr,l,m,r);' },
+    { line: 12, code: 'void mergeSort(int* A, int esq, int dir) {' },
+    { line: 13, code: '    if (esq < dir-1) {' },
+    { line: 14, code: '        int meio = (esq+dir)/2;' },
+    { line: 15, code: '        mergeSort(A,esq,meio);' },
+    { line: 16, code: '        mergeSort(A,meio,dir);' },
+    { line: 17, code: '        intercala(A,esq,meio,dir);' },
     { line: 18, code: '    }' },
     { line: 19, code: '}' },
   ],
   java: [
-    { line: 1, code: 'void mergeSort(int[] arr, int l, int r) {' },
-    { line: 2, code: '    if (l < r) {' },
-    { line: 3, code: '        int m = l + (r - l) / 2;' },
-    { line: 4, code: '        mergeSort(arr, l, m);' },
-    { line: 5, code: '        mergeSort(arr, m + 1, r);' },
-    { line: 6, code: '        merge(arr, l, m, r);' },
-    { line: 7, code: '    }' },
-    { line: 8, code: '}' },
-    { line: 9, code: 'void merge(int[] arr, int l, int m, int r) {' },
-    { line: 10, code: '    int[] L = Arrays.copyOfRange(arr, l, m+1);' },
-    { line: 11, code: '    int[] R = Arrays.copyOfRange(arr, m+1, r+1);' },
-    { line: 12, code: '    int i=0,j=0,k=l;' },
-    { line: 13, code: '    while(i<L.length&&j<R.length)' },
-    { line: 14, code: '        arr[k++]=(L[i]<=R[j])?L[i++]:R[j++];' },
-    { line: 15, code: '    while(i<L.length) arr[k++]=L[i++];' },
-    { line: 16, code: '    while(j<R.length) arr[k++]=R[j++];' },
+    { line: 1,  code: 'void mergeSort(int[] A, int esq, int dir) {' },
+    { line: 2,  code: '    if (esq < dir - 1) {' },
+    { line: 3,  code: '        int meio = (esq + dir) / 2;' },
+    { line: 4,  code: '        mergeSort(A, esq, meio);' },
+    { line: 5,  code: '        mergeSort(A, meio, dir);' },
+    { line: 6,  code: '        intercala(A, esq, meio, dir);' },
+    { line: 7,  code: '    }' },
+    { line: 8,  code: '}' },
+    { line: 9,  code: 'void intercala(int[] A, int esq, int meio, int dir) {' },
+    { line: 10, code: '    int[] AEsq = Arrays.copyOfRange(A, esq, meio);' },
+    { line: 11, code: '    int[] ADir = Arrays.copyOfRange(A, meio, dir);' },
+    { line: 12, code: '    int i=0,j=0,k=esq;' },
+    { line: 13, code: '    while(i<AEsq.length&&j<ADir.length)' },
+    { line: 14, code: '        A[k++]=(AEsq[i]<=ADir[j])?AEsq[i++]:ADir[j++];' },
+    { line: 15, code: '    while(i<AEsq.length) A[k++]=AEsq[i++];' },
+    { line: 16, code: '    while(j<ADir.length) A[k++]=ADir[j++];' },
     { line: 17, code: '}' },
   ],
   go: [

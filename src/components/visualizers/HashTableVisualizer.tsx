@@ -35,11 +35,14 @@ export function HashTableVisualizer({ frame }: HashTableVisualizerProps) {
   }
 
   const state = frame.state as HTState
-  const { buckets, currentBucket } = state
+  const { buckets, currentBucket, operation } = state
+  const auxState = frame.auxState as { key?: string } | undefined
+  const opColor = operation === 'insert' ? '#10b981' : operation === 'remove' ? '#ef4444' : '#f59e0b'
 
   return (
     <div
       style={{
+        position: 'relative',
         padding: '1rem',
         height: '100%',
         overflowY: 'auto',
@@ -48,6 +51,29 @@ export function HashTableVisualizer({ frame }: HashTableVisualizerProps) {
         gap: '4px',
       }}
     >
+      {operation && (
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 10,
+          display: 'flex', alignItems: 'center', gap: '12px',
+          marginBottom: '4px',
+        }}>
+          <div style={{
+            padding: '4px 10px', borderRadius: '12px',
+            background: `${opColor}20`, border: `1px solid ${opColor}60`,
+            color: opColor, fontSize: '11px', fontWeight: 700,
+            fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.05em',
+          }}>
+            {operation}
+          </div>
+          {auxState?.key !== undefined && currentBucket !== null && (
+            <div style={{
+              fontSize: '10px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)',
+            }}>
+              hash(&quot;{auxState.key}&quot;) = {currentBucket}
+            </div>
+          )}
+        </div>
+      )}
       {buckets.map((bucket, i) => {
         const isActive = i === currentBucket
         const hl = frame.highlights.find(h => h.index === i)

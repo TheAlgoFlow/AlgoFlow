@@ -91,6 +91,19 @@
         "done": "Array is sorted!"
       }
     },
+    "shellSort": {
+      "name": "Shell Sort",
+      "description": "A generalisation of insertion sort that sorts elements far apart first using a shrinking gap sequence, then finishes with a standard insertion sort pass.",
+      "whenToUse": "Good practical performance for medium-sized arrays. Faster than insertion sort in most cases. Used in embedded systems and as a subroutine in more complex algorithms.",
+      "steps": {
+        "gap": "New gap h = {{h}} — sorting sub-sequences with stride {{h}}",
+        "pick": "Picking element {{tmp}} at index {{i}} (gap {{h}})",
+        "compare": "Comparing {{val}} with key {{tmp}} — shifting right",
+        "shift": "Shifting {{val}} to position {{pos}}",
+        "insert": "Inserting {{tmp}} at position {{pos}}",
+        "done": "Array is sorted!"
+      }
+    },
     "linearSearch": {
       "name": "Linear Search",
       "description": "Sequentially checks each element until the target is found or the array ends. Works on both sorted and unsorted arrays.",
@@ -148,6 +161,15 @@
         "shift": "Shifting elements to make room",
         "delete": "Deleting element at index {{i}}",
         "search": "Searching for {{v}}"
+      }
+    },
+    "doublyLinkedList": {
+      "name": "Doubly Linked List",
+      "description": "A sequence of nodes where each node holds a value and pointers to both the next and previous nodes, enabling efficient traversal in both directions.",
+      "whenToUse": "When bidirectional traversal or O(1) removal at both ends is needed. Used in browser history, LRU caches, and undo/redo stacks.",
+      "steps": {
+        "init": "Initial list ready",
+        "done": "Operation complete"
       }
     },
     "linkedList": {
@@ -288,6 +310,214 @@
         "update": "dp[{{a}}] = min({{prev}}, dp[{{rem}}]+1) = {{v}}",
         "skip": "Coin {{c}} > amount {{a}}, skipping",
         "done": "Minimum coins for {{amount}}: {{v}}"
+      }
+    }
+  },
+  "ds": {
+    "stack": {
+      "push": {
+        "init": "Stack ready — about to push",
+        "done": "Element pushed onto the top"
+      },
+      "pop": {
+        "init": "Stack ready — about to pop",
+        "highlight": "Top element highlighted",
+        "done": "Top element popped"
+      },
+      "peek": {
+        "init": "Peeking at the top element",
+        "done": "Peek complete"
+      },
+      "search": {
+        "init": "Searching the stack",
+        "checking": "Checking element",
+        "found": "Element found in the stack",
+        "notFound": "Element not found in the stack"
+      }
+    },
+    "queue": {
+      "enqueue": {
+        "step1": "Queue ready — about to enqueue",
+        "step2": "Element enqueued at the rear"
+      },
+      "dequeue": {
+        "step1": "Queue ready — about to dequeue",
+        "step2": "Front element removed",
+        "step3": "Dequeue complete"
+      },
+      "peek": {
+        "step1": "Peeking at the front element",
+        "step2": "Peek complete"
+      },
+      "search": {
+        "step1": "Searching the queue",
+        "step2": "Checking element",
+        "found": "Element found in the queue",
+        "notFound": "Element not found in the queue"
+      }
+    },
+    "linkedList": {
+      "insertHead": {
+        "init": "Inserting at the head",
+        "done": "Inserted at the head"
+      },
+      "insertTail": {
+        "init": "Inserting at the tail",
+        "traversing": "Traversing to the tail",
+        "done": "Inserted at the tail"
+      },
+      "search": {
+        "init": "Searching the list",
+        "checking": "Checking node",
+        "found": "Node found",
+        "notFound": "Node not found"
+      },
+      "traverse": {
+        "init": "Starting traversal",
+        "visiting": "Visiting node"
+      }
+    },
+    "doublyLinkedList": {
+      "inserirInicio": {
+        "init": "Inserting at the head",
+        "done": "Inserted at the head"
+      },
+      "inserirFim": {
+        "init": "Inserting at the tail",
+        "done": "Inserted at the tail"
+      },
+      "removerInicio": {
+        "init": "Removing head node",
+        "done": "Head node removed"
+      },
+      "removerFim": {
+        "init": "Removing tail node",
+        "done": "Tail node removed"
+      },
+      "pesquisar": {
+        "init": "Searching the list",
+        "checking": "Checking node",
+        "found": "Node found",
+        "notFound": "Node not found"
+      },
+      "mostrarInverso": {
+        "init": "Starting reverse traversal",
+        "visiting": "Visiting node",
+        "done": "Reverse traversal complete"
+      }
+    },
+    "hashTable": {
+      "insert": {
+        "step1": "Computing hash for the key",
+        "step2": "Inserting into target bucket",
+        "step3": "Insertion complete"
+      },
+      "search": {
+        "step1": "Computing hash for the key",
+        "step2": "Checking target bucket",
+        "step3": "Scanning bucket entries",
+        "found": "Key found",
+        "notFound": "Key not found"
+      },
+      "remove": {
+        "step1": "Computing hash for the key",
+        "step2": "Scanning target bucket",
+        "step3": "Key removed"
+      }
+    },
+    "minHeap": {
+      "insert": {
+        "init": "Inserting into the heap",
+        "push": "Appended at the end",
+        "bubbleUp": "Bubbling up to restore heap property",
+        "done": "Insertion complete"
+      },
+      "extractMin": {
+        "init": "Extracting minimum element",
+        "siftDown": "Sifting down to restore heap property",
+        "swap": "Swapping with smaller child",
+        "done": "Extraction complete"
+      },
+      "getMin": {
+        "init": "Peeking at minimum element",
+        "done": "Peek complete"
+      },
+      "heapify": {
+        "init": "Heapifying array",
+        "siftDown": "Sifting down",
+        "done": "Heap property restored"
+      }
+    },
+    "bst": {
+      "insert": {
+        "start": "Inserting {{v}} into the BST",
+        "compare": "Comparing {{v}} with node {{nodeV}}",
+        "placed": "Placed {{v}} as a new leaf node",
+        "done": "Insertion complete"
+      },
+      "search": {
+        "start": "Searching for {{target}} in the BST",
+        "visiting": "Visiting node {{nodeV}}",
+        "goLeft": "{{target}} < {{nodeV}} — going left",
+        "goRight": "{{target}} > {{nodeV}} — going right",
+        "found": "Found {{v}}!",
+        "notFound": "{{target}} not found in the BST"
+      },
+      "remove": {
+        "start": "Removing {{v}} from the BST",
+        "searching": "Searching for node {{v}}",
+        "found": "Found node to remove",
+        "notFound": "{{v}} not found in the BST",
+        "done": "Removal complete"
+      }
+    },
+    "binaryTree": {
+      "insert": {
+        "start": "Inserting into the tree",
+        "compare": "Comparing with current node",
+        "placed": "Placed as a new node",
+        "done": "Insertion complete"
+      },
+      "search": {
+        "start": "Searching the tree",
+        "visiting": "Visiting node",
+        "goLeft": "Going left",
+        "goRight": "Going right",
+        "found": "Node found!",
+        "notFound": "Node not found"
+      },
+      "traverse": {
+        "start": "Starting traversal",
+        "visit": "Visiting node",
+        "goLeft": "Going left",
+        "goRight": "Going right",
+        "done": "Traversal complete"
+      }
+    },
+    "arrayOps": {
+      "access": {
+        "init": "Accessing element",
+        "done": "Access complete"
+      },
+      "insert": {
+        "init": "Inserting element",
+        "shift": "Shifting elements to the right",
+        "place": "Placed element at target index",
+        "done": "Insertion complete"
+      },
+      "remove": {
+        "init": "Removing element",
+        "search": "Searching for element",
+        "found": "Element found",
+        "shift": "Shifting elements left",
+        "notFound": "Element not found",
+        "done": "Removal complete"
+      },
+      "search": {
+        "init": "Searching for element",
+        "checking": "Checking index",
+        "found": "Element found",
+        "done": "Search complete"
       }
     }
   }

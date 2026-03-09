@@ -16,6 +16,7 @@ type GraphState = {
   queue?: string[];
   current?: string;
   path?: string[];
+  traversedEdges?: Array<{ from: string; to: string }>;
 };
 
 // ---------------------------------------------------------------------------
@@ -77,12 +78,16 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
   const queue: string[] = [START];
   const path: string[] = [];
 
+  let nodesVisited = 0
+  const traversedEdges: Array<{ from: string; to: string }> = []
+
   const baseState = (): GraphState => ({
     nodes: NODES,
     edges: EDGES,
     visited: [...visited],
     queue: [...queue],
     path: [...path],
+    traversedEdges: [...traversedEdges],
   });
 
   // Initial frame
@@ -91,7 +96,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     highlights: [{ index: START, role: 'active' }],
     message: 'algorithms.bfs.steps.start',
     codeLine: 1,
-    auxState: { node: START },
+    auxState: { node: START, nodesVisited },
   };
 
   while (queue.length > 0) {
@@ -101,6 +106,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
 
     visited.push(current);
     path.push(current);
+    nodesVisited++
 
     // Frame: dequeue and visit current node
     yield {
@@ -118,13 +124,14 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.bfs.steps.dequeue',
       codeLine: 3,
-      auxState: { node: current },
+      auxState: { node: current, nodesVisited },
     };
 
     const neighbours = ADJ[current] ?? [];
     for (const neighbour of neighbours) {
       if (!visited.includes(neighbour)) {
         queue.push(neighbour);
+        traversedEdges.push({ from: current, to: neighbour })
 
         // Frame: enqueue a neighbour
         yield {
@@ -142,7 +149,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
           ],
           message: 'algorithms.bfs.steps.enqueue',
           codeLine: 5,
-          auxState: { node: neighbour },
+          auxState: { node: neighbour, nodesVisited },
         };
       }
     }
@@ -154,7 +161,7 @@ export function* generator(_input: unknown): Generator<AlgorithmFrame> {
     highlights: visited.map((n) => ({ index: n, role: 'visited' as const })),
     message: 'algorithms.bfs.steps.done',
     codeLine: 7,
-    auxState: { path },
+    auxState: { path, nodesVisited },
   };
 }
 

@@ -41,9 +41,10 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [{ index: 0, role: 'dp-fill' }],
     message: 'algorithms.coinChange.steps.init',
     codeLine: 1,
-    auxState: { amount },
+    auxState: { amount, fills: 0 },
   }
 
+  let fills = 0
   for (let a = 1; a <= amount; a++) {
     for (const c of coins) {
       if (c > a) {
@@ -53,7 +54,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
           highlights: [{ index: a, role: 'dp-current' }],
           message: 'algorithms.coinChange.steps.skip',
           codeLine: 4,
-          auxState: { c, a },
+          auxState: { c, a, fills },
         }
         continue
       }
@@ -67,13 +68,14 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         ],
         message: 'algorithms.coinChange.steps.coin',
         codeLine: 5,
-        auxState: { c, a },
+        auxState: { c, a, fills },
       }
 
       const remainder = a - c
       if (dp[remainder] !== INF && dp[remainder] + 1 < dp[a]) {
         const prev = dp[a]
         dp[a] = dp[remainder] + 1
+        fills++
         yield {
           state: { dp: dp.map(v => (v === INF ? null : v)), coins, amount, current: a } as CoinChangeState,
           highlights: [
@@ -87,6 +89,8 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
             prev: prev === INF ? null : prev,
             rem: remainder,
             v: dp[a],
+            fills,
+            formula: `dp[${a}] = dp[${remainder}]+1`,
           },
         }
       }
@@ -106,6 +110,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     auxState: {
       amount: (input as CoinChangeInput).amount,
       v: dp[amount] === INF ? -1 : dp[amount],
+      fills,
     },
   }
 }

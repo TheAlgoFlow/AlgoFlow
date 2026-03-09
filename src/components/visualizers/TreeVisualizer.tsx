@@ -82,6 +82,17 @@ export function TreeVisualizer({ frame }: TreeVisualizerProps) {
   const { nodes, current, visited = [], comparing } = state
   const positions = layoutTree(nodes)
 
+  const getEdgeStroke = (parentId: number, childId: number) => {
+    if (childId === current) return '#f59e0b'
+    if (visited.includes(parentId) && visited.includes(childId)) return '#10b98160'
+    return 'rgba(99,102,241,0.3)'
+  }
+  const getEdgeWidth = (parentId: number, childId: number) => {
+    if (childId === current) return '2.5'
+    if (visited.includes(parentId) && visited.includes(childId)) return '2'
+    return '1.5'
+  }
+
   const getNodeColor = (id: number) => {
     const hl = frame.highlights.find(h => h.index === id)
     if (hl) return ROLE_COLORS[hl.role] ?? '#6366f1'
@@ -107,8 +118,9 @@ export function TreeVisualizer({ frame }: TreeVisualizerProps) {
                   y1={pos.y}
                   x2={positions.get(node.left)!.x}
                   y2={positions.get(node.left)!.y}
-                  stroke="rgba(99,102,241,0.3)"
-                  strokeWidth="2"
+                  stroke={getEdgeStroke(node.id, node.left)}
+                  strokeWidth={getEdgeWidth(node.id, node.left)}
+                  style={{ transition: 'stroke 0.2s ease' }}
                 />
               )}
               {node.right !== null && positions.get(node.right) && (
@@ -118,8 +130,9 @@ export function TreeVisualizer({ frame }: TreeVisualizerProps) {
                   y1={pos.y}
                   x2={positions.get(node.right)!.x}
                   y2={positions.get(node.right)!.y}
-                  stroke="rgba(99,102,241,0.3)"
-                  strokeWidth="2"
+                  stroke={getEdgeStroke(node.id, node.right)}
+                  strokeWidth={getEdgeWidth(node.id, node.right)}
+                  style={{ transition: 'stroke 0.2s ease' }}
                 />
               )}
             </>

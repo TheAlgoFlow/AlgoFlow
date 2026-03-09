@@ -28,6 +28,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
 
   let low = 0;
   let high = arr.length - 1;
+  let comparisons = 0
 
   // Initial frame – show full range before any iteration
   yield {
@@ -38,13 +39,14 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     ],
     message: 'algorithms.binarySearch.steps.init',
     codeLine: 1,
-    auxState: { low, high },
+    auxState: { low, high, comparisons },
   };
 
   while (low <= high) {
     const mid = Math.floor((low + high) / 2);
 
     // Show mid pointer alongside the current low / high boundaries
+    comparisons++
     yield {
       state: { array: arr, target, low, high, mid },
       highlights: [
@@ -54,7 +56,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
       ],
       message: 'algorithms.binarySearch.steps.mid',
       codeLine: 3,
-      auxState: { i: mid, v: arr[mid] },
+      auxState: { i: mid, v: arr[mid], comparisons },
     };
 
     if (arr[mid] === target) {
@@ -63,7 +65,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         highlights: [{ index: mid, role: 'found' }],
         message: 'algorithms.binarySearch.steps.found',
         codeLine: 4,
-        auxState: { i: mid, target },
+        auxState: { i: mid, target, comparisons },
       };
       return;
     } else if (arr[mid] < target) {
@@ -76,7 +78,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         ],
         message: 'algorithms.binarySearch.steps.goRight',
         codeLine: 6,
-        auxState: { mid, low: mid + 1, high },
+        auxState: { mid, low: mid + 1, high, comparisons },
       };
       low = mid + 1;
     } else {
@@ -89,7 +91,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
         ],
         message: 'algorithms.binarySearch.steps.goLeft',
         codeLine: 5,
-        auxState: { mid, low, high: mid - 1 },
+        auxState: { mid, low, high: mid - 1, comparisons },
       };
       high = mid - 1;
     }
@@ -101,7 +103,7 @@ export function* generator(input: unknown): Generator<AlgorithmFrame> {
     highlights: [],
     message: 'algorithms.binarySearch.steps.notFound',
     codeLine: 8,
-    auxState: { target },
+    auxState: { target, comparisons },
   };
 }
 

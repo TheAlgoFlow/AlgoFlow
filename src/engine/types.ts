@@ -90,7 +90,7 @@ export type DSOperationConfig = {
   type: DSOperationType
   label: string
   takesValue: boolean
-  generator: (value?: number) => Generator<AlgorithmFrame>
+  generator: (value?: number, initialState?: unknown) => Generator<AlgorithmFrame>
   codeSnippets: CodeSnippets
 }
 
@@ -141,6 +141,7 @@ export type GraphState = {
   stack?: string[]
   current?: string
   path?: string[]
+  traversedEdges?: Array<{ from: string; to: string }>
 }
 
 // Tree state
