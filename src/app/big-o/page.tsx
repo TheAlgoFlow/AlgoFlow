@@ -129,9 +129,9 @@ export default function BigOPage() {
       color: '#0f7142',
       desc: t('bigo.classes.constant.desc'),
       examples: [
-        { name: 'Array Access', slug: 'array-ops', category: 'data-structures' },
-        { name: 'Hash Table Lookup', slug: 'hash-table', category: 'data-structures' },
-        { name: 'Stack Push / Pop', slug: 'stack', category: 'data-structures' },
+        { name: t('bigo.examplesList.arrayAccess'), slug: 'array-ops', category: 'data-structures' },
+        { name: t('bigo.examplesList.hashTableLookup'), slug: 'hash-table', category: 'data-structures' },
+        { name: t('bigo.examplesList.stackPushPop'), slug: 'stack', category: 'data-structures' },
       ],
     },
     {
@@ -140,8 +140,8 @@ export default function BigOPage() {
       color: '#2563eb',
       desc: t('bigo.classes.logarithmic.desc'),
       examples: [
-        { name: 'Binary Search', slug: 'binary-search', category: 'searching' },
-        { name: 'BST Operations', slug: 'bst', category: 'data-structures' },
+        { name: t('bigo.examplesList.binarySearch'), slug: 'binary-search', category: 'searching' },
+        { name: t('bigo.examplesList.bstOperations'), slug: 'bst', category: 'data-structures' },
       ],
     },
     {
@@ -150,9 +150,9 @@ export default function BigOPage() {
       color: 'var(--text-muted)',
       desc: t('bigo.classes.linear.desc'),
       examples: [
-        { name: 'Linear Search', slug: 'linear-search', category: 'searching' },
-        { name: 'BFS', slug: 'bfs', category: 'searching' },
-        { name: 'DFS', slug: 'dfs', category: 'searching' },
+        { name: t('bigo.examplesList.linearSearch'), slug: 'linear-search', category: 'searching' },
+        { name: t('bigo.examplesList.bfs'), slug: 'bfs', category: 'searching' },
+        { name: t('bigo.examplesList.dfs'), slug: 'dfs', category: 'searching' },
       ],
     },
     {
@@ -161,9 +161,9 @@ export default function BigOPage() {
       color: '#b45309',
       desc: t('bigo.classes.linearithmic.desc'),
       examples: [
-        { name: 'Merge Sort', slug: 'merge-sort', category: 'sorting' },
-        { name: 'Heap Sort', slug: 'heap-sort', category: 'sorting' },
-        { name: 'Quick Sort (avg)', slug: 'quick-sort', category: 'sorting' },
+        { name: t('bigo.examplesList.mergeSort'), slug: 'merge-sort', category: 'sorting' },
+        { name: t('bigo.examplesList.heapSort'), slug: 'heap-sort', category: 'sorting' },
+        { name: t('bigo.examplesList.quickSort'), slug: 'quick-sort', category: 'sorting' },
       ],
     },
     {
@@ -172,9 +172,9 @@ export default function BigOPage() {
       color: '#dc2626',
       desc: t('bigo.classes.quadratic.desc'),
       examples: [
-        { name: 'Bubble Sort', slug: 'bubble-sort', category: 'sorting' },
-        { name: 'Selection Sort', slug: 'selection-sort', category: 'sorting' },
-        { name: 'Insertion Sort', slug: 'insertion-sort', category: 'sorting' },
+        { name: t('bigo.examplesList.bubbleSort'), slug: 'bubble-sort', category: 'sorting' },
+        { name: t('bigo.examplesList.selectionSort'), slug: 'selection-sort', category: 'sorting' },
+        { name: t('bigo.examplesList.insertionSort'), slug: 'insertion-sort', category: 'sorting' },
       ],
     },
     {
@@ -183,8 +183,8 @@ export default function BigOPage() {
       color: '#9333ea',
       desc: t('bigo.classes.exponential.desc'),
       examples: [
-        { name: 'Fibonacci (naïve)', slug: 'fibonacci', category: 'dp' },
-        { name: 'Knapsack (brute)', slug: 'knapsack', category: 'dp' },
+        { name: t('bigo.examplesList.fibonacci'), slug: 'fibonacci', category: 'dp' },
+        { name: t('bigo.examplesList.knapsack'), slug: 'knapsack', category: 'dp' },
       ],
     },
   ]

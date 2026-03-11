@@ -142,6 +142,24 @@
       "linearithmic": { "label": "Linearithmic", "desc": "The theoretical lower bound for comparison sorts. Most efficient general-purpose sorts land here." },
       "quadratic": { "label": "Quadratic", "desc": "Nested iteration. Fine for small datasets — painfully slow beyond ~1,000 elements." },
       "exponential": { "label": "Exponential", "desc": "Doubles with each additional element. Only practical for tiny inputs — think n < 20." }
+    },
+    "examplesList": {
+      "arrayAccess": "Array Access",
+      "hashTableLookup": "Hash Table Lookup",
+      "stackPushPop": "Stack Push / Pop",
+      "binarySearch": "Binary Search",
+      "bstOperations": "BST Operations",
+      "linearSearch": "Linear Search",
+      "bfs": "BFS",
+      "dfs": "DFS",
+      "mergeSort": "Merge Sort",
+      "heapSort": "Heap Sort",
+      "quickSort": "Quick Sort (avg)",
+      "bubbleSort": "Bubble Sort",
+      "selectionSort": "Selection Sort",
+      "insertionSort": "Insertion Sort",
+      "fibonacci": "Fibonacci (naïve)",
+      "knapsack": "Knapsack (brute)"
     }
   }
 }

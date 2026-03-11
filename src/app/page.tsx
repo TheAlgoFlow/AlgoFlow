@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowUpDown, Search, Database, BrainCircuit } from 'lucide-react'
+import { ArrowUpDown, Search, Database, GitFork } from 'lucide-react'
 import { useI18n } from '@/i18n/context'
 import { categories, getCategory } from '@/algorithms/index'
 import { CATEGORY_COLORS } from '@/components/constants/categoryTheme'
@@ -31,7 +31,7 @@ const CATEGORY_META: Record<string, {
     tags: ['tree', 'linked-list'],
   },
   dp: {
-    icon: <BrainCircuit size={20} strokeWidth={2} />,
+    icon: <GitFork size={20} strokeWidth={2} />,
     num: '04',
     tags: ['memoization', 'tabulation'],
   },

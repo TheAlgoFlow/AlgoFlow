@@ -1,11 +1,26 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react'
 import { allModules, categories } from '@/algorithms/index'
 import { useI18n } from '@/i18n/context'
 import { getCategoryTheme, CATEGORY_COLORS } from '@/components/constants/categoryTheme'
 import { Tag } from '@/components/atoms/Tag'
+
+function getComplexityRank(notation: string): number {
+  if (!notation) return 99;
+  const n = notation.toLowerCase();
+  if (n.includes('o(1)')) return 1;
+  if (n.includes('log') && !n.includes('n log') && !n.includes('n·log')) return 2;
+  if (n === 'o(n)' || n === 'n') return 3;
+  if (n.includes('n log') || n.includes('n·log')) return 4;
+  if (n.includes('n²') || n.includes('n^2') || n.includes('n*n')) return 5;
+  if (n.includes('n³') || n.includes('n^3')) return 6;
+  if (n.includes('2^n')) return 7;
+  if (n.includes('n!')) return 8;
+  return 99;
+}
 
 function getComplexityColor(notation: string): string {
   if (notation === 'O(1)') return '#0f7142'
@@ -22,9 +37,67 @@ export default function ReferencePage() {
   const { t } = useI18n()
   const [activeCategory, setActiveCategory] = useState<string>('all')
 
-  const filtered = allModules.filter(
-    mod => activeCategory === 'all' || mod.meta.category === activeCategory
-  )
+  const [sortKey, setSortKey] = useState<string | null>(null)
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      if (sortDirection === 'asc') setSortDirection('desc')
+      else {
+        setSortKey(null)
+        setSortDirection('asc')
+      }
+    } else {
+      setSortKey(key)
+      setSortDirection('asc')
+    }
+  }
+
+  const filtered = useMemo(() => {
+    let result = allModules.filter(
+      mod => activeCategory === 'all' || mod.meta.category === activeCategory
+    )
+
+    if (sortKey) {
+      result = [...result].sort((a, b) => {
+        let valA: any = ''
+        let valB: any = ''
+
+        switch (sortKey) {
+          case 'algorithm':
+            valA = t(a.meta.nameKey)
+            valB = t(b.meta.nameKey)
+            break
+          case 'category':
+            valA = a.meta.category
+            valB = b.meta.category
+            break
+          case 'best':
+            valA = getComplexityRank(a.meta.complexity.time.best)
+            valB = getComplexityRank(b.meta.complexity.time.best)
+            break
+          case 'avg':
+            valA = getComplexityRank(a.meta.complexity.time.avg)
+            valB = getComplexityRank(b.meta.complexity.time.avg)
+            break
+          case 'worst':
+            valA = getComplexityRank(a.meta.complexity.time.worst)
+            valB = getComplexityRank(b.meta.complexity.time.worst)
+            break
+          case 'space':
+            valA = getComplexityRank(a.meta.complexity.space)
+            valB = getComplexityRank(b.meta.complexity.space)
+            break
+        }
+
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1
+        return 0
+      })
+    }
+
+    return result
+  }, [activeCategory, sortKey, sortDirection, t])
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
@@ -111,9 +184,17 @@ export default function ReferencePage() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ background: 'var(--bg-muted)' }}>
-                  {[t('reference.headers.algorithm'), t('reference.headers.category'), t('reference.headers.best'), t('reference.headers.avg'), t('reference.headers.worst'), t('reference.headers.space'), t('reference.headers.tags')].map(h => (
+                  {[
+                    { key: 'algorithm', label: t('reference.headers.algorithm') },
+                    { key: 'category', label: t('reference.headers.category') },
+                    { key: 'best', label: t('reference.headers.best') },
+                    { key: 'avg', label: t('reference.headers.avg') },
+                    { key: 'worst', label: t('reference.headers.worst') },
+                    { key: 'space', label: t('reference.headers.space') },
+                    { key: 'tags', label: t('reference.headers.tags'), disableSort: true }
+                  ].map(h => (
                     <th
-                      key={h}
+                      key={h.key}
                       style={{
                         padding: '12px 16px',
                         textAlign: 'left',
@@ -127,7 +208,27 @@ export default function ReferencePage() {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {h}
+                      <div
+                        onClick={() => !h.disableSort && handleSort(h.key)}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          cursor: h.disableSort ? 'default' : 'pointer',
+                          userSelect: 'none',
+                        }}
+                      >
+                        {h.label}
+                        {!h.disableSort && (
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            {sortKey === h.key ? (
+                              sortDirection === 'asc' ? <ArrowUp size={12} color="#5200FF" /> : <ArrowDown size={12} color="#5200FF" />
+                            ) : (
+                              <ArrowUpDown size={12} style={{ opacity: 0.3 }} />
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </th>
                   ))}
                 </tr>
