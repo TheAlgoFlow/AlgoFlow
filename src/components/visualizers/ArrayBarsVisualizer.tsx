@@ -78,6 +78,7 @@ export function ArrayBarsVisualizer({ frame }: ArrayBarsVisualizerProps) {
         flexDirection: 'column',
         height: '100%',
         padding: '1rem',
+        paddingTop: '3.5rem',
         gap: '0.5rem',
       }}
     >

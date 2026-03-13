@@ -142,6 +142,24 @@
       "linearithmic": { "label": "Linearítmica", "desc": "Limite inferior teórico de eficiência para ordenações de comparação. Quase todos caem aqui." },
       "quadratic": { "label": "Quadrática", "desc": "Iterações alinhadas. Ótimo apenas para arquivos pequenos — desesperadamente lento além de 1.000 elementos." },
       "exponential": { "label": "Exponencial", "desc": "Dobra com cada elemento adicional. Usado apenas para entradas ultracurtas — pense em n < 20." }
+    },
+    "examplesList": {
+      "arrayAccess": "Acesso a Array",
+      "hashTableLookup": "Busca em Tabela Hash",
+      "stackPushPop": "Pilha (Push/Pop)",
+      "binarySearch": "Busca Binária",
+      "bstOperations": "Operações em BST",
+      "linearSearch": "Busca Linear",
+      "bfs": "Busca em Largura (BFS)",
+      "dfs": "Busca em Profundidade (DFS)",
+      "mergeSort": "Merge Sort",
+      "heapSort": "Heap Sort",
+      "quickSort": "Quick Sort (médio)",
+      "bubbleSort": "Bubble Sort",
+      "selectionSort": "Selection Sort",
+      "insertionSort": "Insertion Sort",
+      "fibonacci": "Fibonacci (ingênuo)",
+      "knapsack": "Mochila (bruta)"
     }
   }
 }

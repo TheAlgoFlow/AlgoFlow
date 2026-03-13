@@ -55,12 +55,7 @@ export function useAlgorithmPlayer(
     }
     setFrames(collected)
     setFrameIndex(0)
-    if (isFirstRun.current) {
-      isFirstRun.current = false
-      setIsPlaying(false)
-    } else {
-      setIsPlaying(collected.length > 0)
-    }
+    setIsPlaying(false)
   }, [generator])
 
   // Auto-play interval

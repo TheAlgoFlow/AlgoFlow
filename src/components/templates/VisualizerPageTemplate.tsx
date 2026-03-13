@@ -235,6 +235,7 @@ export function VisualizerPageTemplate({
                 position: 'absolute',
                 top: '12px',
                 right: '12px',
+                zIndex: 50,
                 display: 'flex',
                 gap: '2px',
                 background: 'rgba(253,252,250,0.92)',
