@@ -246,6 +246,52 @@
         "done": "Operation complete"
       }
     },
+    "bTree": {
+      "name": "B-Tree",
+      "description": "A self-balancing multi-way search tree where each node can hold multiple keys and have multiple children. Designed to minimize disk I/O by keeping height low and node occupancy high.",
+      "whenToUse": "Database indexes, file systems, and any scenario involving large datasets on disk. Guarantees O(log n) for search, insert and delete regardless of input order.",
+      "steps": {
+        "insert": "Inserting {{v}}",
+        "search": "Searching for {{v}}",
+        "split": "Splitting full node",
+        "done": "Operation complete"
+      }
+    },
+    "bPlusTree": {
+      "name": "B+ Tree",
+      "description": "A variant of the B-tree where all actual data resides in the leaf nodes, which are linked in a sorted chain. Internal nodes act only as a routing index.",
+      "whenToUse": "Preferred over B-tree for range queries and full sequential scans because all leaves are linked. Used in most relational database engines (MySQL InnoDB, PostgreSQL).",
+      "steps": {
+        "insert": "Inserting {{v}}",
+        "search": "Searching for {{v}}",
+        "scan": "Scanning leaves",
+        "done": "Operation complete"
+      }
+    },
+    "bStarTree": {
+      "name": "B* Tree",
+      "description": "A B-tree variant that maintains at least 2/3 occupancy per node (vs 1/2 for B-tree). Before splitting a full node it tries to redistribute keys with a sibling. Only if both neighbors are full does it perform a 3-way split.",
+      "whenToUse": "When storage efficiency is critical. B* trees have fewer splits and higher average occupancy than B-trees, reducing wasted space in indexes.",
+      "steps": {
+        "insert": "Inserting {{v}}",
+        "search": "Searching for {{v}}",
+        "redist": "Redistributing with sibling",
+        "split": "3-way split",
+        "done": "Operation complete"
+      }
+    },
+    "extHash": {
+      "name": "Extensible Hashing",
+      "description": "A dynamic hash table that grows on demand using a directory of bucket pointers and a global depth. When a bucket overflows, only that bucket is split — the directory may double if needed.",
+      "whenToUse": "Database buffer managers, external hashing of large files, and any scenario requiring a hash table that grows gracefully without full rehashing.",
+      "steps": {
+        "hash": "hash({{v}}) = {{h}} (depth={{depth}})",
+        "insert": "Inserting {{v}} → bucket {{bucket}}",
+        "overflow": "Bucket overflow, splitting",
+        "double": "Doubling directory",
+        "done": "Operation complete"
+      }
+    },
     "minHeap": {
       "name": "Min-Heap",
       "description": "A complete binary tree where every parent node is smaller than its children. The root is always the minimum element.",
@@ -492,6 +538,97 @@
         "goLeft": "Going left",
         "goRight": "Going right",
         "done": "Traversal complete"
+      }
+    },
+    "bTree": {
+      "insert": {
+        "start": "Inserting {{v}} into the B-Tree",
+        "splitRoot": "Root is full — splitting root first",
+        "splitting": "Child is full — splitting before descending",
+        "splitDone": "Split complete — pushed median key up",
+        "visiting": "Visiting node",
+        "goChild": "Going to child[{{childIdx}}]",
+        "placing": "Found correct leaf position",
+        "placed": "{{v}} inserted successfully",
+        "done": "Insertion complete"
+      },
+      "search": {
+        "start": "Searching for {{target}} in the B-Tree",
+        "visiting": "Visiting node",
+        "comparing": "Comparing {{target}} with key {{key}}",
+        "goChild": "Going to child[{{childIdx}}]",
+        "found": "Found {{v}}!",
+        "notFound": "{{target}} not found in the B-Tree"
+      }
+    },
+    "bPlusTree": {
+      "search": {
+        "start": "Searching for {{target}} in the B+ Tree",
+        "visiting": "Visiting node",
+        "comparing": "Comparing {{target}} with key {{key}}",
+        "goChild": "Going to child[{{childIdx}}]",
+        "found": "Found {{v}} in leaf!",
+        "notFound": "{{target}} not found"
+      },
+      "insert": {
+        "start": "Inserting {{v}} into the B+ Tree",
+        "descend": "Descending to correct leaf",
+        "atLeaf": "Reached target leaf",
+        "placed": "{{v}} inserted in leaf",
+        "leafOverflow": "Leaf overflows — splitting",
+        "leafSplit": "Leaf split: pushing key {{pushUp}} up",
+        "intOverflow": "Internal node overflows — splitting",
+        "intSplit": "Internal node split",
+        "pushUp": "Pushing key up to parent",
+        "newRoot": "Creating new root",
+        "done": "Insertion complete"
+      },
+      "traverse": {
+        "start": "Starting leaf chain scan",
+        "descend": "Descending to leftmost leaf",
+        "scan": "Scanning leaf: [{{keys}}]",
+        "done": "Scan complete — all leaves visited"
+      }
+    },
+    "bStarTree": {
+      "search": {
+        "start": "Searching for {{target}} in the B* Tree",
+        "visiting": "Visiting node",
+        "comparing": "Comparing {{target}} with key {{key}}",
+        "goChild": "Going to child[{{childIdx}}]",
+        "found": "Found {{v}}!",
+        "notFound": "{{target}} not found in the B* Tree"
+      },
+      "insert": {
+        "start": "Inserting {{v}} into the B* Tree",
+        "descend": "Descending to correct leaf",
+        "atLeaf": "Reached target leaf",
+        "placed": "{{v}} inserted in leaf",
+        "redistLeft": "Redistributing with left sibling (2/3 fill policy)",
+        "redistRight": "Redistributing with right sibling (2/3 fill policy)",
+        "threeSplit": "Both siblings full — performing 3-way split",
+        "splitDone": "3-way split complete — new node created",
+        "done": "Insertion complete"
+      }
+    },
+    "extHash": {
+      "search": {
+        "start": "Searching for {{v}}",
+        "hash": "hash({{v}}) = {{h}} (global depth = {{depth}})",
+        "bucket": "Looking in bucket B{{bucket}}",
+        "found": "Found {{v}} in bucket!",
+        "notFound": "{{v}} not found"
+      },
+      "insert": {
+        "start": "Inserting {{v}}",
+        "hash": "hash({{v}}) = {{h}} (global depth = {{depth}})",
+        "bucket": "Target bucket B{{bucket}}",
+        "placed": "{{v}} inserted — bucket has space",
+        "overflow": "Bucket B{{bucket}} is full — splitting",
+        "doubleDir": "Local depth = global depth ({{globalDepth}}) — doubling directory",
+        "doubled": "Directory doubled — new global depth = {{globalDepth}}",
+        "split": "Bucket split complete — new bucket created",
+        "done": "Insertion complete"
       }
     },
     "arrayOps": {

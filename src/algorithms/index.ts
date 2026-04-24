@@ -18,6 +18,10 @@ import * as bfs from './searching/bfs'
 import * as dfs from './searching/dfs'
 
 // Data Structures
+import * as bTree from './data-structures/b-tree'
+import * as bPlusTree from './data-structures/b-plus-tree'
+import * as bStarTree from './data-structures/b-star-tree'
+import * as extHash from './data-structures/ext-hash'
 import * as arrayOps from './data-structures/array-ops'
 import * as linkedList from './data-structures/linked-list'
 import * as doublyLinkedList from './data-structures/doubly-linked-list'
@@ -49,6 +53,10 @@ export const allModules: AlgorithmModule[] = [
   binarySearch,
   bfs,
   dfs,
+  bTree,
+  bPlusTree,
+  bStarTree,
+  extHash,
   arrayOps,
   linkedList,
   doublyLinkedList,
