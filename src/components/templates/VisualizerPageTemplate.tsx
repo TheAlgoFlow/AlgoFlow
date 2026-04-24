@@ -20,6 +20,9 @@ import { GridVisualizer } from '@/components/visualizers/GridVisualizer'
 import { LinkedListVisualizer } from '@/components/visualizers/LinkedListVisualizer'
 import { StackQueueVisualizer } from '@/components/visualizers/StackQueueVisualizer'
 import { HashTableVisualizer } from '@/components/visualizers/HashTableVisualizer'
+import { BTreeVisualizer } from '@/components/visualizers/BTreeVisualizer'
+import { BPlusTreeVisualizer } from '@/components/visualizers/BPlusTreeVisualizer'
+import { ExtHashVisualizer } from '@/components/visualizers/ExtHashVisualizer'
 import { useAlgorithmPlayer } from '@/hooks/useAlgorithmPlayer'
 import type { AlgorithmModule, AlgorithmFrame, DSOperationConfig, CodeSnippets } from '@/engine/types'
 import type { PlayerState } from '@/hooks/useAlgorithmPlayer'
@@ -43,6 +46,9 @@ function getVisualizerForSlug(slug: string, frame: AlgorithmFrame | null) {
   if (slug === 'doubly-linked-list') return <LinkedListVisualizer frame={frame} />
   if (slug === 'hash-table') return <HashTableVisualizer frame={frame} />
   if (slug === 'array-ops' || slug === 'min-heap') return <ArrayBarsVisualizer frame={frame} />
+  if (slug === 'b-tree' || slug === 'b-star-tree') return <BTreeVisualizer frame={frame} variant={slug as 'b-tree' | 'b-star-tree'} />
+  if (slug === 'b-plus-tree') return <BPlusTreeVisualizer frame={frame} />
+  if (slug === 'ext-hash') return <ExtHashVisualizer frame={frame} />
   return <GridVisualizer frame={frame} />
 }
 
@@ -161,7 +167,7 @@ export function VisualizerPageTemplate({
 
   const isSearchAlgo  = ['linear-search', 'binary-search'].includes(slug)
   const isGraphAlgo   = ['bfs', 'dfs'].includes(slug)
-  const isTreeOrDS    = ['binary-tree', 'bst', 'linked-list', 'doubly-linked-list', 'stack', 'queue', 'hash-table', 'min-heap', 'array-ops'].includes(slug)
+  const isTreeOrDS    = ['binary-tree', 'bst', 'linked-list', 'doubly-linked-list', 'stack', 'queue', 'hash-table', 'min-heap', 'array-ops', 'b-tree', 'b-plus-tree', 'b-star-tree', 'ext-hash'].includes(slug)
   const isSortingAlgo = SORTING_SLUGS.includes(slug)
   const showArrayInput = !isGraphAlgo && !isTreeOrDS && !isDsPage
   const isArrayAlgo   = isSortingAlgo || isSearchAlgo || slug === 'array-ops'

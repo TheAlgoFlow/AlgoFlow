@@ -246,6 +246,52 @@
         "done": "Operação concluída"
       }
     },
+    "bTree": {
+      "name": "Árvore B",
+      "description": "Uma árvore de busca multiway auto-balanceada onde cada nó pode guardar múltiplas chaves e ter múltiplos filhos. Projetada para minimizar I/O em disco mantendo a altura baixa e a ocupação dos nós alta.",
+      "whenToUse": "Índices de bancos de dados, sistemas de arquivos e qualquer cenário com grandes volumes de dados em disco. Garante O(log n) para busca, inserção e remoção independente da ordem de entrada.",
+      "steps": {
+        "insert": "Inserindo {{v}}",
+        "search": "Buscando {{v}}",
+        "split": "Dividindo nó cheio",
+        "done": "Operação concluída"
+      }
+    },
+    "bPlusTree": {
+      "name": "Árvore B+",
+      "description": "Variante da Árvore B onde todos os dados reais ficam nas folhas, que são ligadas em uma cadeia ordenada. Os nós internos funcionam apenas como índice de roteamento.",
+      "whenToUse": "Preferida em relação à Árvore B para consultas de intervalo e varreduras sequenciais, pois todas as folhas estão encadeadas. Usada na maioria dos motores de banco de dados relacionais (MySQL InnoDB, PostgreSQL).",
+      "steps": {
+        "insert": "Inserindo {{v}}",
+        "search": "Buscando {{v}}",
+        "scan": "Varrendo folhas",
+        "done": "Operação concluída"
+      }
+    },
+    "bStarTree": {
+      "name": "Árvore B*",
+      "description": "Variante da Árvore B que mantém ocupação mínima de 2/3 por nó (contra 1/2 na Árvore B). Antes de dividir um nó cheio, tenta redistribuir chaves com um irmão. Só executa a divisão em 3 nós se ambos os vizinhos estiverem cheios.",
+      "whenToUse": "Quando a eficiência de armazenamento é crítica. Árvores B* têm menos divisões e ocupação média maior que Árvores B, reduzindo espaço desperdiçado em índices.",
+      "steps": {
+        "insert": "Inserindo {{v}}",
+        "search": "Buscando {{v}}",
+        "redist": "Redistribuindo com irmão",
+        "split": "Divisão em 3 nós",
+        "done": "Operação concluída"
+      }
+    },
+    "extHash": {
+      "name": "Hash Extensível",
+      "description": "Uma tabela hash dinâmica que cresce sob demanda usando um diretório de ponteiros para buckets e uma profundidade global. Quando um bucket transborda, só aquele bucket é dividido — o diretório pode dobrar se necessário.",
+      "whenToUse": "Gerenciadores de buffer de banco de dados, hashing externo de arquivos grandes e qualquer cenário que requer uma tabela hash que cresce sem rehashing completo.",
+      "steps": {
+        "hash": "hash({{v}}) = {{h}} (profundidade={{depth}})",
+        "insert": "Inserindo {{v}} → bucket {{bucket}}",
+        "overflow": "Transbordo no bucket, dividindo",
+        "double": "Dobrando diretório",
+        "done": "Operação concluída"
+      }
+    },
     "minHeap": {
       "name": "Min-Heap",
       "description": "Uma árvore binária completa onde todo nó pai é menor que seus filhos. A raiz é sempre o elemento mínimo.",
@@ -492,6 +538,97 @@
         "goLeft": "Indo para a esquerda",
         "goRight": "Indo para a direita",
         "done": "Percurso completo"
+      }
+    },
+    "bTree": {
+      "insert": {
+        "start": "Inserindo {{v}} na Árvore B",
+        "splitRoot": "Raiz cheia — dividindo a raiz primeiro",
+        "splitting": "Filho cheio — dividindo antes de descer",
+        "splitDone": "Divisão concluída — chave mediana promovida",
+        "visiting": "Visitando nó",
+        "goChild": "Indo para filho[{{childIdx}}]",
+        "placing": "Posição correta na folha encontrada",
+        "placed": "{{v}} inserido com sucesso",
+        "done": "Inserção concluída"
+      },
+      "search": {
+        "start": "Buscando {{target}} na Árvore B",
+        "visiting": "Visitando nó",
+        "comparing": "Comparando {{target}} com a chave {{key}}",
+        "goChild": "Indo para filho[{{childIdx}}]",
+        "found": "{{v}} encontrado!",
+        "notFound": "{{target}} não encontrado na Árvore B"
+      }
+    },
+    "bPlusTree": {
+      "search": {
+        "start": "Buscando {{target}} na Árvore B+",
+        "visiting": "Visitando nó",
+        "comparing": "Comparando {{target}} com a chave {{key}}",
+        "goChild": "Indo para filho[{{childIdx}}]",
+        "found": "{{v}} encontrado na folha!",
+        "notFound": "{{target}} não encontrado"
+      },
+      "insert": {
+        "start": "Inserindo {{v}} na Árvore B+",
+        "descend": "Descendo para a folha correta",
+        "atLeaf": "Folha alvo alcançada",
+        "placed": "{{v}} inserido na folha",
+        "leafOverflow": "Folha transbordou — dividindo",
+        "leafSplit": "Folha dividida: promovendo chave {{pushUp}}",
+        "intOverflow": "Nó interno transbordou — dividindo",
+        "intSplit": "Nó interno dividido",
+        "pushUp": "Promovendo chave ao pai",
+        "newRoot": "Criando nova raiz",
+        "done": "Inserção concluída"
+      },
+      "traverse": {
+        "start": "Iniciando varredura das folhas",
+        "descend": "Descendo até a folha mais à esquerda",
+        "scan": "Varrendo folha: [{{keys}}]",
+        "done": "Varredura concluída — todas as folhas visitadas"
+      }
+    },
+    "bStarTree": {
+      "search": {
+        "start": "Buscando {{target}} na Árvore B*",
+        "visiting": "Visitando nó",
+        "comparing": "Comparando {{target}} com a chave {{key}}",
+        "goChild": "Indo para filho[{{childIdx}}]",
+        "found": "{{v}} encontrado!",
+        "notFound": "{{target}} não encontrado na Árvore B*"
+      },
+      "insert": {
+        "start": "Inserindo {{v}} na Árvore B*",
+        "descend": "Descendo para a folha correta",
+        "atLeaf": "Folha alvo alcançada",
+        "placed": "{{v}} inserido na folha",
+        "redistLeft": "Redistribuindo com irmão esquerdo (política 2/3 de ocupação)",
+        "redistRight": "Redistribuindo com irmão direito (política 2/3 de ocupação)",
+        "threeSplit": "Ambos os irmãos cheios — executando divisão em 3 nós",
+        "splitDone": "Divisão em 3 nós concluída — novo nó criado",
+        "done": "Inserção concluída"
+      }
+    },
+    "extHash": {
+      "search": {
+        "start": "Buscando {{v}}",
+        "hash": "hash({{v}}) = {{h}} (profundidade global = {{depth}})",
+        "bucket": "Procurando no bucket B{{bucket}}",
+        "found": "{{v}} encontrado no bucket!",
+        "notFound": "{{v}} não encontrado"
+      },
+      "insert": {
+        "start": "Inserindo {{v}}",
+        "hash": "hash({{v}}) = {{h}} (profundidade global = {{depth}})",
+        "bucket": "Bucket alvo B{{bucket}}",
+        "placed": "{{v}} inserido — bucket tem espaço",
+        "overflow": "Bucket B{{bucket}} cheio — dividindo",
+        "doubleDir": "Profundidade local = global ({{globalDepth}}) — dobrando diretório",
+        "doubled": "Diretório dobrado — nova profundidade global = {{globalDepth}}",
+        "split": "Divisão do bucket concluída — novo bucket criado",
+        "done": "Inserção concluída"
       }
     },
     "arrayOps": {
