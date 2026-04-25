@@ -1,0 +1,166 @@
+{
+  "nav": {
+    "home": "Home",
+    "visualizer": "Visualizer",
+    "sorting": "Sorting",
+    "searching": "Searching",
+    "dataStructures": "Data Structures",
+    "dp": "Dynamic Programming",
+    "reference": "Reference",
+    "bigO": "Big-O",
+    "compare": "Compare",
+    "searchPlaceholder": "Search algorithms…",
+    "playground": "Playground"
+  },
+  "controls": {
+    "play": "Play",
+    "pause": "Pause",
+    "stepBack": "Step Back",
+    "stepForward": "Step Forward",
+    "reset": "Reset",
+    "speed": "Speed",
+    "step": "Step",
+    "of": "of"
+  },
+  "input": {
+    "preset": "Preset",
+    "custom": "Custom array",
+    "customPlaceholder": "e.g. 5,3,8,1,9,2",
+    "target": "Target",
+    "targetPlaceholder": "Search target",
+    "run": "Run",
+    "apply": "Apply",
+    "presetRandom": "Random",
+    "presetNearly": "Nearly ↑",
+    "presetReversed": "Reversed",
+    "presetEqual": "Equal"
+  },
+  "complexity": {
+    "time": "Time",
+    "space": "Space",
+    "best": "Best",
+    "average": "Average",
+    "worst": "Worst"
+  },
+  "tabs": {
+    "typescript": "TypeScript",
+    "python": "Python",
+    "c": "C",
+    "java": "Java",
+    "go": "Go"
+  },
+  "hero": {
+    "title": "DSA Visualizer",
+    "tagline": "Learn algorithms through interactive animations",
+    "subtitle": "Step-by-step visualizations for 25 algorithms across 4 categories. Free, open-source, and designed for students.",
+    "explore": "Explore Algorithms",
+    "viewSource": "View Source"
+  },
+  "back": "← Back",
+  "algorithms": "Algorithms",
+  "home": {
+    "stats": "{{categories}} categories · {{total}} algorithms",
+    "algorithmCount": "{{count}} algorithms"
+  },
+  "viz": {
+    "notFound": "Algorithm not found.",
+    "goHome": "Go home",
+    "hideCode": "Hide code",
+    "showCode": "Code",
+    "modeArray": "Array",
+    "modeClassic": "Classic"
+  },
+  "infopanel": {
+    "complexity": "Complexity",
+    "about": "About"
+  },
+  "search": {
+    "quickAccess": "Quick Access",
+    "noResults": "No algorithms found for \"{{query}}\"",
+    "recent": "Recent",
+    "navigate": "Navigate",
+    "jump": "Jump",
+    "close": "Close"
+  },
+  "tags": "Tags",
+  "description": "Description",
+  "whenToUse": "When to use",
+  "codeline": "Line",
+  "compare": {
+    "subtitle": "Side-by-Side",
+    "title": "Compare Algorithms",
+    "algoA": "Algorithm A",
+    "algoB": "Algorithm B",
+    "vs": "VS",
+    "linkedPlayback": "Linked Playback",
+    "linkPlayback": "Link Playback",
+    "selectAlgoA": "Select Algorithm A",
+    "selectAlgoB": "Select Algorithm B",
+    "complexityComparison": "Complexity Comparison",
+    "metric": "Metric",
+    "winner": "Winner",
+    "tie": "Tie",
+    "selectAlgorithm": "Select algorithm…",
+    "noAlgorithm": "No algorithm selected",
+    "loading": "Loading…",
+    "onlyCategory": "only"
+  },
+  "reference": {
+    "subtitle": "Big-O Reference",
+    "title": "Complexity Cheat Sheet",
+    "description": "Time and space complexity for all {{count}} algorithms, filterable by category.",
+    "all": "All",
+    "headers": {
+      "algorithm": "Algorithm",
+      "category": "Category",
+      "best": "Best",
+      "avg": "Average",
+      "worst": "Worst",
+      "space": "Space",
+      "tags": "Tags"
+    },
+    "bigOGuide": "Big-O Notation Guide",
+    "bigODesc": "Interactive growth curves, complexity cards, and algorithm examples — all in one place.",
+    "openGuide": "→ Open Guide",
+    "footerLink": "Click any algorithm name to open its interactive visualizer."
+  },
+  "bigo": {
+    "subtitle": "Complexity Theory",
+    "title": "Big-O Notation",
+    "description": "How algorithms scale with input size n — the lens every engineer needs.",
+    "curvesTitle": "Growth Curves",
+    "curvesDesc": "Operations vs. input size n = 1..20 — y-axis capped at {{ymax}} for readability",
+    "ymax": "y max",
+    "inputSize": "Input size (n)",
+    "classesTitle": "The Six Classes",
+    "examples": "Examples in AlgoFlow",
+    "fullCheatSheet": "→ Full Cheat Sheet",
+    "footerLink": "Click any algorithm name to open its interactive visualizer.",
+    "classes": {
+      "constant": { "label": "Constant", "desc": "Fixed time regardless of input size. The gold standard — as close to instant as algorithms get." },
+      "logarithmic": { "label": "Logarithmic", "desc": "Halves the search space each step. Blazingly fast even on inputs with millions of elements." },
+      "linear": { "label": "Linear", "desc": "Grows directly with input size. Acceptable for most real-world workloads." },
+      "linearithmic": { "label": "Linearithmic", "desc": "The theoretical lower bound for comparison sorts. Most efficient general-purpose sorts land here." },
+      "quadratic": { "label": "Quadratic", "desc": "Nested iteration. Fine for small datasets — painfully slow beyond ~1,000 elements." },
+      "exponential": { "label": "Exponential", "desc": "Doubles with each additional element. Only practical for tiny inputs — think n < 20." }
+    },
+    "examplesList": {
+      "arrayAccess": "Array Access",
+      "hashTableLookup": "Hash Table Lookup",
+      "stackPushPop": "Stack Push / Pop",
+      "binarySearch": "Binary Search",
+      "bstOperations": "BST Operations",
+      "linearSearch": "Linear Search",
+      "bfs": "BFS",
+      "dfs": "DFS",
+      "mergeSort": "Merge Sort",
+      "heapSort": "Heap Sort",
+      "quickSort": "Quick Sort (avg)",
+      "bubbleSort": "Bubble Sort",
+      "selectionSort": "Selection Sort",
+      "insertionSort": "Insertion Sort",
+      "fibonacci": "Fibonacci (naïve)",
+      "knapsack": "Knapsack (brute)"
+    }
+  }
+}
