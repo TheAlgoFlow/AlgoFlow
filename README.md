@@ -1,140 +1,129 @@
 # AlgoFlow
 
-> Step through algorithms, not just read about them.
+Interactive algorithm visualizer with step-by-step code execution across 8 languages.
 
-**AlgoFlow** is an interactive algorithm visualizer built with Next.js 16. Watch sorting, searching, graph traversal, data structures, and dynamic programming algorithms execute frame by frame — with full playback controls, complexity references, and side-by-side comparison.
+## Project structure
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
-![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8?style=flat-square&logo=tailwindcss)
-![License](https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square)
-
----
+```
+AlgoFlow/
+├── frontend/          # Next.js 16 app (React 19, TypeScript, Tailwind CSS 4)
+│   ├── src/
+│   │   ├── algorithms/      # 31 algorithms across 4 categories
+│   │   ├── app/             # Next.js App Router pages
+│   │   ├── components/      # UI atoms, molecules, organisms, visualizers
+│   │   ├── engine/          # AlgorithmFrame types + execution model
+│   │   ├── hooks/           # useAlgorithmPlayer, useCodeExecution
+│   │   ├── i18n/            # EN / PT translations
+│   │   └── types/           # Execution trace types (Playground)
+│   └── public/
+│       ├── locales/         # i18n JSON files
+│       └── logos/           # Language SVG logos
+└── backend/           # Python FastAPI — code execution engine
+    ├── main.py
+    ├── executors/
+    │   ├── python_executor.py    # sys.settrace step tracer
+    │   ├── js_executor.py        # V8 Inspector (CDP) step tracer
+    │   ├── ts_executor.py        # esbuild/tsc transpile → JS tracer
+    │   ├── c_executor.py         # GCC -g + GDB MI step tracer
+    │   ├── go_executor.py        # go build -gcflags -N -l + GDB MI
+    │   ├── csharp_executor.py    # dotnet instrumented run
+    │   └── java_executor.py      # javac + source instrumentation
+    └── requirements.txt
+```
 
 ## Features
 
-- **Step-by-step playback** — scrub forward/backward through every state change in an algorithm's execution
-- **25 algorithms** across 4 categories, all with frame-accurate visualization
-- **Code panel** — highlighted pseudocode synced to the current execution step
-- **Side-by-side compare** — run two algorithms simultaneously with linked or independent playback
-- **Complexity reference** — Big-O cheat sheet with time/space complexity for every algorithm
-- **Custom input** — test algorithms against your own data
-- **Responsive design** — works on desktop and tablet
-- **i18n ready** — internationalization support built in
+- **Visualizer** — step-by-step animation for 31 algorithms (sorting, searching, data structures, dynamic programming)
+- **Code panel** — 8 language tabs per algorithm: C, C++, C#, Java, Python, Go, JavaScript, TypeScript
+- **Playground** — write your own code, run it, and watch memory allocation, stack frames, and heap objects evolve step by step (Python Tutor style)
+- **Reference** — Big-O cheat sheet, algorithm comparison
+- **i18n** — English and Portuguese
 
----
+## Running with Docker (recommended)
 
-## Algorithm Library
-
-| Category | Algorithms |
-|---|---|
-| **Sorting** | Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort, Heap Sort, Counting Sort, Radix Sort |
-| **Searching** | Linear Search, Binary Search, BFS, DFS |
-| **Data Structures** | Array Operations, Linked List, Stack, Queue, Binary Tree, BST, Hash Table, Min-Heap |
-| **Dynamic Programming** | Fibonacci, 0/1 Knapsack, Longest Common Subsequence, Longest Increasing Subsequence, Coin Change |
-
----
-
-## Getting Started
-
-**Prerequisites:** Node.js 18+
+Single command — no toolchain installations needed:
 
 ```bash
-# Clone the repo
-git clone https://github.com/your-username/algoflow.git
-cd algoflow
+docker compose up --build
+```
 
-# Install dependencies
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8000`
+
+To deploy with a custom backend URL (e.g. a VPS):
+
+```bash
+docker compose build --build-arg NEXT_PUBLIC_BACKEND_URL=https://api.yourdomain.com frontend
+docker compose up
+```
+
+---
+
+## Running locally (manual)
+
+### Frontend
+
+```bash
+cd frontend
 npm install
-
-# Start the dev server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Opens at `http://localhost:3000`.
 
----
+### Backend (required for Playground)
 
-## Project Structure
+**System requirements:**
 
-```
-src/
-├── algorithms/          # Algorithm implementations + frame generators
-│   ├── sorting/
-│   ├── searching/
-│   ├── data-structures/
-│   └── dp/
-├── app/                 # Next.js App Router pages
-│   ├── page.tsx         # Homepage
-│   ├── reference/       # Big-O complexity cheat sheet
-│   ├── compare/         # Side-by-side algorithm comparison
-│   └── visualizer/
-│       └── [category]/
-│           └── [slug]/  # Individual visualizer
-├── components/
-│   ├── atoms/
-│   ├── molecules/       # PlaybackControls, CodePanel, SearchOverlay, AlgorithmCard
-│   └── organisms/       # Nav
-├── engine/              # Core types and frame engine
-├── hooks/               # useAlgorithmPlayer playback hook
-└── i18n/                # Internationalization context
-```
+| Tool | Version | Purpose |
+|------|---------|---------|
+| Python | 3.11+ | Backend runtime |
+| Node.js | 18+ | JavaScript / TypeScript tracing |
+| GCC / G++ | any | C / C++ compilation |
+| GDB | any | C / C++ / Go step debugging |
+| Go | 1.21+ | Go compilation |
+| JDK | 11+ | Java compilation |
+| .NET SDK | 7+ | C# compilation |
+| esbuild *(optional)* | any | Faster TypeScript transpilation |
 
----
+```bash
+cd backend
+python -m venv .venv
 
-## How It Works
+# Windows
+.venv\Scripts\activate
+# macOS / Linux
+source .venv/bin/activate
 
-Each algorithm is implemented as a **frame generator** — a pure function that produces snapshots of program state at every meaningful step. The visualizer replays these frames, letting you scrub through execution at your own pace.
-
-```ts
-// Every algorithm exports a generate() function that produces frames
-export function generate(input: number[]): AlgorithmFrame[] {
-  const frames: AlgorithmFrame[] = []
-  // ... algorithm logic, push a frame on each state change
-  return frames
-}
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
 
-The `useAlgorithmPlayer` hook manages playback state: play/pause, speed, step navigation, and progress.
+The frontend reads `NEXT_PUBLIC_BACKEND_URL` (default `http://localhost:8000`).  
+Create `frontend/.env.local` to override:
 
----
+```
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+```
 
-## Tech Stack
+## Supported languages
 
-| Tool | Role |
-|---|---|
-| [Next.js 16](https://nextjs.org) | Framework (App Router) |
-| [React 19](https://react.dev) | UI |
-| [TypeScript 5](https://typescriptlang.org) | Type safety |
-| [Tailwind CSS 4](https://tailwindcss.com) | Styling |
-| [Framer Motion](https://www.framer.com/motion/) | Animations |
-| [Recharts](https://recharts.org) | Charts (complexity graphs) |
-| [Prism React Renderer](https://github.com/FormidableLabs/prism-react-renderer) | Code highlighting |
+| Language | Visualizer snippets | Playground tracing |
+|----------|--------------------|--------------------|
+| C | ✓ | ✓ GCC + GDB MI |
+| C++ | ✓ | ✓ G++ + GDB MI |
+| C# | ✓ | ✓ dotnet + source instrumentation |
+| Java | ✓ | ✓ javac + source instrumentation |
+| Python | ✓ | ✓ sys.settrace (full heap model) |
+| Go | ✓ | ✓ go build + GDB MI |
+| JavaScript | ✓ | ✓ Node.js V8 Inspector (CDP) |
+| TypeScript | ✓ | ✓ esbuild/tsc → JS tracer |
 
----
+## Algorithm categories
 
-## Contributing
-
-Contributions are welcome — especially new algorithms and visualizer renderers.
-
-1. Fork the repo
-2. Create a branch: `git checkout -b feat/my-algorithm`
-3. Add your algorithm in `src/algorithms/<category>/my-algorithm.ts`
-4. Register it in `src/algorithms/index.ts`
-5. Open a pull request
-
-See the existing algorithm files for the expected shape of `meta`, `generate()`, and the frame types in `src/engine/types.ts`.
-
----
-
-## License
-
-Apache 2.0 — free to use, fork, and build on. See [LICENSE](./LICENSE) for details.
-Copyright 2026 Wide Chain & Co.
-
----
-
-<p align="center">
-  Built for learners, by learners.
-</p>
+| Category | Count |
+|----------|-------|
+| Sorting | 9 (Bubble, Insertion, Selection, Shell, Merge, Quick, Heap, Counting, Radix) |
+| Searching | 4 (Linear, Binary, BFS, DFS) |
+| Data Structures | 13 (Linked List, Stack, Queue, BST, Min-Heap, Hash Table, B-Tree family…) |
+| Dynamic Programming | 5 (Fibonacci, Knapsack, LCS, LIS, Coin Change) |
