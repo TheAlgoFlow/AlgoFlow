@@ -5,7 +5,9 @@ import type { Language, ExecutionResult, TraceStep } from '@/types/execution'
 
 function resolveExecuteUrl(): string {
   const raw = process.env.NEXT_PUBLIC_BACKEND_URL?.trim()
-  const base = raw && raw.length > 0 ? raw.replace(/\/+$/, '') : 'http://localhost:8000'
+  const candidate = raw && raw.length > 0 ? raw : 'http://localhost:8000'
+  const withProtocol = /^https?:\/\//i.test(candidate) ? candidate : `https://${candidate}`
+  const base = withProtocol.replace(/\/+$/, '')
   return base.endsWith('/execute') ? base : `${base}/execute`
 }
 
