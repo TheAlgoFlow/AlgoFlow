@@ -3,7 +3,13 @@
 import { useState, useCallback } from 'react'
 import type { Language, ExecutionResult, TraceStep } from '@/types/execution'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000'
+function resolveExecuteUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_BACKEND_URL?.trim()
+  const base = raw && raw.length > 0 ? raw.replace(/\/+$/, '') : 'http://localhost:8000'
+  return base.endsWith('/execute') ? base : `${base}/execute`
+}
+
+const EXECUTE_URL = resolveExecuteUrl()
 
 type Status = 'idle' | 'running' | 'done' | 'error'
 
@@ -20,7 +26,7 @@ export function useCodeExecution() {
     setStepIndex(0)
 
     try {
-      const res = await fetch(`${BACKEND_URL}/execute`, {
+      const res = await fetch(EXECUTE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code, language }),
@@ -28,7 +34,7 @@ export function useCodeExecution() {
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        throw new Error(body.detail ?? `Server error ${res.status}`)
+        throw new Error(body.detail ?? `Server error ${res.status} at ${EXECUTE_URL}`)
       }
 
       const data: ExecutionResult = await res.json()
