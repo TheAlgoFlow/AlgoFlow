@@ -1,8 +1,14 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { loader } from '@monaco-editor/react'
 import type { Language } from '@/types/execution'
 import { useTheme } from '@/i18n/theme-context'
+
+// Force Monaco to load from CDN instead of local files — avoids 404 + "Unexpected token 'export'" on workers
+loader.config({
+  paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.0/min/vs' },
+})
 
 const MonacoEditor = dynamic(() => import('@monaco-editor/react'), { ssr: false })
 
